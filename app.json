@@ -3,8 +3,12 @@
     "name": "Alphys",
     "slug": "Alphys",
     "version": "1.0.0",
+    "scheme": "Alphys",
     "assetBundlePatterns": [
       "**/*"
+    ],
+    "plugins": [
+      "expo-router"
     ]
   }
 }

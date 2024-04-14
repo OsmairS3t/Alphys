@@ -1,9 +1,22 @@
-import { Stack } from 'expo-router/stack';
+import { Stack } from "expo-router";
 
-export default function AppLayout() {
+export default function Layout() {
   return (
-    <Stack>
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-    </Stack>
+    <>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          headerStyle: {
+            backgroundColor: '#f4511e',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+        }}
+      >
+        <Stack.Screen name="index" />
+      </Stack>
+    </>
   );
 }

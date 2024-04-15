@@ -1,22 +1,22 @@
 export interface ICategory {
   id: string;
-  nameCategory: string;
+  name: string;
 }
 export interface IProduct {
   id: string;
   category: ICategory;
-  nameProduct: string;
+  name: string;
   price: number;
   photo: string;
 }
 export interface IClient {
   id: string;
-  nameClient: string;
+  name: string;
   photo: string;
 }
 export interface IPurchase {
   id: string;
-  nameItem: string;
+  name: string;
   amount: number;
   price: number;
 }

@@ -3,7 +3,7 @@
     "name": "Alphys",
     "slug": "Alphys",
     "version": "1.0.0",
-    "scheme": "Alphys",
+    "scheme": "alphys",
     "assetBundlePatterns": [
       "**/*"
     ],

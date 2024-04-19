@@ -7,8 +7,32 @@
     "assetBundlePatterns": [
       "**/*"
     ],
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#D45C05"
+    },
+    "android": {
+      "package": "com.os3tdev.Alpys"
+    },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      ["@morrowdigital/watermelondb-expo-plugin"],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "kotlinVersion": "1.6.10",
+            "packagingOptions": {
+              "pickFirst": [
+                "**/libc++_shared.so"
+              ]
+            }
+          }
+        }
+      ]
     ]
   }
 }

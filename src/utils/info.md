@@ -5,3 +5,6 @@ em outra aba rodar a aplicação com:
 npx react-native run-android
 
 https://www.youtube.com/watch?v=r4aAlsbF1DM
+
+plugin watermelowdb + expo 
+https://www.themorrow.digital/blog/how-to-use-watermelondb-with-react-native-expo

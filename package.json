@@ -9,23 +9,32 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@expo-google-fonts/roboto": "^0.2.3",
     "@expo/vector-icons": "^14.0.0",
+    "@morrowdigital/watermelondb-expo-plugin": "^2.3.1",
     "@nozbe/watermelondb": "^0.27.1",
     "@types/react": "~18.2.45",
-    "expo": "~50.0.14",
-    "expo-constants": "~15.4.5",
+    "expo": "~50.0.17",
+    "expo-build-properties": "~0.11.1",
+    "expo-constants": "~15.4.6",
+    "expo-google-fonts": "^0.0.0",
     "expo-linking": "~6.2.2",
     "expo-router": "~3.4.8",
     "expo-status-bar": "~1.11.1",
     "react": "18.2.0",
     "react-native": "0.73.6",
+    "react-native-reanimated": "^3.8.1",
     "react-native-safe-area-context": "4.8.2",
     "react-native-screens": "~3.29.0",
+    "styled-components": "^6.1.8",
     "typescript": "^5.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
     "@babel/plugin-proposal-decorators": "^7.24.1"
   },
-  "private": true
+  "private": true,
+  "resolutions": {
+    "styled-components": "^5"
+  }
 }

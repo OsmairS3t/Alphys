@@ -1,19 +1,21 @@
-import { Pressable, Text, View } from "react-native";
+import { Pressable } from "react-native";
 import { useRouter } from "expo-router";
+
+import { Container, LabelForm, ButtonSignIn, TextButton } from './styles/global'
 
 export default function Login() {
   const router = useRouter();
 
   function handleLogIn() {
-    router.replace('/(tabs)/register')
+    router.replace('/(tabs)/transactions')
   }
 
   return (
-    <View>
-      <Text>Log In</Text>
-      <Pressable onPress={handleLogIn}>
-        <Text>Entrar</Text>
-      </Pressable>
-    </View>
+    <Container>
+      <LabelForm>Log In</LabelForm>
+      <ButtonSignIn onPress={handleLogIn}>
+        <TextButton>Entrar</TextButton>
+      </ButtonSignIn>
+    </Container>
   )
 }

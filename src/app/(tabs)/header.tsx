@@ -1,6 +1,8 @@
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { Alert, Pressable, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
+
+import { ContainerHeader, ContainerImgHeader, ImgLogoHeader, IconSignOut } from '../styles/global';
 
 export default function Header() {
   const router = useRouter()
@@ -9,28 +11,16 @@ export default function Header() {
     router.replace('/')
   }
 
+  const logo = '../../assets/logo_alpys.png';
+
   return (
-    <View
-      style={{
-        height: 100,
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 20,
-        backgroundColor: '#f4511e'
-      }}
-    >
-      <View
-        style={{
-          width: '80%',
-          alignItems: 'center'
-        }}
-      >
-        <Text>HEADER</Text>
-      </View>
+    <ContainerHeader>
+      <ContainerImgHeader>
+        <ImgLogoHeader source={require(logo)} />
+      </ContainerImgHeader>
       <Pressable onPress={handleLogOut}>
-        <Text>Sair</Text>
+        <IconSignOut name='log-out' />
       </Pressable>
-    </View>
+    </ContainerHeader>
   )
 }

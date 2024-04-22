@@ -1,16 +1,16 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 
-import { Container, Title } from '../styles/productStyle';
+import { Container, Title } from '../styles/clientStyle';
 
-type ProductProps = {
+type ClientProps = {
   closeModal: (value: boolean) => void;
 }
 
-export default function Product({ closeModal }: ProductProps) {
+export default function Client({ closeModal }: ClientProps) {
   return (
     <Container>
-      <Title>PRODUCT</Title>
+      <Title>CLIENTES</Title>
       <Pressable onPress={()=>closeModal(false)}>
         <Text>Fechar</Text>
       </Pressable>

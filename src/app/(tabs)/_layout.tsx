@@ -23,10 +23,21 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="settings"
+          name="transactions"
           options={{
-            title: 'Settings',
-            tabBarIcon: ({ color }) => <FontAwesome size={28} name="cog" color={color} />,
+            title: 'Home',
+            tabBarIcon: ({ color }) => <FontAwesome size={28} name="home" color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="settings"
+          options={{ href: null }}
+        />
+        <Tabs.Screen
+          name="stock"
+          options={{
+            title: 'Estoque',
+            tabBarIcon: ({ color }) => <FontAwesome size={28} name="book" color={color} />,
           }}
         />
       </Tabs>

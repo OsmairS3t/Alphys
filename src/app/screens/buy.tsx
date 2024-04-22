@@ -1,16 +1,16 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 
-import { Container, Title } from '../styles/productStyle';
+import { Container, Title } from '../styles/buyStyle';
 
-type ProductProps = {
+type BuyProps = {
   closeModal: (value: boolean) => void;
 }
 
-export default function Product({ closeModal }: ProductProps) {
+export default function Buy({ closeModal }: BuyProps) {
   return (
     <Container>
-      <Title>PRODUCT</Title>
+      <Title>COMPRAS</Title>
       <Pressable onPress={()=>closeModal(false)}>
         <Text>Fechar</Text>
       </Pressable>

@@ -18,7 +18,11 @@ export default {
     
     title: '#F5F2F2',
     text:'#818181',
+    text_placeholder: '#999999',
     background: '#1B0D00',
+
+    border_input: '#999999',
+    bg_input: '#f5f2f2',
   },
 
   fonts: {

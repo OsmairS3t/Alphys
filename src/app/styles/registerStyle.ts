@@ -2,12 +2,14 @@ import { RFValue } from "react-native-responsive-fontsize";
 import { styled } from "styled-components/native";
 
 export const Container = styled.View`
+  background-color: ${({ theme }) => theme.colors.background};
   flex: 1;
 `;
 
 export const Title = styled.Text`
   color: ${({ theme }) => theme.colors.title};
-  font-size: ${RFValue(14)}px;
+  font-size: ${RFValue(18)}px;
+  padding: 10px 10px 0px 10px;
   `;
 
 export const ListGroup = styled.View`
@@ -20,9 +22,10 @@ export const ItemList = styled.View`
   justify-content: center;
   gap: 10px;
   width: 100%;
-  `;
+`;
 
 export const Item = styled.Pressable`
+  background-color: ${({ theme }) => theme.colors.shape};
   justify-content: center;
   align-items: center;
   width: 100%;

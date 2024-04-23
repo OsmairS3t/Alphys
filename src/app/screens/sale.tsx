@@ -1,7 +1,9 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
+import HeaderModal from '../components/HeaderModal';
 
-import { Container, Title } from '../styles/saleStyle';
+import { Container } from '../styles/saleStyle';
+import { TitleModal } from '../styles/global';
 
 type SaleProps = {
   closeModal: (value: boolean) => void;
@@ -10,7 +12,9 @@ type SaleProps = {
 export default function Sale({ closeModal }: SaleProps) {
   return (
     <Container>
-      <Title>VENDAS</Title>
+      <HeaderModal closeModal={()=>closeModal(false)} titleModal='CADASTRO DE VENDAS' />
+
+      <TitleModal>NOVA VENDA</TitleModal>
       <Pressable onPress={()=>closeModal(false)}>
         <Text>Fechar</Text>
       </Pressable>

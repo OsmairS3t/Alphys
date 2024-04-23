@@ -2,42 +2,48 @@ import React from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Tabs } from 'expo-router';
 import Header from './header';
+import { useTheme } from 'styled-components';
 
 export default function TabLayout() {
+  const theme = useTheme();
+
   return (
     <>
       <Header />
       <Tabs
         screenOptions={{
           headerShown: false,
-          tabBarActiveTintColor: 'blue',
-          headerTintColor: '#fff',
+          tabBarInactiveTintColor: theme.colors.secondary_light,
+          tabBarActiveTintColor: theme.colors.secondary,
+          tabBarStyle: {
+            height: 50,
+            backgroundColor: theme.colors.background,
+            borderWidth: 0,
+            borderColor: theme.colors.secondary,
+        },
         }}
       >
         <Tabs.Screen name="header" options={{ href: null }} />
         <Tabs.Screen
           name="register"
           options={{
-            title: 'Cadastros',
-            tabBarIcon: ({ color }) => <FontAwesome size={28} name="list-alt" color={color} />,
+            title: 'CADASTROS',
+            tabBarIcon: ({ color }) => <FontAwesome size={24} name="list-alt" color={color} />,
           }}
         />
         <Tabs.Screen
           name="transactions"
           options={{
-            title: 'Home',
-            tabBarIcon: ({ color }) => <FontAwesome size={28} name="home" color={color} />,
+            title: 'HOME',
+            tabBarIcon: ({ color }) => <FontAwesome size={24} name="home" color={color} />,
           }}
         />
-        <Tabs.Screen
-          name="settings"
-          options={{ href: null }}
-        />
+        <Tabs.Screen name="settings" options={{ href: null }} />
         <Tabs.Screen
           name="stock"
           options={{
-            title: 'Estoque',
-            tabBarIcon: ({ color }) => <FontAwesome size={28} name="book" color={color} />,
+            title: 'ESTOQUE',
+            tabBarIcon: ({ color }) => <FontAwesome size={24} name="book" color={color} />,
           }}
         />
       </Tabs>

@@ -1,9 +1,10 @@
 export default {
   colors: {
     primary: '#5A2600',
+    primary_light: '#9c6b48',
     
     secondary: '#D45C05',
-    secondary_light: 'rgba(90, 38, 0, 0.1)',
+    secondary_light: '#ffc59c',
     
     success: '#12a454',
     success_light: 'rgba(18, 164, 84, 0.5)',
@@ -18,6 +19,7 @@ export default {
     
     title: '#F5F2F2',
     text:'#818181',
+    text_title: '#313131',
     text_placeholder: '#999999',
     background: '#1B0D00',
 

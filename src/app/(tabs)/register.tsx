@@ -26,7 +26,7 @@ export default function Register() {
 
   return (
     <Container>
-      <Title>Cadastros</Title>
+      <Title>Cadastros:</Title>
       <ListGroup>
         <ItemList>
           <Item onPress={() => handleModalRegister('category')}>

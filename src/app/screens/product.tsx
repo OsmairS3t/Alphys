@@ -1,7 +1,9 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
+import HeaderModal from '../components/HeaderModal';
 
-import { Container, Title } from '../styles/productStyle';
+import { Container } from '../styles/productStyle';
+import { TitleModal } from '../styles/global';
 
 type ProductProps = {
   closeModal: (value: boolean) => void;
@@ -10,7 +12,9 @@ type ProductProps = {
 export default function Product({ closeModal }: ProductProps) {
   return (
     <Container>
-      <Title>PRODUCT</Title>
+      <HeaderModal closeModal={()=>closeModal(false)} titleModal='CADASTRO DE PRODUTOS' />
+
+      <TitleModal>NOVO CADASTRO</TitleModal>
       <Pressable onPress={()=>closeModal(false)}>
         <Text>Fechar</Text>
       </Pressable>

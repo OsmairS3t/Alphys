@@ -23,9 +23,54 @@ export const ButtonSignIn = styled.Pressable`
   background-color: ${({ theme }) => theme.colors.secondary};
 `;
 
+export const ButtonForm = styled.Pressable`
+  border-radius: 4px;
+  width: 100%;
+  height: 40px;
+  justify-content: center;
+  align-items: center;
+  background-color: ${({ theme }) => theme.colors.secondary};
+`;
+
+export const ButtonCloseModal = styled.Pressable`
+  border-radius: 4px;
+  width: 32px;
+  height: 32px;
+  justify-content: center;
+  align-items: center;
+  background-color: ${({ theme }) => theme.colors.shape};
+`;
+
 export const TextButton = styled.Text`
   font-size: 24px;
   color: ${({ theme }) => theme.colors.title};
+`;
+
+export const TextButtonModal = styled.Text`
+  font-size: 24px;
+  color: ${({ theme }) => theme.colors.secondary};
+`;
+
+export const HeaderContainerModaL = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  height: 50px;
+  padding: 0px 8px;
+  background-color: ${({ theme }) => theme.colors.secondary};
+`;
+
+export const TitleModal = styled.Text`
+  color: ${({ theme }) => theme.colors.title};
+  font-size: ${RFValue(14)}px;
+`;
+
+export const TitleForm = styled.Text`
+  font-size: ${RFValue(14)}px;
+  color: ${({ theme }) => theme.colors.title};
+  width: 100%;
+  text-align: center;
+  margin: 10px 0px;
 `;
 
 export const ContainerHeader = styled.View`
@@ -52,8 +97,6 @@ export const ImgLogoHeader = styled.Image`
   height: 65px;
 `;
 
-export const IconSignOut = styled(Feather).attrs({
-  size: 32
-})`
+export const IconSignOut = styled(Feather).attrs({ size: 24 })`
   color: ${({ theme }) => theme.colors.shape};
 `;

@@ -25,7 +25,7 @@ export const ItemList = styled.View`
 `;
 
 export const Item = styled.Pressable`
-  background-color: ${({ theme }) => theme.colors.shape};
+  background-color: ${({ theme }) => theme.colors.shape_transparent};
   justify-content: center;
   align-items: center;
   width: 100%;

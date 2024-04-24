@@ -13,6 +13,7 @@ export default {
     attention_light: 'rgba(232, 63,91,0.5)',
 
     shape: '#ffffff',
+    shape_transparent: '#ffffff95',
     shape_light10: 'rgba(255,255,255,0.10)',
     shape_light: 'rgba(255,255,255,0.70)',
     light: '#ffffff',

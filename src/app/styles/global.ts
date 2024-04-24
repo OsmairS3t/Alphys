@@ -4,9 +4,27 @@ import styled from "styled-components/native";
 
 export const Container = styled.View`
   flex: 1;
-  background-color: ${({ theme }) => theme.colors.shape};
+  background-color: ${({ theme }) => theme.colors.background};
+  padding: 10px;
+`;
+
+export const ContainerSignIn = styled.View`
+  flex: 1;
+  padding: 20px;
+  background-color: ${({ theme }) => theme.colors.secondary};
   justify-content: center;
   align-items: center;
+  gap: 60px;
+`;
+
+export const ImgLogoLogin = styled.Image`
+  width: 150px;
+  height: 65px;
+`;
+
+export const ImgCredit = styled.Image`
+  width: 20px;
+  height: 20px;
 `;
 
 export const LabelForm = styled.Text`
@@ -14,13 +32,26 @@ export const LabelForm = styled.Text`
   color: ${({ theme }) => theme.colors.text};  
 `;
 
+export const Form = styled.View`
+  width: 100%;
+`;
+
 export const ButtonSignIn = styled.Pressable`
   border-radius: 10px;
-  width: 90%;
+  width: 100%;
   height: 60px;
   justify-content: center;
   align-items: center;
-  background-color: ${({ theme }) => theme.colors.secondary};
+  border-width: 1px;
+  border-style: solid;
+  border-color: ${({ theme }) => theme.colors.primary};
+  background-color: ${({ theme }) => theme.colors.secondary_light};
+`;
+
+export const TextButtonSignIn = styled.Text`
+  font-size: 24px;
+  font-weight: bold;
+  color: ${({ theme }) => theme.colors.secondary};
 `;
 
 export const ButtonForm = styled.Pressable`

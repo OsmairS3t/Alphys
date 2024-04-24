@@ -1,6 +1,10 @@
 export interface IIcon {
   name: string;
 }
+export interface ISelectProps {
+  key: string;
+  value: string;
+}
 export interface ICategory {
   id: string;
   name: string;
@@ -33,7 +37,8 @@ export interface ISale {
 }
 export interface IStock {
   id: string;
-  product: IProduct;
+  codproduct: string;
+  product: string;
   amount: number;
   hasStock: boolean;
 }

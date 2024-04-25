@@ -26,6 +26,7 @@ export default {
 
     border_input: '#999999',
     bg_input: '#f5f2f2',
+    bg_form: '#ebebed',
   },
 
   fonts: {

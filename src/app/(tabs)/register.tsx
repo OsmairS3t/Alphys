@@ -48,8 +48,8 @@ export default function Register() {
       </ListGroup>
 
       <Modal 
+        transparent={true}
         animationType='slide' 
-        presentationStyle='pageSheet'
         visible={isCategoryModalOpen} 
         onRequestClose={() => {
           setIsCategoryModalOpen(!isCategoryModalOpen)
@@ -58,8 +58,8 @@ export default function Register() {
       </Modal>
 
       <Modal 
+        transparent={true}
         animationType='slide' 
-        presentationStyle='pageSheet'
         visible={isProductModalOpen} 
         onRequestClose={() => {
           setIsProductModalOpen(!isProductModalOpen)
@@ -68,8 +68,8 @@ export default function Register() {
       </Modal>
 
       <Modal 
+        transparent={true}
         animationType='slide' 
-        presentationStyle='pageSheet'
         visible={isBuyModalOpen} 
         onRequestClose={() => {
           setIsBuyModalOpen(!isBuyModalOpen)
@@ -78,8 +78,8 @@ export default function Register() {
       </Modal>
 
       <Modal 
+        transparent={true}
         animationType='slide' 
-        presentationStyle='pageSheet'
         visible={isSaleModalOpen} 
         onRequestClose={() => {
           setIsSaleModalOpen(!isSaleModalOpen)
@@ -88,8 +88,8 @@ export default function Register() {
       </Modal>
 
       <Modal 
+        transparent={true}
         animationType='slide' 
-        presentationStyle='pageSheet'
         visible={isClientModalOpen} 
         onRequestClose={() => {
           setIsClientModalOpen(!isClientModalOpen)

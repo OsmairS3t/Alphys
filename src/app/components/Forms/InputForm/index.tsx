@@ -3,13 +3,16 @@ import { TextInputProps } from 'react-native';
 
 import { Container, Input, Error } from './styles';
 
-type Props = TextInputProps;
+// type Props = TextInputProps;
+interface Props extends TextInputProps {
+  error ?: string;
+}
 
-export function InputForm({...rest}: Props) {
+export function InputForm({error, ...rest}: Props) {
   return (
     <Container>
       <Input {...rest} />
-      <Error></Error>
+      <Error>{error}</Error>
     </Container>
   )
 }

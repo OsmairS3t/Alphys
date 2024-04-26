@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import {Alert} from 'react-native'
 import { useTheme } from 'styled-components';
 import { featherIcons } from '../../utils/database';
 import uuid from 'react-native-uuid';
@@ -58,7 +57,7 @@ export default function Category({ closeModal }: CategoryProps) {
       <Controller 
         control={control}
         rules={{
-        maxLength: 100,
+          maxLength: 100,
         }}
         render={({ field: { onChange, onBlur, value } }) => (
           <InputForm 
@@ -66,13 +65,13 @@ export default function Category({ closeModal }: CategoryProps) {
             onBlur={onBlur}
             onChangeText={onChange}
             value={value}
-            error={errors.name?.message}
           />
         )}
         name="name"
       />
 
       <SelectList 
+        placeholder='Icone da categoria'
         boxStyles={{backgroundColor: theme.colors.bg_input, marginBottom: 10}}
         dropdownStyles={{backgroundColor: theme.colors.bg_input}}
         setSelected={(val:string) => setSelectedIcon(val)} 

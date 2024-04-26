@@ -1,6 +1,10 @@
 import { RFValue } from "react-native-responsive-fontsize";
 import { styled } from "styled-components/native";
 
+interface PaidProps {
+  isPaid ?: boolean;
+}
+
 export const Container = styled.View`
   top: 90px;
   background-color: ${({ theme }) => theme.colors.bg_form};
@@ -18,3 +22,28 @@ export const Title = styled.Text`
   text-align: center;
   margin: 10px 0px;
   `;
+
+export const GroupSwitch = styled.View`
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  padding: 0px 10px;
+  margin-bottom: 10px;
+  gap: 5px;
+`;
+
+export const TitleSwitch = styled.Text`
+  color: ${({ theme }) => theme.colors.text_title
+  };
+  font-size: ${RFValue(14)}px;
+  font-weight: bold;
+`;
+
+export const TextSwitch = styled.Text<PaidProps>`
+  color: ${({ theme, isPaid }) => 
+    isPaid ? theme.colors.text_title : theme.colors.attention
+  };
+  font-size: ${RFValue(14)}px;
+  font-weight: bold;
+`;

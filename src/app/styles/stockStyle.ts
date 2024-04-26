@@ -3,9 +3,13 @@ import { RFValue } from "react-native-responsive-fontsize";
 import { styled } from "styled-components/native";
 
 export const Container = styled.View`
-  flex: 1;
-  background-color: ${({ theme }) => theme.colors.background};
+  top: 90px;
+  background-color: ${({ theme }) => theme.colors.bg_form};
   padding: 10px;
+  border-radius: 8px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: ${({ theme }) => theme.colors.shape};
 `;
 
 export const HeaderStock = styled.View`
@@ -17,11 +21,16 @@ export const HeaderStock = styled.View`
   gap: 20px;
 `;
 
-export const ButtonFilterStock = styled(Feather)`
+export const ButtonFilterStock = styled.Pressable`
   width: 30px;
   height: 30px;
   justify-content: center;
   align-items: center;
+`;
+
+export const IconFilterStock = styled(Feather)`
+  width: 28px;
+  height: 28px;
   color: ${({ theme }) => theme.colors.secondary};
 `;
 
@@ -41,9 +50,10 @@ export const TextButtonNewStock = styled.Text`
 `;
 
 export const Title = styled.Text`
-  color: ${({ theme }) => theme.colors.title};
-  font-size: ${RFValue(18)}px;
-  `;
+  color: ${({ theme }) => theme.colors.text_title};
+  font-size: ${RFValue(14)}px;
+  margin: 10px 0px;
+`;
 
 export const GroupStock = styled.View`
   padding-top: 10px;

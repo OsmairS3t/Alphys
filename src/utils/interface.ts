@@ -22,7 +22,7 @@ export interface IClient {
   name: string;
   photo: string;
 }
-export interface IPurchase {
+export interface IBuy {
   id: string;
   name: string;
   amount: number;

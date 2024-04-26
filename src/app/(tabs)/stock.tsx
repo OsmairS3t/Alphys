@@ -1,15 +1,30 @@
 import { useState } from 'react';
 import { Modal, FlatList } from 'react-native';
 import StockProducts from '../screens/stockproducts';
+import FilterStock from '../screens/filterstock';
 import { stocks } from '../../utils/database'
 
 import { Container } from '../styles/global'
-import { HeaderStock, ButtonFilterStock, ButtonNewStock, TextButtonNewStock, Title, GroupStock, ItemStock, TextStock, Separator } from '../styles/stockStyle'
+import { HeaderStock, 
+  ButtonFilterStock, 
+  IconFilterStock,
+  ButtonNewStock, 
+  TextButtonNewStock, 
+  Title, 
+  GroupStock, 
+  ItemStock, 
+  TextStock, 
+  Separator } from '../styles/stockStyle'
 
 export default function Stock() {
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false)
   const [isStockModalOpen, setIsStockModalOpen] = useState(false)
+  
+  function handleFilterModalOpen() {
+    setIsFilterModalOpen(true)
+  }
 
-  function handleModalOpen() {
+  function handleStockModalOpen() {
     setIsStockModalOpen(true)
   }
 
@@ -17,12 +32,10 @@ export default function Stock() {
     <Container>
       <Title>Estoque de produtos e mercadorias:</Title>
       <HeaderStock>
-        <ButtonFilterStock 
-          onPress={()=> {}}
-          name='sliders' 
-          size={24} 
-        />
-        <ButtonNewStock onPress={handleModalOpen}>
+        <ButtonFilterStock onPress={handleFilterModalOpen}>
+          <IconFilterStock name='sliders' size={24} />
+        </ButtonFilterStock>
+        <ButtonNewStock onPress={handleStockModalOpen}>
           <TextButtonNewStock>+</TextButtonNewStock>
         </ButtonNewStock>
       </HeaderStock>
@@ -47,8 +60,18 @@ export default function Stock() {
       </GroupStock>
 
       <Modal 
+        transparent={true}
         animationType='slide' 
-        presentationStyle='pageSheet'
+        visible={isFilterModalOpen} 
+        onRequestClose={() => {
+          setIsFilterModalOpen(!isFilterModalOpen)
+        }}>
+        <FilterStock closeModal={setIsFilterModalOpen} />
+      </Modal>
+
+      <Modal 
+        transparent={true}
+        animationType='slide' 
         visible={isStockModalOpen} 
         onRequestClose={() => {
           setIsStockModalOpen(!isStockModalOpen)

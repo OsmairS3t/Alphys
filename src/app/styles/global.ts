@@ -1,5 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import { RFValue } from "react-native-responsive-fontsize";
+import { MaskedTextInput } from 'react-native-mask-text'
 import styled from "styled-components/native";
 
 export const Container = styled.View`
@@ -61,6 +62,20 @@ export const ButtonForm = styled.Pressable`
   justify-content: center;
   align-items: center;
   background-color: ${({ theme }) => theme.colors.secondary};
+`;
+
+export const InputMask = styled(MaskedTextInput).attrs(({theme}) => ({
+  placeholderTextColor: theme.colors.text_placeholder,
+}))`
+  padding: 10px;
+  margin-bottom: 10px;
+  width: 100%;
+  height: 50px;
+  border: 1px;
+  border-radius: 8px;
+  color: ${({ theme }) => theme.colors.text};
+  border-color: ${({ theme }) => theme.colors.border_input};
+  background-color: ${({ theme }) => theme.colors.bg_input};
 `;
 
 export const ButtonCloseModal = styled.Pressable`
@@ -130,4 +145,12 @@ export const ImgLogoHeader = styled.Image`
 
 export const IconSignOut = styled(Feather).attrs({ size: 24 })`
   color: ${({ theme }) => theme.colors.shape};
+`;
+
+export const Error = styled.Text`
+  font-size: ${RFValue(12)}px;
+  font-family: ${({ theme }) => theme.fonts.regular};
+  color: ${({ theme }) => theme.colors.attention};
+  margin-top: -4px;
+  margin-bottom: 6px;
 `;

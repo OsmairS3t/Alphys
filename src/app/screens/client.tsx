@@ -16,6 +16,10 @@ import { Container,
   PhotoImage, 
   ImgCapture } from '../styles/clientStyle';
 import { ButtonForm, TextButton } from '../styles/global';
+import { IClient } from '../../utils/interface';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { keyClient } from '../../utils/keyStorage';
+import { Alert } from 'react-native';
 
 type ClientProps = {
   closeModal: (value: boolean) => void;
@@ -53,13 +57,24 @@ export default function Client({ closeModal }: ClientProps) {
     }
   } 
 
-  function handleSave() {
+  async function handleSave() {
     const data = {
-      id: uuid.v4(),
+      id: uuid.v4().toString(),
       name: name,
       photo: imgPhoto,
     }
-    console.log(data)
+    try {
+      const response = await AsyncStorage.getItem(keyClient)
+      let oldData: IClient[] = response ? JSON.parse(response) : []
+
+      oldData.push(data)
+
+      await AsyncStorage.setItem(keyClient, JSON.stringify(oldData))
+      Alert.alert('Cliente incluído com sucesso!')
+      closeModal(false);
+    } catch (error) {
+      console.log('Ocorreu um erro ao tentar salvar: ', error)
+    }
   }
 
   return (

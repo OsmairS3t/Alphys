@@ -4,7 +4,7 @@ import { useTheme } from 'styled-components';
 import HeaderModal from '../components/HeaderModal';
 
 import { categories } from '../../utils/database';
-import { ISelectProps } from '../../utils/interface';
+import { IProduct, ISelectProps } from '../../utils/interface';
 
 import uuid from 'react-native-uuid';
 import { useForm, Controller } from 'react-hook-form';
@@ -25,6 +25,9 @@ import {
   PhotoImage, 
   ImgCapture } from '../styles/productStyle';
 import { ButtonForm, TextButton, InputMask } from '../styles/global';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { keyProduct } from '../../utils/keyStorage';
+import { Alert } from 'react-native';
 
 type ProductProps = {
   closeModal: (value: boolean) => void;
@@ -79,15 +82,26 @@ export default function Product({ closeModal }: ProductProps) {
     return category
   }
 
-  function handleSave(formData: TypeData) {
+  async function handleSave(formData: TypeData) {
     const data = {
-      id: uuid.v4(),
+      id: uuid.v4().toString(),
       category: loadCategory(selected),
       name: formData.name,
-      price: priceValue,
+      price: Number(priceValue),
       photo: imgPhoto,
     }
-    console.log(data)
+    try {
+      const response = await AsyncStorage.getItem(keyProduct)
+      let oldData: IProduct[] = response ? JSON.parse(response) : []
+
+      oldData.push(data)
+
+      await AsyncStorage.setItem(keyProduct, JSON.stringify(oldData))
+      Alert.alert('Produto incluído com sucesso!')
+      closeModal(false);
+    } catch (error) {
+      console.log('Ocorreu um erro ao tentar salvar: ', error)
+    }
   }
 
   useEffect(()=>{

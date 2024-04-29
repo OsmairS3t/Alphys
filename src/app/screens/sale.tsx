@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Switch } from 'react-native';
+import { Alert, Switch } from 'react-native';
 import { useTheme } from 'styled-components';
 import HeaderModal from '../components/HeaderModal';
 
-import { ISelectProps } from '../../utils/interface';
+import { IClient, IProduct, ISale, ISelectProps, IStock } from '../../utils/interface';
 import { clients, products } from '../../utils/database';
 import uuid from 'react-native-uuid';
 import { InputForm } from '../components/Forms/InputForm';
@@ -11,6 +11,9 @@ import { SelectList } from 'react-native-dropdown-select-list';
 
 import { Container, Title, GroupSwitch, TitleSwitch, TextSwitch } from '../styles/saleStyle';
 import { ButtonForm, TextButton, InputMask } from '../styles/global';
+import { keyClient, keySale, keyStock } from '../../utils/keyStorage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { actualDate } from '../../utils/functions';
 
 type SaleProps = {
   closeModal: (value: boolean) => void;
@@ -27,23 +30,61 @@ export default function Sale({ closeModal }: SaleProps) {
   const [isPaid, setIsPaid] = useState(false);
   
   function loadClients(idClient: string) {
-    const client = clients.find(cli => cli.id === idClient)
+    const client:IClient | undefined = clients.find(cli => cli.id === idClient)
     return client
   }
   
   function loadProducts(idProduct: string) {
-    const product = products.find(pro => pro.id === idProduct)
+    const product:IProduct | undefined = products.find(pro => pro.id === idProduct)
     return product
   }
 
-  function handleSave() {
+  async function handleSave() {
+    const result = await AsyncStorage.getItem(keyStock)
+    const dataStock: IStock[] = result ? JSON.parse(result) : []
+    const stockFound = dataStock.find(de => de.codproduct === selectedProduct)
+    let stockUpdate = dataStock.filter(de => de.codproduct !== selectedProduct)
+    if(Number(amount) > Number(stockFound?.amount)) {
+      Alert.alert('Não há quantidade disponível para este produto.')
+      return false;
+    } else {
+      const newAmount = Number(stockFound?.amount) - Number(amount)
+      let idProduct=''
+      let nameProduct=''
+      if(stockFound) {
+        idProduct = stockFound.id
+        nameProduct = stockFound.product
+      }
+      const dataNewStock = {
+        id: idProduct,
+        codproduct: selectedProduct,
+        product: nameProduct,
+        amount: newAmount,
+        hasStock: newAmount > 0 ? true : false
+      }
+      stockUpdate.push(dataNewStock)
+    }
     const data = {
-      id: uuid.v4(),
+      id: uuid.v4().toString(),
       client: loadClients(selectedClient),
       product: loadProducts(selectedProduct),
-      amount: amount,
-      price: price,
-      isPaid: isPaid
+      amount: Number(amount),
+      price: Number(price),
+      isPaid: isPaid,
+      dateSale: actualDate()
+  }
+    try {
+      const response = await AsyncStorage.getItem(keySale)
+      let oldData: ISale[] = response ? JSON.parse(response) : []
+
+      oldData.push(data)
+
+      await AsyncStorage.setItem(keyStock, JSON.stringify(stockUpdate))
+      await AsyncStorage.setItem(keyClient, JSON.stringify(oldData))
+      Alert.alert('Venda incluída com sucesso!')
+      closeModal(false);
+    } catch (error) {
+      console.log('Ocorreu um erro ao tentar salvar: ', error)
     }
     console.log(data)
   }

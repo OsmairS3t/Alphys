@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { Modal, FlatList } from 'react-native';
+import { useState, useEffect } from 'react';
+import { Modal, FlatList, Pressable } from 'react-native';
 import StockProducts from '../screens/stockproducts';
 import FilterStock from '../screens/filterstock';
-import { stocks } from '../../utils/database'
+//import { stocks } from '../../utils/database'
 
 import { Container } from '../styles/global'
 import { HeaderStock, 
@@ -13,20 +13,46 @@ import { HeaderStock,
   Title, 
   GroupStock, 
   ItemStock, 
-  TextStock, 
+  LineStock,
+  TextStock,
+  QtdStock,
+  StatusStock,
+  IconStock, 
   Separator } from '../styles/stockStyle'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { keyStock } from '../../utils/keyStorage';
+import { IStock } from '../../utils/interface';
 
 export default function Stock() {
+  const [stocks, setStocks] = useState<IStock[]>([])
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false)
   const [isStockModalOpen, setIsStockModalOpen] = useState(false)
+  const [codPro, setCodPro] = useState('')
+  const [amountPro, setAmountPro] = useState('')
   
+  async function loadStock() {
+    try {
+      const result = await AsyncStorage.getItem(keyStock)
+      const stock: IStock[] = result !== null ? JSON.parse(result) : []
+      setStocks(stock)
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
   function handleFilterModalOpen() {
     setIsFilterModalOpen(true)
   }
 
-  function handleStockModalOpen() {
+  function handleStockModalOpen(codpro: string, amountpro: string) {
+    setCodPro(codpro)
+    setAmountPro(amountpro)
     setIsStockModalOpen(true)
   }
+
+  useEffect(() => {
+    loadStock()
+  },[])
 
   return (
     <Container>
@@ -35,7 +61,7 @@ export default function Stock() {
         <ButtonFilterStock onPress={handleFilterModalOpen}>
           <IconFilterStock name='sliders' size={24} />
         </ButtonFilterStock>
-        <ButtonNewStock onPress={handleStockModalOpen}>
+        <ButtonNewStock onPress={() => handleStockModalOpen('','')}>
           <TextButtonNewStock>+</TextButtonNewStock>
         </ButtonNewStock>
       </HeaderStock>
@@ -47,9 +73,18 @@ export default function Stock() {
             keyExtractor={(item) => item.id}
               renderItem={({ item }) =>
               <ItemStock>
-                <TextStock>Produto: {item.product}</TextStock>
-                <TextStock>Quant: {item.amount}</TextStock>
-                <TextStock>Status: {item.hasStock? '':'Produto indisponível'}</TextStock>
+                <Pressable onPress={() => handleStockModalOpen(item.codproduct, item.amount.toString())}>
+                  <LineStock>
+                    <TextStock>{item.product}</TextStock>
+                    <QtdStock>{item.amount} itens</QtdStock>
+                    <StatusStock>
+                      {item.hasStock ? 
+                        <IconStock name='thumbs-up' size={20} accessibilityHint='Disponivel' />:
+                        <IconStock name='thumbs-down' size={32} accessibilityHint='Indisponivel' />
+                      }
+                    </StatusStock>
+                  </LineStock>
+                </Pressable>
                 <Separator />
               </ItemStock>
             }  
@@ -76,7 +111,7 @@ export default function Stock() {
         onRequestClose={() => {
           setIsStockModalOpen(!isStockModalOpen)
         }}>
-        <StockProducts closeModal={setIsStockModalOpen} />
+        <StockProducts closeModal={setIsStockModalOpen} codprod={codPro} amountprod={amountPro} />
       </Modal>
     </Container>
   )

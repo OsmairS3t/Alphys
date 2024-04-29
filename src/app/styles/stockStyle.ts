@@ -50,6 +50,12 @@ export const TextButtonNewStock = styled.Text`
 `;
 
 export const Title = styled.Text`
+  color: ${({ theme }) => theme.colors.title};
+  font-size: ${RFValue(14)}px;
+  margin: 10px 0px;
+`;
+
+export const TitleModal = styled.Text`
   color: ${({ theme }) => theme.colors.text_title};
   font-size: ${RFValue(14)}px;
   margin: 10px 0px;
@@ -61,9 +67,33 @@ export const GroupStock = styled.View`
 
 export const ItemStock = styled.View``;
 
+export const LineStock = styled.View`
+  width: 100%;
+  flex-direction: row;
+  padding: 2px 0px;
+  align-items: center;
+`;
+
 export const TextStock = styled.Text`
+  flex: 1;
   color: ${({ theme }) => theme.colors.text};
   font-size: ${RFValue(14)}px;
+  `;
+
+export const QtdStock = styled.Text`
+  color: ${({ theme }) => theme.colors.text};
+  font-size: ${RFValue(14)}px;
+  width: 100px;
+  `;
+
+export const StatusStock = styled.View`
+  justify-content: center;
+  align-items: center;
+  width: 50px;
+`;
+
+export const IconStock = styled(Feather)`
+  color: ${({ theme }) => theme.colors.text};
 `;
 
 export const Separator = styled.View`

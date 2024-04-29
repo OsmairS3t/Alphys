@@ -13,6 +13,9 @@ import { SelectList } from 'react-native-dropdown-select-list'
 import { Container, Title } from '../styles/categoryStyle';
 import { ButtonForm, TextButton } from '../styles/global';
 import { ICategory, ISelectProps } from '../../utils/interface';
+import { keyCategory } from '../../utils/keyStorage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Alert } from 'react-native';
 
 type CategoryProps = {
   closeModal: (value: boolean) => void;
@@ -33,13 +36,24 @@ export default function Category({ closeModal }: CategoryProps) {
     resolver: zodResolver(schema)
   })
 
-  function handleSave(formData: TypeData) {
+  async function handleSave(formData: TypeData) {
     const data = {
-      id: uuid.v4(),
+      id: uuid.v4().toString(),
       name: formData.name,
       icon: selectedIcon
     }
-    console.log(data)
+    try {
+      const response = await AsyncStorage.getItem(keyCategory)
+      let oldData: ICategory[] = response ? JSON.parse(response) : []
+
+      oldData.push(data)
+
+      await AsyncStorage.setItem(keyCategory, JSON.stringify(oldData))
+      Alert.alert('Categoria incluída com sucesso!')
+      closeModal(false);
+    } catch (error) {
+      console.log('Ocorreu um erro ao tentar salvar: ', error)
+    }
   }
 
   useEffect(()=>{

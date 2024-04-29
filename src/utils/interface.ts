@@ -12,7 +12,7 @@ export interface ICategory {
 }
 export interface IProduct {
   id: string;
-  category: ICategory;
+  category: ICategory | undefined;
   name: string;
   price: number;
   photo: string;
@@ -29,11 +29,13 @@ export interface IBuy {
   price: number;
 }
 export interface ISale {
-  client: IClient;
-  product: IProduct;
+  id: string;
+  client: IClient | undefined;
+  product: IProduct | undefined;
   amount: number;
   price: number;
   isPaid: boolean;
+  dateSale: string;
 }
 export interface IStock {
   id: string;

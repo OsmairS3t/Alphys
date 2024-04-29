@@ -90,6 +90,7 @@ export const sales = [
     amount: 2,
     price: 12,
     isPaid: false,
+    dateSale: '01/01/2024'
   },
   {
     client: {
@@ -111,6 +112,7 @@ export const sales = [
     amount: 1,
     price: 5,
     isPaid: false,
+    dateSale: '01/02/2024'
   },
 ]
 

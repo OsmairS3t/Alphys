@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Alert, Text } from 'react-native'
+import { Alert, Text, View } from 'react-native'
 import HeaderModal from '../components/HeaderModal';
 import uuid from 'react-native-uuid';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -25,36 +25,32 @@ export default function Buy({ closeModal }: BuyProps) {
     try {
       const result = await AsyncStorage.getItem(keyBuy)
       const b: IBuy[] = result !== null ? JSON.parse(result) : []
-      setBuy(b)
+      return b
     } catch (e) {
       console.log(e)
     }
   }
 
-  async function setAsyncStorageBuy(buy: IBuy) {
-    try {
-      const dataBuy = JSON.stringify(buy)
-      await AsyncStorage.setItem(keyBuy, dataBuy)
-    } catch (e) {
-      console.log(e)
-    }
-  }
-
-  function handleSave() {
+  async function handleSave() {
     const data = {
       id: uuid.v4().toString(),
       name: name,
       amount: Number(amount),
       price: Number(price)
     }
-    setAsyncStorageBuy(data)
-    Alert.alert('Compra salva com sucesso!')
-    console.log(data)
-  }
+    try {
+      const response = await AsyncStorage.getItem(keyBuy)
+      let oldData: IBuy[] = response ? JSON.parse(response) : []
 
-  useEffect(() => {
-    getAsyncStorageBuy();
-  }, [])
+      oldData.push(data)
+
+      await AsyncStorage.setItem(keyBuy, JSON.stringify(oldData))
+      Alert.alert('Compra incluída com sucesso!')
+      closeModal(false);
+    } catch (error) {
+      console.log('Ocorreu um erro ao tentar salvar: ', error)
+    }
+  }
 
   return (
     <Container>
@@ -89,13 +85,6 @@ export default function Buy({ closeModal }: BuyProps) {
           setPrice(text)
         }}
       />
-
-      {
-        buy.map(b => (
-          <Text>b.name</Text>
-        ))
-      }
-
       <ButtonForm onPress={handleSave}>
         <TextButton>Salvar</TextButton>
       </ButtonForm>

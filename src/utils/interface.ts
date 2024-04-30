@@ -39,8 +39,7 @@ export interface ISale {
 }
 export interface IStock {
   id: string;
-  codproduct: string;
-  product: string;
+  product: IProduct | undefined;
   amount: number;
   hasStock: boolean;
 }

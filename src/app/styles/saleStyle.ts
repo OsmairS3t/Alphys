@@ -34,8 +34,7 @@ export const GroupSwitch = styled.View`
 `;
 
 export const TitleSwitch = styled.Text`
-  color: ${({ theme }) => theme.colors.text_title
-  };
+  color: ${({ theme }) => theme.colors.text_title };
   font-size: ${RFValue(14)}px;
   font-weight: bold;
 `;
@@ -47,3 +46,19 @@ export const TextSwitch = styled.Text<PaidProps>`
   font-size: ${RFValue(14)}px;
   font-weight: bold;
 `;
+
+export const GroupInput = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+export const GroupAmount = styled.View`
+  width: 120px
+`;
+
+export const ItemAmount = styled.Text`
+  color: ${({ theme }) => theme.colors.text_title };
+  font-size: ${RFValue(14)}px;
+`;
+

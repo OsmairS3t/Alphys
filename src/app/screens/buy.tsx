@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Alert, Text, View } from 'react-native'
+import { Alert } from 'react-native'
 import HeaderModal from '../components/HeaderModal';
 import uuid from 'react-native-uuid';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -9,7 +9,6 @@ import { InputForm } from '../components/Forms/InputForm';
 
 import { Container, Title } from '../styles/buyStyle';
 import { ButtonForm, TextButton, InputMask } from '../styles/global';
-import { setStatusBarStyle } from 'expo-status-bar';
 
 type BuyProps = {
   closeModal: (value: boolean) => void;

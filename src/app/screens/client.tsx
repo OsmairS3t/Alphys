@@ -69,6 +69,7 @@ export default function Client({ closeModal }: ClientProps) {
 
       oldData.push(data)
 
+      // await AsyncStorage.removeItem(keyClient)
       await AsyncStorage.setItem(keyClient, JSON.stringify(oldData))
       Alert.alert('Cliente incluído com sucesso!')
       closeModal(false);

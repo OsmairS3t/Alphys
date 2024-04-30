@@ -40,6 +40,17 @@ export const products = [
     price: 5,
     photo: ''
   },
+  {
+    id: '4',
+    category: {
+      id: 'sugarplum', 
+      name: 'Bombom', 
+      icon: 'circle',
+    },
+    name: 'Maracujá',
+    price: 5,
+    photo: ''
+  },
 ];
 
 export const clients = [
@@ -119,24 +130,51 @@ export const sales = [
 export const stocks = [ 
   {
     id: '1',
-    codproduct: '1',
-    product: 'Barra Recheada - Amendoim',
+    product: {
+      id: '1',
+      category: {
+        id: 'bar', 
+        name: 'Barra Recheada', 
+        icon: 'server',
+      },
+      name: 'Amendoim',
+      price: 6,
+      photo: ''
+    },
     amount: 1,
-    hasStock: false,
+    hasStock: true,
   },
   {
     id: '2',
-    codproduct: '2',
-    product: 'Barra Recheada - Brigadeiro',
+    product: {
+      id: '2',
+      category: {
+        id: 'bar', 
+        name: 'Barra Recheada', 
+        icon: 'server',
+      },
+      name: 'Brigadeiro',
+      price: 6,
+      photo: ''
+    },
     amount: 5,
-    hasStock: false,
+    hasStock: true,
   },
   {
     id: '3',
-    codproduct: '3',
-    product: 'Bombom - Côco',
+    product: {
+      id: '3',
+      category: {
+        id: 'sugarplum', 
+        name: 'Bombom', 
+        icon: 'circle',
+      },
+      name: 'Côco',
+      price: 5,
+      photo: ''
+    },
     amount: 2,
-    hasStock: false,
+    hasStock: true,
   },
 ]
 

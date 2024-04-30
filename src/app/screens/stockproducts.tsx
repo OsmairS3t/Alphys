@@ -24,12 +24,13 @@ type StockProps = {
 
 export default function StockProducts({ closeModal, codprod, amountprod }: StockProps) {
   const theme = useTheme();
+  let title_page = codprod === '' ? 'NOVO CADASTRO' : 'EDITAR CADASTRO'
   const [selected, setSelected] = useState(codprod);
   const [amount, setAmount] = useState(amountprod);
   const [data, setData] = useState<ISelectProps[]>([]);
 
   function loadProducts(idProduct: string) {
-    const product:IProduct | undefined = products.find(pro => pro.id === idProduct)
+    const product: IProduct | undefined = products.find(pro => pro.id === idProduct)
     return product
   }
 
@@ -38,9 +39,9 @@ export default function StockProducts({ closeModal, codprod, amountprod }: Stock
     let name_product = ''
     if (loadProduct) {
       if (loadProduct.category) {
-        name_product = loadProduct.category.name +' - '+ loadProduct.name
+        name_product = loadProduct.category.name + ' - ' + loadProduct.name
       } else {
-        name_product = 'Sem categoria '+ loadProduct.name
+        name_product = 'Sem categoria ' + loadProduct.name
       }
     }
     const n_amount = Number(amount)
@@ -57,33 +58,34 @@ export default function StockProducts({ closeModal, codprod, amountprod }: Stock
 
       oldData.push(data)
 
+      // await AsyncStorage.removeItem(keyStock)
       await AsyncStorage.setItem(keyStock, JSON.stringify(oldData))
       Alert.alert('Produto incluído no estoque com sucesso!')
-      setSelected('')
-      setAmount('')
+      // setSelected('')
+      // setAmount('')
     } catch (error) {
       console.log('Ocorreu um erro ao tentar salvar: ', error)
     }
   }
 
-  useEffect(()=>{
-    let newArray:ISelectProps[] = stocks.map(stock => {
-      return {key: stock.id, value: stock.product}
+  useEffect(() => {
+    let newArray: ISelectProps[] = stocks.map(stock => {
+      return { key: stock.id, value: stock.product }
     })
     setData(newArray)
-  },[])
+  }, [])
 
   return (
     <Container>
-      <HeaderModal closeModal={()=>closeModal(false)} titleModal='CADASTRO DE ESTOQUE DE PRODUTOS' />
+      <HeaderModal closeModal={() => closeModal(false)} titleModal='ESTOQUE DE PRODUTOS' />
 
-      <TitleModal>NOVO CADASTRO</TitleModal>
-      <SelectList 
+      <TitleModal>{title_page}</TitleModal>
+      <SelectList
         placeholder='Informe o Produto'
-        boxStyles={{backgroundColor: theme.colors.bg_input, marginBottom: 10}}
-        dropdownStyles={{backgroundColor: theme.colors.bg_input}}
-        setSelected={(selected:string) => setSelected(selected)} 
-        data={data} 
+        boxStyles={{ backgroundColor: theme.colors.bg_input, marginBottom: 10 }}
+        dropdownStyles={{ backgroundColor: theme.colors.bg_input }}
+        setSelected={(selected: string) => setSelected(selected)}
+        data={data}
         save="key"
       />
 

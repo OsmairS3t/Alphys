@@ -15,6 +15,13 @@ export const ContainerSignIn = styled.View`
   background-color: ${({ theme }) => theme.colors.secondary};
   justify-content: center;
   align-items: center;
+  gap: 100px;
+`;
+
+export const HeaderLogin = styled.View`
+  width: 100%;
+  justify-content: center;
+  align-items: center;
   gap: 60px;
 `;
 

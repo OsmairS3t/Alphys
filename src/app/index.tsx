@@ -1,7 +1,15 @@
 import { Pressable } from "react-native";
 import { useRouter } from "expo-router";
 
-import { ContainerSignIn, ImgLogoLogin, Form, ButtonSignIn, TextButtonSignIn, ImgCredit } from './styles/global'
+import {
+  ContainerSignIn,
+  HeaderLogin,
+  ImgLogoLogin,
+  Form,
+  ButtonSignIn,
+  TextButtonSignIn,
+  ImgCredit
+} from './styles/global'
 import { Input } from "./components/Forms/InputForm/styles";
 
 export default function Login() {
@@ -15,22 +23,24 @@ export default function Login() {
 
   return (
     <ContainerSignIn>
-      <ImgLogoLogin source={require(logo)} />
-      <Form>
-        <Input 
-          placeholder="E-mail"
-          keyboardType="email-address"
-        />
-        
-        <Input 
-          placeholder="Senha"
-          keyboardType="visible-password"
-        />
+      <HeaderLogin>
+        <ImgLogoLogin source={require(logo)} />
+        <Form>
+          <Input
+            placeholder="E-mail"
+            keyboardType="email-address"
+          />
 
-        <ButtonSignIn onPress={handleLogIn}>
-          <TextButtonSignIn>Entrar</TextButtonSignIn>
-        </ButtonSignIn>
-      </Form>
+          <Input
+            placeholder="Senha"
+            keyboardType="visible-password"
+          />
+
+          <ButtonSignIn onPress={handleLogIn}>
+            <TextButtonSignIn>Entrar</TextButtonSignIn>
+          </ButtonSignIn>
+        </Form>
+      </HeaderLogin>
       <ImgCredit source={require(imgCredit)} />
     </ContainerSignIn>
   )

@@ -43,6 +43,10 @@ export const ButtonNewStock = styled.Pressable`
   background-color: ${({ theme }) => theme.colors.secondary};
 `;
 
+export const IconButtonNewStock = styled(Feather)`
+  color: ${({ theme }) => theme.colors.background};
+`;
+
 export const TextButtonNewStock = styled.Text`
   font-size: ${RFValue(24)}px;
   font-weight: bold;

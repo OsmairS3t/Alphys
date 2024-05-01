@@ -1,7 +1,7 @@
 import React from 'react';
 import { ITransactionViewProps } from '../../../utils/interface';
 
-import { 
+import {
   Container,
   Header,
   Content,
@@ -45,7 +45,7 @@ export function TransactionCard({ data }: Props) {
 
       <Content>
         <Price modality={dataFormatted.modality}>
-          {dataFormatted.modality === 'buy' && '- ' }
+          {dataFormatted.modality === 'buy' && '- '}
           {dataFormatted.price}
         </Price>
         <Amount>Qtd: {dataFormatted.amount}</Amount>

@@ -12,6 +12,12 @@ export const Container = styled.View`
   border-color: ${({ theme }) => theme.colors.shape};
 `;
 
+export const TitleModal = styled.Text`
+  color: ${({ theme }) => theme.colors.text_title};
+  font-size: ${RFValue(14)}px;
+  margin: 10px 0px;
+`;
+
 export const HeaderStock = styled.View`
   width: 100%;
   padding: 10px 0px;
@@ -59,51 +65,3 @@ export const Title = styled.Text`
   margin: 10px 0px;
 `;
 
-export const TitleModal = styled.Text`
-  color: ${({ theme }) => theme.colors.text_title};
-  font-size: ${RFValue(14)}px;
-  margin: 10px 0px;
-`;
-
-export const GroupStock = styled.View`
-  padding-top: 10px;
-`;
-
-export const ItemStock = styled.View``;
-
-export const LineStock = styled.View`
-  width: 100%;
-  flex-direction: row;
-  padding: 2px 0px;
-  align-items: center;
-`;
-
-export const TextStock = styled.Text`
-  flex: 1;
-  color: ${({ theme }) => theme.colors.text};
-  font-size: ${RFValue(14)}px;
-  `;
-
-export const QtdStock = styled.Text`
-  color: ${({ theme }) => theme.colors.text};
-  font-size: ${RFValue(14)}px;
-  width: 60px;
-  `;
-
-export const StatusStock = styled.View`
-  justify-content: center;
-  align-items: center;
-  width: 30px;
-`;
-
-export const IconStock = styled(Feather)`
-  color: ${({ theme }) => theme.colors.text};
-`;
-
-export const Separator = styled.View`
-  width: 100%;
-  margin: 4px 0px;
-  border-bottom-width: 1px;
-  border-bottom-style: solid;
-  border-bottom-color: ${({ theme }) => theme.colors.primary};
-`;

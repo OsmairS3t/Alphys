@@ -6,8 +6,9 @@ import Product from '../screens/product';
 import Buy from '../screens/buy';
 import Sale from '../screens/sale';
 import Client from '../screens/client';
+import Stock from '../screens/stock';
 
-import { Container, Title, ListGroup, ItemList, Item, TextItem } from '../styles/registerStyle';
+import { Container, Title, ListGroup, ItemList, Item, TextItem, GroupList, IconList } from '../styles/registerStyle';
 
 export default function Register() {
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false)
@@ -15,86 +16,117 @@ export default function Register() {
   const [isBuyModalOpen, setIsBuyModalOpen] = useState(false)
   const [isSaleModalOpen, setIsSaleModalOpen] = useState(false)
   const [isClientModalOpen, setIsClientModalOpen] = useState(false)
+  const [isStockModalOpen, setIsStockModalOpen] = useState(false)
 
   function handleModalRegister(typeRegister: string) {
-    if(typeRegister === 'category') {setIsCategoryModalOpen(true)}
-    if(typeRegister === 'product') {setIsProductModalOpen(true)}
-    if(typeRegister === 'buy') {setIsBuyModalOpen(true)}
-    if(typeRegister === 'sale') {setIsSaleModalOpen(true)}
-    if(typeRegister === 'client') {setIsClientModalOpen(true)}
+    if (typeRegister === 'category') { setIsCategoryModalOpen(true) }
+    if (typeRegister === 'product') { setIsProductModalOpen(true) }
+    if (typeRegister === 'buy') { setIsBuyModalOpen(true) }
+    if (typeRegister === 'sale') { setIsSaleModalOpen(true) }
+    if (typeRegister === 'client') { setIsClientModalOpen(true) }
+    if (typeRegister === 'stock') { setIsStockModalOpen(true) }
   }
 
   return (
     <Container>
       <Title>Cadastros:</Title>
-      <ListGroup>
-        <ItemList>
-          <Item onPress={() => handleModalRegister('category')}>
+      <ItemList>
+        <Item onPress={() => handleModalRegister('category')}>
+          <GroupList>
+            <IconList name='category' size={32} />
             <TextItem>CATEGORIAS</TextItem>
-          </Item>
-          <Item onPress={() => handleModalRegister('product')}>
+          </GroupList>
+        </Item>
+        <Item onPress={() => handleModalRegister('product')}>
+          <GroupList>
+            <IconList name='fastfood' size={32} />
             <TextItem>PRODUTOS</TextItem>
-          </Item>
-          <Item onPress={() => handleModalRegister('buy')}>
+          </GroupList>
+        </Item>
+        <Item onPress={() => handleModalRegister('buy')}>
+          <GroupList>
+            <IconList name='shopping-cart' size={32} />
             <TextItem>COMPRAS</TextItem>
-          </Item>
-          <Item onPress={() => handleModalRegister('sale')}>
+          </GroupList>
+        </Item>
+        <Item onPress={() => handleModalRegister('sale')}>
+          <GroupList>
+            <IconList name='sell' size={32} />
             <TextItem>VENDAS</TextItem>
-          </Item>
-          <Item onPress={() => handleModalRegister('client')}>
+          </GroupList>
+        </Item>
+        <Item onPress={() => handleModalRegister('client')}>
+          <GroupList>
+            <IconList name='emoji-people' size={32} />
             <TextItem>CLIENTES</TextItem>
-          </Item>
-        </ItemList>
-      </ListGroup>
+          </GroupList>
+        </Item>
+        <Item onPress={() => handleModalRegister('stock')}>
+          <GroupList>
+            <IconList name='add-business' size={32} />
+            <TextItem>ESTOQUE</TextItem>
+          </GroupList>
+        </Item>
+      </ItemList>
 
-      <Modal 
+      <Modal
         transparent={true}
-        animationType='slide' 
-        visible={isCategoryModalOpen} 
+        animationType='slide'
+        visible={isCategoryModalOpen}
         onRequestClose={() => {
           setIsCategoryModalOpen(!isCategoryModalOpen)
         }}>
         <Category closeModal={setIsCategoryModalOpen} />
       </Modal>
 
-      <Modal 
+      <Modal
         transparent={true}
-        animationType='slide' 
-        visible={isProductModalOpen} 
+        animationType='slide'
+        visible={isProductModalOpen}
         onRequestClose={() => {
           setIsProductModalOpen(!isProductModalOpen)
         }}>
         <Product closeModal={setIsProductModalOpen} />
       </Modal>
 
-      <Modal 
+      <Modal
         transparent={true}
-        animationType='slide' 
-        visible={isBuyModalOpen} 
+        animationType='slide'
+        visible={isBuyModalOpen}
         onRequestClose={() => {
           setIsBuyModalOpen(!isBuyModalOpen)
         }}>
         <Buy closeModal={setIsBuyModalOpen} />
       </Modal>
 
-      <Modal 
+      <Modal
         transparent={true}
-        animationType='slide' 
-        visible={isSaleModalOpen} 
+        animationType='slide'
+        visible={isSaleModalOpen}
         onRequestClose={() => {
           setIsSaleModalOpen(!isSaleModalOpen)
         }}>
         <Sale closeModal={setIsSaleModalOpen} />
       </Modal>
 
-      <Modal 
+      <Modal
         transparent={true}
-        animationType='slide' 
-        visible={isClientModalOpen} 
+        animationType='slide'
+        visible={isClientModalOpen}
         onRequestClose={() => {
           setIsClientModalOpen(!isClientModalOpen)
         }}>
         <Client closeModal={setIsClientModalOpen} />
+      </Modal>
+
+      <Modal
+        transparent={true}
+        animationType='slide'
+        visible={isStockModalOpen}
+        onRequestClose={() => {
+          setIsStockModalOpen(!isStockModalOpen)
+        }}>
+        <Stock closeModal={setIsStockModalOpen} />
       </Modal>
     </Container>
   )

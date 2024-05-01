@@ -3,32 +3,34 @@ import { Modal, FlatList, Pressable } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import StockProducts from '../screens/stockproducts';
-import FilterStock from '../screens/filterstock';
+import RegisterStock from './regStock';
+import FilterStock from './filterstock';
 
 import { keyStock } from '../../utils/keyStorage';
 import { IStock } from '../../utils/interface';
-//import { stocks } from '../../utils/database';
 
-import { Container } from '../styles/global'
+import {
+  ContainerModal,
+  GroupColumn,
+  ItemColumnList,
+  GroupIconTextRow,
+  IconColumnList,
+  TextColumnList
+} from '../styles/registerStyle';
 import {
   HeaderStock,
   ButtonFilterStock,
   IconFilterStock,
   ButtonNewStock,
-  IconButtonNewStock,
-  Title,
-  GroupStock,
-  ItemStock,
-  LineStock,
-  TextStock,
-  QtdStock,
-  StatusStock,
-  IconStock,
-  Separator
+  IconButtonNewStock
 } from '../styles/stockStyle'
+import HeaderModal from '../components/HeaderModal';
 
-export default function Stock() {
+type StockProps = {
+  closeModal: (value: boolean) => void;
+}
+
+export default function Stock({ closeModal }: StockProps) {
   const [stocks, setStocks] = useState<IStock[]>([])
   const [stock, setStock] = useState<IStock>()
   const [idStock, setIdStock] = useState('')
@@ -66,8 +68,8 @@ export default function Stock() {
   )
 
   return (
-    <Container>
-      <Title>Estoque de produtos:</Title>
+    <ContainerModal>
+      <HeaderModal closeModal={() => closeModal(false)} titleModal='ESTOQUE DE PRODUTOS' />
       <HeaderStock>
         <ButtonFilterStock onPress={handleFilterModalOpen}>
           <IconFilterStock name='sliders' size={24} />
@@ -77,37 +79,31 @@ export default function Stock() {
         </ButtonNewStock>
       </HeaderStock>
 
-      <GroupStock>
+      <GroupColumn>
         {stocks.length > 0 ?
           <FlatList
+            style={{ height: 450 }}
             data={stocks}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) =>
-              <ItemStock>
-                <Pressable onPress={() => handleEditStockModalOpen(item.id)}>
-                  <LineStock>
-                    <TextStock>{item.product?.category?.name} - {item.product?.name}</TextStock>
-                    <QtdStock>{item.amount} itens</QtdStock>
-                    <StatusStock>
-                      {item.hasStock ?
-                        <IconStock name='thumbs-up' size={20} accessibilityHint='Disponivel' /> :
-                        <IconStock name='thumbs-down' size={20} accessibilityHint='Indisponivel' />
-                      }
-                    </StatusStock>
-                  </LineStock>
-                </Pressable>
-                <Separator />
-              </ItemStock>
+              <Pressable onPress={() => handleEditStockModalOpen(item.id)}>
+                <ItemColumnList>
+                  <GroupIconTextRow>
+                    <TextColumnList>{item.product?.category?.name} - {item.product?.name}</TextColumnList>
+                    <TextColumnList>{item.amount} itens</TextColumnList>
+                  </GroupIconTextRow>
+                </ItemColumnList>
+              </Pressable>
             }
           />
           :
-          <TextStock>Não há produtos cadastrados no estoque</TextStock>
+          <TextColumnList>Não há produtos cadastrados no estoque</TextColumnList>
         }
-      </GroupStock>
+      </GroupColumn>
 
       <Modal
         transparent={true}
-        animationType='slide'
+        animationType='fade'
         visible={isFilterModalOpen}
         onRequestClose={() => {
           setIsFilterModalOpen(!isFilterModalOpen)
@@ -117,13 +113,13 @@ export default function Stock() {
 
       <Modal
         transparent={true}
-        animationType='slide'
+        animationType='fade'
         visible={isStockModalOpen}
         onRequestClose={() => {
           setIsStockModalOpen(!isStockModalOpen)
         }}>
-        <StockProducts closeModal={setIsStockModalOpen} idStock={idStock} />
+        <RegisterStock closeModal={setIsStockModalOpen} idStock={idStock} />
       </Modal>
-    </Container>
+    </ContainerModal>
   )
 }

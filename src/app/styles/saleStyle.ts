@@ -4,7 +4,6 @@ import { styled } from "styled-components/native";
 interface PaidProps {
   isPaid ?: boolean;
 }
-
 export const Container = styled.View`
   top: 90px;
   background-color: ${({ theme }) => theme.colors.bg_form};
@@ -13,6 +12,12 @@ export const Container = styled.View`
   border-width: 1px;
   border-style: solid;
   border-color: ${({ theme }) => theme.colors.shape};
+`;
+
+export const TitleModal = styled.Text`
+  color: ${({ theme }) => theme.colors.text_title};
+  font-size: ${RFValue(14)}px;
+  margin: 10px 0px;
 `;
 
 export const Title = styled.Text`

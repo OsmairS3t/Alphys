@@ -8,7 +8,7 @@ export interface ISelectProps {
 export interface ICategory {
   id: string;
   name: string;
-  icon: string;
+  icon: 'book' | 'book-open' | 'box' | 'circle' | 'coffee' | 'disc' | 'dollar-sign' | 'file-text' | 'grid' | 'smile' | 'square' | 'star';
 }
 export interface IProduct {
   id: string;
@@ -21,6 +21,12 @@ export interface IClient {
   id: string;
   name: string;
   photo: string;
+}
+export interface IStock {
+  id: string;
+  product: IProduct | undefined;
+  amount: number;
+  hasStock: boolean;
 }
 export interface IBuy {
   id: string;
@@ -37,14 +43,7 @@ export interface ISale {
   isPaid: boolean;
   dateSale: string;
 }
-export interface IStock {
-  id: string;
-  product: IProduct | undefined;
-  amount: number;
-  hasStock: boolean;
-}
-
-//transactions
+//transactions: buy + sale = replications table
 export interface ITransactionViewProps {
   id: string;
   description: string;
@@ -53,18 +52,17 @@ export interface ITransactionViewProps {
   datetransaction: string;
   amount: number;
   price: string;
-  ispaid: boolean;
 }
 
 export interface ITransactionProps {
   id: string;
+  idtransactiontype: string;
   description: string;
   modality: 'buy'|'sell';
   modalityicon: string;
   datetransaction: Date;
   amount: number;
   price: number;
-  ispaid: boolean;
 }
 
 interface HighlightTypeProps {

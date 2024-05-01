@@ -2,6 +2,10 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { RFValue } from "react-native-responsive-fontsize";
 import { styled } from "styled-components/native";
 
+type BtnSituationProps = {
+  isPaid: boolean;
+}
+
 export const Container = styled.View`
   top: 90px;
   background-color: ${({ theme }) => theme.colors.bg_form};
@@ -30,33 +34,50 @@ export const GroupSale = styled.View`
 
 export const ItemSale = styled.View``;
 
-export const LineSale = styled.View`
-  width: 100%;
-  flex-direction: row;
-  padding: 2px 0px;
-  align-items: center;
+export const ClientReceipt = styled.Text`
+  color: ${({ theme }) => theme.colors.text};
+  font-size: ${RFValue(14)}px;
+`;
+
+export const ProductReceipt = styled.Text`
+  color: ${({ theme }) => theme.colors.text};
+  font-size: ${RFValue(14)}px;
+`;
+
+export const PriceReceipt = styled.Text`
+  color: ${({ theme }) => theme.colors.text};
+  font-size: ${RFValue(14)}px;
 `;
 
 export const TextSale = styled.Text`
-  flex: 1;
   color: ${({ theme }) => theme.colors.text};
   font-size: ${RFValue(14)}px;
-  `;
+`;
 
 export const QtdSale = styled.Text`
   color: ${({ theme }) => theme.colors.text};
   font-size: ${RFValue(14)}px;
-  width: 60px;
-  `;
-
-export const StatusSale = styled.View`
-  justify-content: center;
-  align-items: center;
-  width: 30px;
 `;
 
 export const IconSale = styled(MaterialIcons)`
   color: ${({ theme }) => theme.colors.text};
+`;
+
+export const BtnSituation = styled.Pressable<BtnSituationProps>`
+  padding: 4px 10px;
+  background-color: ${({ theme, isPaid }) => isPaid ? theme.colors.success_light : theme.colors.attention_light};
+`;
+
+export const StatusSale = styled.View`
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+`;
+
+export const TextBtnSituation = styled.Text`
+  color: ${({ theme }) => theme.colors.text};
+  font-size: ${RFValue(14)}px;
 `;
 
 export const Separator = styled.View`

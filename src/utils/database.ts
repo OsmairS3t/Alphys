@@ -182,7 +182,8 @@ export const stocks = [
 export const transactions = [
   {
     id: '',
-    description: '',
+    idTransactionType: '',
+    description: 'Compra',
     modality: 'buy',
     modalityicon: '',
     datetransaction: '01/01/2024',
@@ -203,18 +204,34 @@ export const IHightLights = [
   {
     buys: {
       price: '100',
-      lastTransaction: '',
+      lastTransaction: 'Ultima compra no dia 99/99/9999',
     },
     sells: {
       price: '50',
-      lastTransaction: '',
+      lastTransaction: 'Ultima venda no dia 99/99/9999',
     },
     total: {
       price: '50',
-      lastTransaction: '',
+      lastTransaction: 'De 99 a 99/99/9999',
     },
   },
 ]
+
+export const IFeatherIcons = [
+  {key: 'book', value:'Livro'},
+  {key: 'book-open', value:'Livro aberto'},
+  {key: 'box', value:'Caixa'},
+  {key: 'circle', value:'Circulo'},
+  {key: 'coffee', value:'Xicara de Café'},
+  {key: 'disc', value:'Disco'},
+  {key: 'dollar-sign', value:'Sifrão'},
+  {key: 'file-text', value:'Folha escrita'},
+  {key: 'grid', value:'Blocos'},
+  {key: 'smile', value:'Smile'},
+  {key: 'square', value:'Quadrado'},
+  {key: 'star', value:'Estrela'}
+]
+
 export const featherIcons = [
   { name: "link"}, 
   { name: "search"}, 

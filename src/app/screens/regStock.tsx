@@ -19,17 +19,17 @@ type StockProps = {
   idStock: string;
 }
 
-export default function StockProducts({ closeModal, idStock }: StockProps) {
+export default function RegisterStock({ closeModal, idStock }: StockProps) {
   const theme = useTheme();
   let title_page = idStock === '' ? 'NOVO CADASTRO' : 'EDITAR CADASTRO'
   const [selected, setSelected] = useState('');
   const [amount, setAmount] = useState('');
-  const [initialValue, setInitialValue] = useState<ISelectProps>({key: '', value: ''})
+  const [initialValue, setInitialValue] = useState<ISelectProps>({ key: '', value: '' })
   const [data, setData] = useState<ISelectProps[]>([]);
 
   async function loadProduct(idProduct: string) {
     const response = await AsyncStorage.getItem(keyProduct)
-    const dataProduct:IProduct[] = response ? JSON.parse(response) : []
+    const dataProduct: IProduct[] = response ? JSON.parse(response) : []
     return dataProduct.find(d => d.id === idProduct)
   }
 
@@ -45,7 +45,7 @@ export default function StockProducts({ closeModal, idStock }: StockProps) {
     try {
       const response = await AsyncStorage.getItem(keyStock)
       let oldData: IStock[] = response ? JSON.parse(response) : []
-      
+
       // localiza o produto na coleção existente para não duplicar
       const updateData = oldData.find(od => od.product?.id === selected)
       if (!updateData) {
@@ -71,9 +71,9 @@ export default function StockProducts({ closeModal, idStock }: StockProps) {
   async function LoadProductSelect() {
     try {
       const response = await AsyncStorage.getItem(keyProduct)
-      const dataProduct:IProduct[] = response ? JSON.parse(response) : []
+      const dataProduct: IProduct[] = response ? JSON.parse(response) : []
       let newArray: ISelectProps[] = dataProduct.map(dp => {
-        return { key: String(dp.id), value: dp.category?.name +' - '+ dp.name }
+        return { key: String(dp.id), value: dp.category?.name + ' - ' + dp.name }
       })
       setData(newArray)
     } catch (error) {
@@ -84,12 +84,12 @@ export default function StockProducts({ closeModal, idStock }: StockProps) {
   async function LoadProductSelected() {
     try {
       const response = await AsyncStorage.getItem(keyStock)
-      const dataStock:IStock[] = response ? JSON.parse(response) : []
+      const dataStock: IStock[] = response ? JSON.parse(response) : []
       const objStock = dataStock.find(ds => ds.id === idStock)
       let newArray: ISelectProps[] = [
-        { 
-          key: String(objStock?.product?.id), 
-          value: objStock?.product?.category?.name +' - '+ objStock?.product?.name
+        {
+          key: String(objStock?.product?.id),
+          value: objStock?.product?.category?.name + ' - ' + objStock?.product?.name
         }]
       setData(newArray)
       setAmount(String(objStock?.amount))

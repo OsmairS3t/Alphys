@@ -16,11 +16,11 @@ export default function TabLayout() {
           tabBarInactiveTintColor: theme.colors.secondary_light,
           tabBarActiveTintColor: theme.colors.secondary,
           tabBarStyle: {
-            height: 50,
+            height: 60,
             backgroundColor: theme.colors.background,
             borderWidth: 0,
             borderColor: theme.colors.secondary,
-        },
+          },
         }}
       >
         <Tabs.Screen name="header" options={{ href: null }} />
@@ -36,13 +36,6 @@ export default function TabLayout() {
           options={{
             title: 'HOME',
             tabBarIcon: ({ color }) => <FontAwesome size={24} name="home" color={color} />,
-          }}
-        />
-        <Tabs.Screen
-          name="stock"
-          options={{
-            title: 'ESTOQUE',
-            tabBarIcon: ({ color }) => <FontAwesome size={24} name="book" color={color} />,
           }}
         />
         <Tabs.Screen

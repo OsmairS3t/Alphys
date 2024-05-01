@@ -3,23 +3,27 @@ import { Modal, FlatList, Pressable } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import StockProducts from '../screens/stockproducts';
+import StockProducts from '../screens/regStock';
 import FilterStock from '../screens/filterstock';
 
 import { keySale, keyStock } from '../../utils/keyStorage';
 import { ISale, IStock } from '../../utils/interface';
 
 import { Container } from '../styles/global'
-import { Title,
-TitleModal,
-GroupSale,
-ItemSale,
-LineSale,
-TextSale,
-QtdSale,
-StatusSale,
-IconSale,
-Separator
+import {
+  Title,
+  GroupSale,
+  ItemSale,
+  ClientReceipt,
+  ProductReceipt,
+  PriceReceipt,
+  TextSale,
+  QtdSale,
+  StatusSale,
+  IconSale,
+  BtnSituation,
+  TextBtnSituation,
+  Separator
 } from '../styles/receiptStyle'
 
 export default function Stock() {
@@ -50,28 +54,42 @@ export default function Stock() {
             data={sales}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) =>
-              <ItemSale>
-                <Pressable onPress={() => {}}>
-                  <LineSale>
-                    <TextSale>
-                      {item.client?.name} - {item.product?.category?.name} - {item.product?.name}
-                    </TextSale>
-                    <QtdSale>
-                      {Intl.NumberFormat('pt-BR', {
-                        style: 'currency',
-                        currency: 'BRL'
-                      }).format(item.price)}
-                    </QtdSale>
-                    <StatusSale>
-                      {item.isPaid ?
-                        <IconSale name='attach-money' size={20} accessibilityHint='Pago' /> :
-                        <IconSale name='money-off' size={20} accessibilityHint='A pagar' />
-                      }
-                    </StatusSale>
-                  </LineSale>
-                </Pressable>
-                <Separator />
-              </ItemSale>
+              <Pressable onPress={() => { }}>
+                <ItemSale>
+                  <ClientReceipt>
+                    Cliente: {item.client?.name}
+                  </ClientReceipt>
+                  <ProductReceipt>
+                    Produto: {item.product?.category?.name} - {item.product?.name}
+                  </ProductReceipt>
+                  <QtdSale>
+                    Quant.:{item.amount}
+                  </QtdSale>
+                  <PriceReceipt>
+                    Valor: {Intl.NumberFormat('pt-BR', {
+                      style: 'currency',
+                      currency: 'BRL'
+                    }).format(item.price)}
+                  </PriceReceipt>
+                  <QtdSale>
+                    Data: {item.dateSale}
+                  </QtdSale>
+                  <BtnSituation isPaid={item.isPaid}>
+                    {item.isPaid ?
+                      <StatusSale>
+                        <IconSale name='attach-money' size={20} />
+                        <TextBtnSituation>Pago</TextBtnSituation>
+                      </StatusSale>
+                      :
+                      <StatusSale>
+                        <IconSale name='money-off' size={20} />
+                        <TextBtnSituation>A pagar</TextBtnSituation>
+                      </StatusSale>
+                    }
+                  </BtnSituation>
+                  <Separator />
+                </ItemSale>
+              </Pressable>
             }
           />
           :

@@ -1,101 +1,98 @@
-import React, { useEffect, useState } from 'react';
-import { useTheme } from 'styled-components';
-import { featherIcons } from '../../utils/database';
-import uuid from 'react-native-uuid';
-import { useForm, Controller } from 'react-hook-form';
-import * as z from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod';
+import React, { useCallback, useEffect, useState } from 'react';
+import { FlatList, Pressable, Modal } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import HeaderModal from '../components/HeaderModal';
-import { InputForm } from '../components/Forms/InputForm';
-import { SelectList } from 'react-native-dropdown-select-list'
 
-import { Container, Title } from '../styles/categoryStyle';
-import { ButtonForm, TextButton } from '../styles/global';
-import { ICategory, ISelectProps } from '../../utils/interface';
+import { ICategory } from '../../utils/interface';
 import { keyCategory } from '../../utils/keyStorage';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Alert } from 'react-native';
+import RegisterCategory from './regCategory';
+
+import {
+  HeaderScreenPage,
+  ButtonNewScreenPage,
+  IconButtonNewScreenPage
+} from '../styles/global';
+import {
+  ContainerModal,
+  GroupColumn,
+  ItemColumnList,
+  GroupIconTextRow,
+  IconColumnList,
+  TextColumnList
+} from '../styles/registerStyle';
+import { useFocusEffect } from 'expo-router';
 
 type CategoryProps = {
   closeModal: (value: boolean) => void;
 }
 
-const schema = z
-  .object({
-    name: z.string().min(3,'O nome da categoria deve ter pelo menos 3 caracteres.'),
-  })
-
-type TypeData = z.infer<typeof schema>
-
 export default function Category({ closeModal }: CategoryProps) {
-  const theme = useTheme()
-  const [selectedIcon, setSelectedIcon] = useState("")
-  const [data, setData] = useState<ISelectProps[]>([]);
-  const { handleSubmit, control, formState: {errors} } = useForm<TypeData>({
-    resolver: zodResolver(schema)
-  })
+  const [categories, setCategories] = useState<ICategory[]>([])
+  const [isNewModalOpen, setIsNewModalOpen] = useState(false)
 
-  async function handleSave(formData: TypeData) {
-    const data = {
-      id: uuid.v4().toString(),
-      name: formData.name,
-      icon: selectedIcon
-    }
+  async function loadCategories() {
     try {
       const response = await AsyncStorage.getItem(keyCategory)
-      let oldData: ICategory[] = response ? JSON.parse(response) : []
-
-      oldData.push(data)
-
-      await AsyncStorage.setItem(keyCategory, JSON.stringify(oldData))
-      Alert.alert('Categoria incluída com sucesso!')
-      closeModal(false);
-    } catch (error) {
-      console.log('Ocorreu um erro ao tentar salvar: ', error)
+      const dataCategory: ICategory[] = response ? JSON.parse(response) : []
+      setCategories(dataCategory)
+    } catch (e) {
+      console.log(e)
     }
   }
 
-  useEffect(()=>{
-    let newArray:ISelectProps[] = featherIcons.map(fi => {
-      return {key: fi.name, value: fi.name}
-    })
-    setData(newArray)
-  },[])
+  function handleNewCategoryModalOpen() {
+    setIsNewModalOpen(true)
+  }
+
+  useFocusEffect(
+    useCallback(() => {
+      loadCategories();
+    }, [])
+  )
 
   return (
-    <Container>
-      <HeaderModal closeModal={()=>closeModal(false)} titleModal='CADASTRO DE CATEGORIAS' />
+    <ContainerModal>
+      <HeaderModal closeModal={() => closeModal(false)} titleModal='CADASTRO DE CATEGORIAS' />
 
-      <Title>NOVO CADASTRO:</Title>
-      <Controller 
-        control={control}
-        rules={{
-          maxLength: 100,
-        }}
-        render={({ field: { onChange, onBlur, value } }) => (
-          <InputForm 
-            placeholder='Nome da categoria'
-            onBlur={onBlur}
-            onChangeText={onChange}
-            value={value}
+      <HeaderScreenPage>
+        <ButtonNewScreenPage onPress={handleNewCategoryModalOpen}>
+          <IconButtonNewScreenPage name='plus' size={24} />
+        </ButtonNewScreenPage>
+      </HeaderScreenPage>
+
+      <GroupColumn>
+        {categories.length > 0 ?
+          <FlatList
+            style={{ height: 450 }}
+            data={categories}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) =>
+              <Pressable onPress={() => { }}>
+                <ItemColumnList>
+                  <GroupIconTextRow>
+                    <TextColumnList>Categoria: {item.name}</TextColumnList>
+                    <IconColumnList name={item.icon} size={20} />
+                  </GroupIconTextRow>
+                </ItemColumnList>
+              </Pressable>
+            }
           />
-        )}
-        name="name"
-      />
+          :
+          <TextColumnList>Não há produtos cadastrados no estoque</TextColumnList>
+        }
+      </GroupColumn>
 
-      <SelectList 
-        placeholder='Icone da categoria'
-        boxStyles={{backgroundColor: theme.colors.bg_input, marginBottom: 10}}
-        dropdownStyles={{backgroundColor: theme.colors.bg_input}}
-        setSelected={(val:string) => setSelectedIcon(val)} 
-        data={data} 
-        save="key"
-      />
+      <Modal
+        transparent={true}
+        animationType='fade'
+        visible={isNewModalOpen}
+        onRequestClose={() => {
+          setIsNewModalOpen(!isNewModalOpen)
+        }}>
+        <RegisterCategory closeModal={setIsNewModalOpen} />
+      </Modal>
 
-      <ButtonForm onPress={handleSubmit(handleSave)}>
-        <TextButton>Salvar</TextButton>
-      </ButtonForm>
-    </Container>
+    </ContainerModal>
   )
 }

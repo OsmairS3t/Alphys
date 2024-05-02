@@ -39,10 +39,10 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="receipt"
+          name="order"
           options={{
-            title: 'RECEBER',
-            tabBarIcon: ({ color }) => <FontAwesome size={24} name="money" color={color} />,
+            title: 'ENCOMENDAS',
+            tabBarIcon: ({ color }) => <FontAwesome size={24} name="edit" color={color} />,
           }}
         />
       </Tabs>

@@ -4,4 +4,5 @@ export const keyClient = "@AlphysChoco:Client";
 export const keyBuy = "@AlphysChoco:Buy";
 export const keySale = "@AlphysChoco:Sale";
 export const keyStock = "@AlphysChoco:Stock";
+export const keyOrder = "@AlphysChoco:Order";
 export const keyTransaction = "@AlphysChoco:Transaction";

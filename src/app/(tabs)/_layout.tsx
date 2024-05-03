@@ -1,7 +1,7 @@
 import React from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Tabs } from 'expo-router';
-import Header from './header';
+import Header from '../header';
 import { useTheme } from 'styled-components';
 
 export default function TabLayout() {
@@ -23,7 +23,6 @@ export default function TabLayout() {
           },
         }}
       >
-        <Tabs.Screen name="header" options={{ href: null }} />
         <Tabs.Screen
           name="register"
           options={{

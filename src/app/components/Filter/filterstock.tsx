@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { useTheme } from 'styled-components';
 
-import HeaderModal from '../components/HeaderModal';
-import { InputForm } from '../components/Forms/InputForm';
+import HeaderModal from '../HeaderModal';
+import { InputForm } from '../Forms/InputForm';
 import { SelectList } from 'react-native-dropdown-select-list'
 
-import { ISelectProps } from '../../utils/interface';
+import { ISelectProps } from '../../../utils/interface';
 
-import { ButtonForm, TextButton } from '../styles/global';
-import { Container, Title } from '../styles/stockStyle';
+import { ButtonForm, TextButton } from '../../styles/global';
+import { Container, Title } from '../../styles/stockStyle';
 
 type StockProps = {
   closeModal: (value: boolean) => void;

@@ -37,7 +37,7 @@ export default function Buy({ closeModal }: BuyProps) {
       console.log(e)
     }
   }
-
+  
   function handleNewBuyModalOpen() {
     setIsNewModalOpen(true)
   }

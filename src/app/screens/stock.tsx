@@ -4,7 +4,7 @@ import { useFocusEffect } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import RegisterStock from './regStock';
-import FilterStock from './filterstock';
+import FilterStock from '../components/Filter/filterstock';
 
 import { keyStock } from '../../utils/keyStorage';
 import { IStock } from '../../utils/interface';

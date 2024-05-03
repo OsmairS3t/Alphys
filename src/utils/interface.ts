@@ -43,6 +43,14 @@ export interface ISale {
   isPaid: boolean;
   dateSale: string;
 }
+export interface IOrder {
+  id: string;
+  client: IClient | undefined;
+  product: IProduct | undefined;
+  amount: number;
+  price: number;
+  obs: string;
+}
 //transactions: buy + sale = replications table
 export interface ITransactionViewProps {
   id: string;

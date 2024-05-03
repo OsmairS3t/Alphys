@@ -2,7 +2,7 @@ import { useRouter } from 'expo-router';
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 
-import { ContainerHeader, ContainerImgHeader, ImgLogoHeader, IconSignOut } from '../styles/global';
+import { ContainerHeader, ContainerImgHeader, ImgLogoHeader, IconSignOut } from './styles/global';
 
 export default function Header() {
   const router = useRouter()
@@ -11,7 +11,7 @@ export default function Header() {
     router.replace('/')
   }
 
-  const logo = '../../assets/logo_alpys.png';
+  const logo = '../assets/logo_alpys.png';
 
   return (
     <ContainerHeader>

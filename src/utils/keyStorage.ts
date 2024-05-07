@@ -1,3 +1,4 @@
+export const keyUser = "@AlphysChoco:User";
 export const keyCategory = "@AlphysChoco:Category";
 export const keyProduct = "@AlphysChoco:Product";
 export const keyClient = "@AlphysChoco:Client";

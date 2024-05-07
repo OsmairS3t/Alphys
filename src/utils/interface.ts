@@ -5,6 +5,12 @@ export interface ISelectProps {
   key: string;
   value: string;
 }
+export interface IUser {
+  id: string;
+  email: string;
+  name: string;
+  password: string;
+}
 export interface ICategory {
   id: string;
   name: string;

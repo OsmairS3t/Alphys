@@ -1,5 +1,8 @@
-import { Pressable } from "react-native";
-import { useRouter } from "expo-router";
+import { Text } from "react-native";
+import { Link, useRouter } from "expo-router";
+import { useTheme } from "styled-components";
+import { Input } from "./components/Forms/InputForm/styles";
+import { useState } from "react";
 
 import {
   ContainerSignIn,
@@ -8,16 +11,26 @@ import {
   Form,
   ButtonSignIn,
   TextButtonSignIn,
-  ImgCredit
+  ImgCredit,
+  GroupLink,
+  LinkScreen,
+  TextLink
 } from './styles/global'
-import { Input } from "./components/Forms/InputForm/styles";
 
 export default function Login() {
-  const router = useRouter();
+  const theme = useTheme()
   const logo = '../assets/logo_alpys.png';
   const imgCredit = '../assets/credit_dark.png';
+  const router = useRouter();
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
 
   function handleLogIn() {
+    const dataUser = {
+      email: email,
+      password: password
+    }
+    // console.log(dataUser)
     router.replace('/(tabs)/transactions')
   }
 
@@ -29,16 +42,29 @@ export default function Login() {
           <Input
             placeholder="E-mail"
             keyboardType="email-address"
+            onChangeText={text => setEmail(text)}
+            value={email}
           />
 
           <Input
             placeholder="Senha"
-            keyboardType="visible-password"
+            secureTextEntry={true}
+            onChangeText={text => setPassword(text)}
+            value={password}
           />
 
           <ButtonSignIn onPress={handleLogIn}>
             <TextButtonSignIn>Entrar</TextButtonSignIn>
           </ButtonSignIn>
+          <GroupLink>
+            <LinkScreen href='./newuser'>
+              <TextLink>Não tenho cadastro</TextLink>
+            </LinkScreen>
+            <TextLink>|</TextLink>
+            <LinkScreen href='./esquecisenha'>
+              <TextLink>Esqueci a senha</TextLink>
+            </LinkScreen>
+          </GroupLink>
         </Form>
       </HeaderLogin>
       <ImgCredit source={require(imgCredit)} />

@@ -2,6 +2,7 @@ import { Feather } from "@expo/vector-icons";
 import { RFValue } from "react-native-responsive-fontsize";
 import { MaskedTextInput } from 'react-native-mask-text'
 import styled from "styled-components/native";
+import { Link } from "expo-router";
 
 export const Container = styled.View`
   flex: 1;
@@ -37,7 +38,22 @@ export const ImgCredit = styled.Image`
 
 export const LabelForm = styled.Text`
   font-size: 18px;
-  color: ${({ theme }) => theme.colors.text};  
+  color: ${({ theme }) => theme.colors.text_title};  
+`;
+
+export const GroupLink = styled.View`
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding-top: 10px;
+  gap: 10px;
+`;
+
+export const LinkScreen = styled(Link)``;
+
+export const TextLink = styled.Text`
+  font-size: 14px;
+  color: ${({ theme }) => theme.colors.shape};
 `;
 
 export const Form = styled.View`

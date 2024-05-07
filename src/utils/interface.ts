@@ -14,7 +14,6 @@ export interface IUser {
 export interface ICategory {
   id: string;
   name: string;
-  icon: 'book' | 'book-open' | 'box' | 'circle' | 'coffee' | 'disc' | 'dollar-sign' | 'file-text' | 'grid' | 'smile' | 'square' | 'star';
 }
 export interface IProduct {
   id: string;

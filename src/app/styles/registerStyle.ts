@@ -69,17 +69,17 @@ export const GroupColumn = styled.View`
 
 export const ItemColumnList = styled.View`
   margin: 4px 0px;
-  padding-bottom: 10px;
-  border-bottom-width: 1px;
-  border-bottom-style: solid;
-  border-bottom-color: ${({ theme }) => theme.colors.border_input};
 `;
 
 export const GroupIconTextRow = styled.View`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  padding-bottom: 10px;
   gap: 10px;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-color: ${({ theme }) => theme.colors.border_input};
 `;
 
 export const IconColumnList = styled(Feather)`

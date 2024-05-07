@@ -1,92 +1,92 @@
 import React, { useEffect, useState } from 'react';
 import { Alert } from 'react-native';
-import { useTheme } from 'styled-components';
 import uuid from 'react-native-uuid';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { useForm, Controller } from 'react-hook-form';
-import * as z from 'zod'
+import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import HeaderModal from '../components/HeaderModal';
 import { InputForm } from '../components/Forms/InputForm';
-import { SelectList } from 'react-native-dropdown-select-list'
 
-import { featherIcons, IFeatherIcons } from '../../utils/database';
-import { ICategory, ISelectProps } from '../../utils/interface';
+import { ICategory } from '../../utils/interface';
 import { keyCategory } from '../../utils/keyStorage';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { Container, Title } from '../styles/categoryStyle';
-import { ButtonForm, TextButton } from '../styles/global';
+import { ButtonForm, TextButton, TextError } from '../styles/global';
 
 type CategoryProps = {
   closeModal: (value: boolean) => void;
+  updateList: () => void;
+  idCategory: string;
 }
 
-const schema = z
-  .object({
-    name: z.string().min(3, 'O nome da categoria deve ter pelo menos 3 caracteres.'),
-  })
+const schema = z.object({
+  name: z.string().min(2, 'O nome da Categoria deve ter no mínimo 2 caracteres.')
+})
 
-type TypeData = z.infer<typeof schema>
+export default function RegisterCategory({ closeModal, updateList, idCategory }: CategoryProps) {
+  const { handleSubmit, control, setValue, formState:{errors} } = useForm<ICategory>({resolver: zodResolver(schema)})
+  let title_page = idCategory === '' ? 'NOVO CADASTRO' : 'EDITAR CADASTRO'
 
-export default function RegisterCategory({ closeModal }: CategoryProps) {
-  const theme = useTheme()
-  const [selectedIcon, setSelectedIcon] = useState("")
-  const [data, setData] = useState<ISelectProps[]>(IFeatherIcons);
-  const { handleSubmit, control, formState: { errors } } = useForm<TypeData>({
-    resolver: zodResolver(schema)
-  })
+  async function loadCategory(id: string) {
+    const response = await AsyncStorage.getItem(keyCategory)
+    const categories:ICategory[] = response ? JSON.parse(response) : []
+    const objCategory = categories.find(cat => cat.id === id)
+    setValue('name', String(objCategory?.name))
+  }
 
-  async function handleSave(formData: TypeData) {
+  async function handleSave(formData: ICategory) {
     const dataCategory = {
       id: uuid.v4().toString(),
-      name: formData.name,
-      icon: selectedIcon
+      name: String(formData.name),
     }
     try {
       const response = await AsyncStorage.getItem(keyCategory)
       let oldData: ICategory[] = response ? JSON.parse(response) : []
 
-      oldData.push(dataCategory)
-
-      await AsyncStorage.setItem(keyCategory, JSON.stringify(oldData))
-      Alert.alert('Categoria incluída com sucesso!')
+      const updateData = oldData.find(od => od.id === idCategory)
+      if (!updateData) {
+        oldData.push(dataCategory)
+        await AsyncStorage.setItem(keyCategory, JSON.stringify(oldData))
+        Alert.alert('Categoria incluída com sucesso!')
+      } else {
+        const removeData = oldData.filter(od => od.id !== idCategory)
+        removeData.push(dataCategory)
+        await AsyncStorage.setItem(keyCategory, JSON.stringify(removeData))
+        Alert.alert('Categoria alterada com sucesso!')
+      }
+      updateList();
       closeModal(false);
     } catch (error) {
       console.log('Ocorreu um erro ao tentar salvar: ', error)
     }
   }
 
+  useEffect(() => {
+    if (idCategory) {
+      loadCategory(idCategory)
+    }
+  },[])
+
   return (
     <Container>
       <HeaderModal closeModal={() => closeModal(false)} titleModal='CADASTRO DE CATEGORIAS' />
 
-      <Title>NOVO CADASTRO:</Title>
-      <Controller
+      <Title>{title_page}</Title>
+      <Controller 
+        name='name'
         control={control}
-        rules={{
-          maxLength: 100,
-        }}
-        render={({ field: { onChange, onBlur, value } }) => (
+        render={({ field: { onChange, value } }) => (
           <InputForm
-            placeholder='Nome da categoria'
-            onBlur={onBlur}
+            placeholder='Nome da Categoria'
             onChangeText={onChange}
             value={value}
           />
         )}
-        name="name"
       />
-
-      <SelectList
-        placeholder='Icone da categoria'
-        boxStyles={{ backgroundColor: theme.colors.bg_input, marginBottom: 10 }}
-        dropdownStyles={{ backgroundColor: theme.colors.bg_input }}
-        setSelected={(val: string) => setSelectedIcon(val)}
-        data={data}
-        save="key"
-      />
+      {errors.name && <TextError>{errors.name.message}</TextError>}
 
       <ButtonForm onPress={handleSubmit(handleSave)}>
         <TextButton>Salvar</TextButton>

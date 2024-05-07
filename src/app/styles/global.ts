@@ -218,3 +218,13 @@ export const TextButtonNewScreenPage = styled.Text`
   font-weight: bold;
   color: ${({ theme }) => theme.colors.background};
 `;
+
+export const IconList = styled(Feather)`
+  color: ${({ theme }) => theme.colors.text};
+`;
+
+export const TextError = styled.Text`
+  color: ${({ theme }) => theme.colors.attention};
+  font-size: ${RFValue(12)}px;
+  padding-bottom: 10px;
+`;

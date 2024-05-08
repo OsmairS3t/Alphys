@@ -5,14 +5,13 @@ import { useTheme } from 'styled-components';
 import HeaderModal from '../components/HeaderModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { keyCategory, keyProduct } from '../../utils/keyStorage';
+import { MaskedText, mask } from "react-native-mask-text";
 
 // import { categories } from '../../utils/database';
 import { ICategory, IProduct, ISelectProps } from '../../utils/interface';
 
 import uuid from 'react-native-uuid';
-import { useForm, Controller } from 'react-hook-form';
-import * as z from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod';
+
 import { InputForm } from '../components/Forms/InputForm';
 import { SelectList } from 'react-native-dropdown-select-list';
 
@@ -36,25 +35,17 @@ type ProductProps = {
   idProduct: string;
 }
 
-const schema = z
-  .object({
-    name: z.string().min(2, 'O nome do produto deve ter pelo menos 2 caracteres.'),
-    price: z.string().min(1, 'O preço tem que ter...')
-  })
-
-type TypeData = z.infer<typeof schema>
-
 export default function RegisterProduct({ closeModal, updateList, idProduct }: ProductProps) {
   const theme = useTheme()
   let title_page = idProduct === '' ? 'NOVO CADASTRO' : 'EDITAR CADASTRO'
   const [categories, setCategories] = useState<ICategory[]>([])
   const [imgPhoto, setImgPhoto] = useState<string>('../../assets/produto_padrao.png')
+  const [nameProduct, setNameProduct] = useState("")
   const [priceValue, setPriceValue] = useState("")
   const [selected, setSelected] = useState("")
   const [data, setData] = useState<ISelectProps[]>([]);
-  const { handleSubmit, control, setValue, formState: { errors } } = useForm<TypeData>({
-    resolver: zodResolver(schema)
-  })
+  const [categorySelect, setCategorySelect] = useState({ key: '', value: '' })
+  
   const PickImageLibrary = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -104,15 +95,19 @@ export default function RegisterProduct({ closeModal, updateList, idProduct }: P
     const response = await AsyncStorage.getItem(keyProduct)
     const products:IProduct[] = response ? JSON.parse(response) : []
     const objProduct = products.find(pro => pro.id === id)
-    setValue('name', String(objProduct?.name))
+    setCategorySelect({key:String(objProduct?.category?.id), value: String(objProduct?.category?.name)})
+    setNameProduct(String(objProduct?.name))
+    const code = mask("ABC1234","AAA-9999") // return ABC-1234
+    const priceFormatted = mask(String(objProduct?.price), "0.00")
     setPriceValue(String(objProduct?.price))
+    console.log('preco: ', priceFormatted)
   }
 
-  async function handleSave(formData: TypeData) {
+  async function handleSave() {
     const dataCategory = {
       id: uuid.v4().toString(),
       category: await loadCategory(selected),
-      name: formData.name,
+      name: nameProduct,
       price: Number(priceValue),
       photo: imgPhoto,
     }
@@ -152,19 +147,26 @@ export default function RegisterProduct({ closeModal, updateList, idProduct }: P
             setSelected={(val: string) => setSelected(val)}
             data={data}
             save="key"
+            defaultOption={categorySelect}
           />
 
-          <Controller
-            name="name"
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <InputForm
-                placeholder='Nome do produto'
-                onChangeText={onChange}
-                value={value}
-              />
-            )}
+          <InputForm
+            placeholder='Nome do produto'
+            onChangeText={text => setNameProduct(text)}
+            value={nameProduct}
           />
+          
+          {/* <MaskedText
+            type="currency"
+            options={{
+              prefix: '$',
+              decimalSeparator: '.',
+              groupSeparator: ',',
+              precision: 2
+            }}
+          >
+            5999
+          </MaskedText> */}
 
           <InputMask
             type='currency'
@@ -176,8 +178,8 @@ export default function RegisterProduct({ closeModal, updateList, idProduct }: P
             }}
             placeholder='0.00'
             keyboardType='numeric'
-            onChangeText={(text, rawText) => {
-              setPriceValue(text)
+            onChangeText={(priceValue, rawText) => {
+              setPriceValue(priceValue)
             }}
           />
 
@@ -196,7 +198,7 @@ export default function RegisterProduct({ closeModal, updateList, idProduct }: P
             </PhotoImage>
           </GroupImage>
 
-          <ButtonForm onPress={handleSubmit(handleSave)}>
+          <ButtonForm onPress={handleSave}>
             <TextButton>Salvar</TextButton>
           </ButtonForm>
 

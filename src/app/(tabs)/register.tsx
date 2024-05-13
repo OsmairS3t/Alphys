@@ -9,6 +9,7 @@ import Client from '../screens/client';
 import Stock from '../screens/stock';
 
 import { Container, Title, ListGroup, ItemList, Item, TextItem, GroupList, IconList } from '../styles/registerStyle';
+import Recipe from '../screens/recipe';
 
 export default function Register() {
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false)
@@ -17,6 +18,7 @@ export default function Register() {
   const [isSaleModalOpen, setIsSaleModalOpen] = useState(false)
   const [isClientModalOpen, setIsClientModalOpen] = useState(false)
   const [isStockModalOpen, setIsStockModalOpen] = useState(false)
+  const [isRecipeModalOpen, setIsRecipeModalOpen] = useState(false)
 
   function handleModalRegister(typeRegister: string) {
     if (typeRegister === 'category') { setIsCategoryModalOpen(true) }
@@ -25,6 +27,7 @@ export default function Register() {
     if (typeRegister === 'sale') { setIsSaleModalOpen(true) }
     if (typeRegister === 'client') { setIsClientModalOpen(true) }
     if (typeRegister === 'stock') { setIsStockModalOpen(true) }
+    if (typeRegister === 'recipe') { setIsRecipeModalOpen(true) }
   }
 
   return (
@@ -65,6 +68,12 @@ export default function Register() {
           <GroupList>
             <IconList name='add-business' size={32} />
             <TextItem>ESTOQUE</TextItem>
+          </GroupList>
+        </Item>
+        <Item onPress={() => handleModalRegister('recipe')}>
+          <GroupList>
+            <IconList name='list-alt' size={32} />
+            <TextItem>RECEITAS</TextItem>
           </GroupList>
         </Item>
       </ItemList>
@@ -127,6 +136,16 @@ export default function Register() {
           setIsStockModalOpen(!isStockModalOpen)
         }}>
         <Stock closeModal={setIsStockModalOpen} />
+      </Modal>
+
+      <Modal
+        transparent={true}
+        animationType='slide'
+        visible={isRecipeModalOpen}
+        onRequestClose={() => {
+          setIsRecipeModalOpen(!isRecipeModalOpen)
+        }}>
+        <Recipe closeModal={setIsRecipeModalOpen} />
       </Modal>
     </Container>
   )

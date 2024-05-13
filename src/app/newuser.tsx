@@ -16,6 +16,10 @@ import {
   LinkScreen,
   TextLink
 } from './styles/global';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { keyUser } from '../utils/keyStorage';
+import { IUser } from '../utils/interface';
+import { Alert } from 'react-native';
 
 const NewUser: React.FC = () => {
   const theme = useTheme();
@@ -27,11 +31,23 @@ const NewUser: React.FC = () => {
 
   async function handleSave() {
     const dataUser = {
-      id: uuid.v4().toString(),
-      email: email,
-      name: name,
-      password: password,
-      password2: password2
+      email: String(email),
+      name: String(name),
+      password: String(password),
+      password2: String(password2)
+    }
+    try {
+      const response = await AsyncStorage.getItem(keyUser)
+      const users: IUser[] = response ? JSON.parse(response) : []
+      const foundUser = users.find(u => u.email === email)
+      if (foundUser) {
+        Alert.alert('Usuário já cadastrado!')
+      } else {
+        await AsyncStorage.setItem(keyUser, JSON.stringify(dataUser))
+        Alert.alert('Usuário incluído com sucesso!')
+      }
+    } catch (error) {
+      console.log(error)
     }
     console.log(dataUser)
   }

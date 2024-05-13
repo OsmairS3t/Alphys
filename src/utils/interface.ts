@@ -6,7 +6,6 @@ export interface ISelectProps {
   value: string;
 }
 export interface IUser {
-  id: string;
   email: string;
   name: string;
   password: string;
@@ -55,6 +54,20 @@ export interface IOrder {
   amount: number;
   price: number;
   obs: string;
+}
+export interface IIngredient {
+  id: string;
+  name: string;
+  amount: number;
+  unit: string;
+  conditions: string;
+}
+export interface IRecipe {
+  id: string;
+  product: IProduct | undefined;
+  ingredients: IIngredient[];
+  preparation: string;
+  cooking: string;
 }
 //transactions: buy + sale = replications table
 export interface ITransactionViewProps {

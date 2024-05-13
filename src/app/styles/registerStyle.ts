@@ -18,9 +18,8 @@ export const ListGroup = styled.View`
   padding: 10px;
 `;
 
-export const ItemList = styled.View`
-  margin-top: 16px;
-  gap: 10px;
+export const ItemList = styled.ScrollView`
+  margin: 10px 0px;
   width: 100%;
 `;
 
@@ -31,12 +30,9 @@ export const Item = styled.Pressable`
   width: 100%;
   height: 60px;
   padding: 10px;
-  border-width: 1px;
-  border-style: solid;
-  border-color: ${({ theme }) => theme.colors.border_input};
+  margin-bottom: 5px;
   border-radius: 5px;
-  `;
-
+`;
 
 export const GroupList = styled.View`
   flex-direction: row;

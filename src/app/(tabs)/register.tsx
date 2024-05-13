@@ -8,7 +8,7 @@ import Sale from '../screens/sale';
 import Client from '../screens/client';
 import Stock from '../screens/stock';
 
-import { Container, Title, ListGroup, ItemList, Item, TextItem, GroupList, IconList } from '../styles/registerStyle';
+import { Container, Title, ItemList, Item, TextItem, GroupList, IconList } from '../styles/registerStyle';
 import Recipe from '../screens/recipe';
 
 export default function Register() {

@@ -47,15 +47,15 @@ export default function RegisterCategory({ closeModal, updateList, idCategory }:
       const response = await AsyncStorage.getItem(keyCategory)
       let oldData: ICategory[] = response ? JSON.parse(response) : []
 
-      const updateData = oldData.find(od => od.id === idCategory)
-      if (!updateData) {
+      const foundedData = oldData.find(od => od.id === idCategory)
+      if (!foundedData) {
         oldData.push(dataCategory)
         await AsyncStorage.setItem(keyCategory, JSON.stringify(oldData))
         Alert.alert('Categoria incluída com sucesso!')
       } else {
-        const removeData = oldData.filter(od => od.id !== idCategory)
-        removeData.push(dataCategory)
-        await AsyncStorage.setItem(keyCategory, JSON.stringify(removeData))
+        const updateData = oldData.filter(od => od.id !== idCategory)
+        updateData.push(dataCategory)
+        await AsyncStorage.setItem(keyCategory, JSON.stringify(updateData))
         Alert.alert('Categoria alterada com sucesso!')
       }
       updateList();
@@ -66,7 +66,7 @@ export default function RegisterCategory({ closeModal, updateList, idCategory }:
   }
 
   useEffect(() => {
-    if (idCategory) {
+    if (idCategory!=='') {
       loadCategory(idCategory)
     }
   }, [])

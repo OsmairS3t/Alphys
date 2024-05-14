@@ -1,12 +1,12 @@
 import React, { useCallback, useState } from 'react';
-import { FlatList, Pressable, Modal } from 'react-native';
+import { FlatList, Pressable, Modal, Alert } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import HeaderModal from '../components/HeaderModal';
 
-import { IClient } from '../../utils/interface';
-import { keyClient } from '../../utils/keyStorage';
+import { IClient, ISale } from '../../utils/interface';
+import { keyClient, keySale } from '../../utils/keyStorage';
 import RegisterClient from './regClient';
 
 import {
@@ -30,6 +30,7 @@ type ClientProps = {
 }
 
 export default function Client({ closeModal }: ClientProps) {
+  const [idClient, setIdClient] = useState('')
   const [clients, setClients] = useState<IClient[]>([])
   const [isNewModalOpen, setIsNewModalOpen] = useState(false)
 
@@ -44,7 +45,54 @@ export default function Client({ closeModal }: ClientProps) {
   }
 
   function handleNewCategoryModalOpen() {
+    setIdClient('')
     setIsNewModalOpen(true)
+  }
+
+  function handleEditCategoryModalOpen(id: string) {
+    setIdClient(id)
+    setIsNewModalOpen(true)
+  }
+
+  async function deleteClient(id: string) {
+    try {
+      const responseSale = await AsyncStorage.getItem(keySale)
+      const sales: ISale[] = responseSale ? JSON.parse(responseSale) : []
+      const saleClient = sales.find(sale => sale.client?.id === id)
+      if (saleClient) {
+        Alert.alert('Cliente possui venda em seu nome.')
+      } else {
+        const responseClient = await AsyncStorage.getItem(keyClient)
+        const clients: IClient[] = responseClient ? JSON.parse(responseClient) : []
+        const removedItem = clients.filter(cli => cli.id !== id)
+        await AsyncStorage.setItem(keyClient, JSON.stringify(removedItem))
+        loadClients()
+        Alert.alert('Cliente excluído com sucesso!')
+      }
+    } catch (error) {
+      console.log('Erro ao tentar excluir: ', error)
+    }
+  }
+
+  function handleDeleteClient(id: string) {
+    Alert.alert(
+      'Exclusao de Clientes',
+      'Tem certeza que deseja excluir este Cliente?',
+      [
+        {
+          text: 'Sim',
+          onPress: () => {
+            deleteClient(id)
+          },
+          style: 'default',
+        },
+        {
+          text: 'Não',
+          style: 'cancel',
+        },
+      ],
+      { cancelable: true },
+    );
   }
 
   useFocusEffect(
@@ -70,13 +118,19 @@ export default function Client({ closeModal }: ClientProps) {
             data={clients}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) =>
-              <Pressable onPress={() => { }}>
-                <ItemColumnList>
-                  <GroupIconTextRow>
-                    <TextColumnList>Nome: {item.name}</TextColumnList>
-                  </GroupIconTextRow>
-                </ItemColumnList>
-              </Pressable>
+              <GroupIconTextRow>
+                <Pressable onPress={() => handleEditCategoryModalOpen(item.id)}>
+                  <ItemColumnList>
+                      <TextColumnList> {item.name}</TextColumnList>
+                  </ItemColumnList>
+                </Pressable>
+
+                <Pressable onPress={() => handleDeleteClient(item.id)}>
+                  <ItemColumnList>
+                    <IconColumnList name='trash-2' size={24} />
+                  </ItemColumnList>
+                </Pressable>
+              </GroupIconTextRow>
             }
           />
           :
@@ -91,7 +145,11 @@ export default function Client({ closeModal }: ClientProps) {
         onRequestClose={() => {
           setIsNewModalOpen(!isNewModalOpen)
         }}>
-        <RegisterClient closeModal={setIsNewModalOpen} />
+        <RegisterClient 
+          updateList={loadClients}
+          closeModal={setIsNewModalOpen} 
+          idClient={idClient}
+        />
       </Modal>
 
     </ContainerModal>

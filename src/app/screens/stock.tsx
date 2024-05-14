@@ -39,6 +39,7 @@ export default function Stock({ closeModal }: StockProps) {
 
   async function loadStock() {
     try {
+      //await AsyncStorage.removeItem(keyStock)
       const result = await AsyncStorage.getItem(keyStock)
       const stock: IStock[] = result !== null ? JSON.parse(result) : []
       setStocks(stock)
@@ -86,14 +87,20 @@ export default function Stock({ closeModal }: StockProps) {
             data={stocks}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) =>
-              <Pressable onPress={() => handleEditStockModalOpen(item.id)}>
-                <ItemColumnList>
-                  <GroupIconTextRow>
-                    <TextColumnList>{item.product?.category?.name} - {item.product?.name}</TextColumnList>
-                    <TextColumnList>{item.amount} itens</TextColumnList>
-                  </GroupIconTextRow>
-                </ItemColumnList>
-              </Pressable>
+              <GroupIconTextRow>
+                <Pressable onPress={() => handleEditStockModalOpen(item.id)}>
+                  <ItemColumnList>
+                      <TextColumnList>{item.product?.category?.name} - {item.product?.name}</TextColumnList>
+                      <TextColumnList>{item.amount} itens</TextColumnList>
+                  </ItemColumnList>
+                </Pressable>
+
+                <Pressable onPress={() => {}}>
+                  <TextColumnList>
+                    <IconColumnList name='trash-2' size={24} />
+                  </TextColumnList>
+                </Pressable>
+              </GroupIconTextRow>
             }
           />
           :
@@ -118,7 +125,11 @@ export default function Stock({ closeModal }: StockProps) {
         onRequestClose={() => {
           setIsStockModalOpen(!isStockModalOpen)
         }}>
-        <RegisterStock closeModal={setIsStockModalOpen} idStock={idStock} />
+        <RegisterStock 
+          closeModal={setIsStockModalOpen} 
+          updateList={loadStock}
+          idStock={idStock} 
+        />
       </Modal>
     </ContainerModal>
   )

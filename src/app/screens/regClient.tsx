@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import uuid from 'react-native-uuid';
 import * as ImagePicker from 'expo-image-picker';
 import { InputForm } from '../components/Forms/InputForm';
@@ -26,9 +26,12 @@ import { Alert } from 'react-native';
 
 type ClientProps = {
   closeModal: (value: boolean) => void;
+  updateList: () => void;
+  idClient: string;
 }
 
-export default function RegisterClient({ closeModal }: ClientProps) {
+export default function RegisterClient({ closeModal, updateList, idClient }: ClientProps) {
+  let title_page = idClient === '' ? 'NOVO CADASTRO' : 'EDITAR CADASTRO'
   const [name, setName] = useState('')
   const [imgPhoto, setImgPhoto] = useState('../../assets/foto_cliente.png')
 
@@ -60,8 +63,16 @@ export default function RegisterClient({ closeModal }: ClientProps) {
     }
   }
 
+  async function loadClient(id: string) {
+    const response = await AsyncStorage.getItem(keyClient)
+    const clients: IClient[] = response ? JSON.parse(response) : []
+    const foundClient = clients.find(cli => cli.id === id)
+    setName(String(foundClient?.name))
+    setImgPhoto(String(foundClient?.photo))
+  }
+
   async function handleSave() {
-    const data = {
+    const dataClient = {
       id: uuid.v4().toString(),
       name: name,
       photo: imgPhoto,
@@ -69,23 +80,35 @@ export default function RegisterClient({ closeModal }: ClientProps) {
     try {
       const response = await AsyncStorage.getItem(keyClient)
       let oldData: IClient[] = response ? JSON.parse(response) : []
-
-      oldData.push(data)
-
-      // await AsyncStorage.removeItem(keyClient)
-      await AsyncStorage.setItem(keyClient, JSON.stringify(oldData))
-      Alert.alert('Cliente incluído com sucesso!')
+      const foundedData = oldData.find(od => od.id === idClient)
+      if(!foundedData){
+        oldData.push(dataClient)
+        await AsyncStorage.setItem(keyClient, JSON.stringify(oldData))
+        Alert.alert('Cliente incluído com sucesso!')
+      } else {
+        const updateData = oldData.filter(od => od.id !== idClient)
+        updateData.push(dataClient)
+        await AsyncStorage.setItem(keyClient, JSON.stringify(updateData))
+        Alert.alert('Cliente alterado com sucesso!')
+      }
+      updateList()
       closeModal(false);
     } catch (error) {
       console.log('Ocorreu um erro ao tentar salvar: ', error)
     }
   }
 
+  useEffect(() => {
+    if(idClient !== '') {
+      loadClient(idClient)
+    }
+  }, [])
+
   return (
     <Container>
       <HeaderModal closeModal={() => closeModal(false)} titleModal='CADASTRO DE CLIENTES' />
 
-      <Title>NOVO CADASTRO:</Title>
+      <Title>{title_page}</Title>
       <InputForm
         placeholder='Nome'
         onChangeText={text => setName(text)}

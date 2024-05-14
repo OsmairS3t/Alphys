@@ -16,10 +16,11 @@ import { Container, TitleModal } from '../styles/stockStyle';
 
 type StockProps = {
   closeModal: (value: boolean) => void;
+  updateList: () => void;
   idStock: string;
 }
 
-export default function RegisterStock({ closeModal, idStock }: StockProps) {
+export default function RegisterStock({ closeModal, updateList, idStock }: StockProps) {
   const theme = useTheme();
   let title_page = idStock === '' ? 'NOVO CADASTRO' : 'EDITAR CADASTRO'
   const [selected, setSelected] = useState('');
@@ -53,15 +54,15 @@ export default function RegisterStock({ closeModal, idStock }: StockProps) {
         oldData.push(dataNewStock)
         await AsyncStorage.setItem(keyStock, JSON.stringify(oldData))
         Alert.alert('Produto incluído no estoque com sucesso!')
-
       } else {
-
         // caso encontre, remove da coleção e inclui o novo com nova quantidade
         const removeData = oldData.filter(od => od.product?.id !== selected)
         removeData.push(dataNewStock)
         await AsyncStorage.setItem(keyStock, JSON.stringify(removeData))
         Alert.alert('Quantidade do produto no estoque alterada com sucesso!')
       }
+      updateList();
+      closeModal(false);
       // await AsyncStorage.removeItem(keyStock)
     } catch (error) {
       console.log('Ocorreu um erro ao tentar salvar: ', error)

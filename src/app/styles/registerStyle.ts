@@ -71,7 +71,7 @@ export const GroupIconTextRow = styled.View`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 10px;
+  padding-bottom: 4px;
   gap: 10px;
   border-bottom-width: 1px;
   border-bottom-style: solid;

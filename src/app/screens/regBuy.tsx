@@ -6,56 +6,78 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { keyBuy } from '../../utils/keyStorage';
 import { IBuy } from '../../utils/interface';
 import { InputForm } from '../components/Forms/InputForm';
+import { actualDate } from '../../utils/functions';
 
 import { Container, Title } from '../styles/buyStyle';
 import { ButtonForm, TextButton, InputMask } from '../styles/global';
 
 type BuyProps = {
   closeModal: (value: boolean) => void;
+  updateList: () => void;
+  idBuy: string;
 }
 
-export default function RegisterBuy({ closeModal }: BuyProps) {
+export default function RegisterBuy({ closeModal, updateList, idBuy }: BuyProps) {
+  let title_page = idBuy === '' ? 'NOVO CADASTRO' : 'EDITAR CADASTRO'
   const [buy, setBuy] = useState<IBuy[]>([])
   const [name, setName] = useState('')
   const [amount, setAmount] = useState('')
   const [price, setPrice] = useState('')
+  const [dateBuy, setDateBuy] = useState(actualDate())
 
-  async function getAsyncStorageBuy() {
+  async function loadBuy(id: string) {
     try {
-      const result = await AsyncStorage.getItem(keyBuy)
-      const b: IBuy[] = result !== null ? JSON.parse(result) : []
-      return b
+      const response = await AsyncStorage.getItem(keyBuy)
+      const buys: IBuy[] = response ? JSON.parse(response) : []
+      const foundBuy = buys.find(buy => buy.id === id)
+      setName(String(foundBuy?.name))
+      setAmount(String(foundBuy?.amount))
+      setPrice(String(foundBuy?.price))
     } catch (e) {
       console.log(e)
     }
   }
 
   async function handleSave() {
-    const data = {
+    const dataBuy = {
       id: uuid.v4().toString(),
       name: name,
-      amount: Number(amount),
-      price: Number(price)
+      amount: amount,
+      price: Number(price),
+      datebuy: dateBuy
     }
     try {
       const response = await AsyncStorage.getItem(keyBuy)
       let oldData: IBuy[] = response ? JSON.parse(response) : []
-
-      oldData.push(data)
-
-      await AsyncStorage.setItem(keyBuy, JSON.stringify(oldData))
-      Alert.alert('Compra incluída com sucesso!')
+      const foundedData = oldData.find(od => od.id === idBuy)
+      if (!foundedData) {
+        oldData.push(dataBuy)
+        await AsyncStorage.setItem(keyBuy, JSON.stringify(oldData))
+        Alert.alert('Compra incluída com sucesso!')
+      } else {
+        const updateData = oldData.filter(od => od.id !== idBuy)
+        updateData.push(dataBuy)
+        await AsyncStorage.setItem(keyBuy, JSON.stringify(updateData))
+        Alert.alert('Compra atualizada com sucesso!')
+      }
+      updateList();
       closeModal(false);
     } catch (error) {
       console.log('Ocorreu um erro ao tentar salvar: ', error)
     }
   }
 
+  useEffect(() => {
+    if (idBuy !== '') {
+      loadBuy(idBuy)
+    }
+  }, [])
+
   return (
     <Container>
       <HeaderModal closeModal={() => closeModal(false)} titleModal='CADASTRO DE COMPRAS' />
 
-      <Title>NOVO CADASTRO:</Title>
+      <Title>{title_page}</Title>
 
       <InputForm
         placeholder='Identificação'
@@ -65,7 +87,7 @@ export default function RegisterBuy({ closeModal }: BuyProps) {
 
       <InputForm
         placeholder='Quantidade'
-        keyboardType='numeric'
+        keyboardType='default'
         onChangeText={text => setAmount(text)}
         value={amount}
       />
@@ -80,10 +102,18 @@ export default function RegisterBuy({ closeModal }: BuyProps) {
         }}
         placeholder='0.00'
         keyboardType='numeric'
-        onChangeText={(text, rawText) => {
-          setPrice(text)
+        onChangeText={(price, rawText) => {
+          setPrice(price)
         }}
       />
+
+      <InputForm
+        placeholder='dd/mm/yyyy'
+        keyboardType='numbers-and-punctuation'
+        onChangeText={text => setDateBuy(text)}
+        value={dateBuy}
+      />
+
       <ButtonForm onPress={handleSave}>
         <TextButton>Salvar</TextButton>
       </ButtonForm>

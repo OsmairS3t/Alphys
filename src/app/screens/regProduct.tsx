@@ -15,7 +15,7 @@ import uuid from 'react-native-uuid';
 import { InputForm } from '../components/Forms/InputForm';
 import { SelectList } from 'react-native-dropdown-select-list';
 
-import { ButtonForm, TextButton, InputMask } from '../styles/global';
+import { ButtonForm, TextButton, InputMask, Error } from '../styles/global';
 import {
   Container,
   Title,
@@ -38,6 +38,9 @@ type ProductProps = {
 export default function RegisterProduct({ closeModal, updateList, idProduct }: ProductProps) {
   const theme = useTheme()
   let title_page = idProduct === '' ? 'NOVO CADASTRO' : 'EDITAR CADASTRO'
+  const [errCateogry, setErrCategory] = useState('')
+  const [errName, setErrName] = useState('')
+  const [errPrice, setErrPrice] = useState('')
   const [categories, setCategories] = useState<ICategory[]>([])
   const [imgPhoto, setImgPhoto] = useState<string>('../../assets/produto_padrao.png')
   const [nameProduct, setNameProduct] = useState("")
@@ -45,7 +48,7 @@ export default function RegisterProduct({ closeModal, updateList, idProduct }: P
   const [selected, setSelected] = useState("")
   const [data, setData] = useState<ISelectProps[]>([]);
   const [categorySelect, setCategorySelect] = useState({ key: '', value: '' })
-  
+
   const PickImageLibrary = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -76,7 +79,7 @@ export default function RegisterProduct({ closeModal, updateList, idProduct }: P
 
   async function loadCategories() {
     const response = await AsyncStorage.getItem(keyCategory)
-    const categories:ICategory[] = response ? JSON.parse(response) : []
+    const categories: ICategory[] = response ? JSON.parse(response) : []
     setCategories(categories)
     let newArray: ISelectProps[] = categories.map(cat => {
       return { key: cat.id, value: cat.name }
@@ -86,24 +89,27 @@ export default function RegisterProduct({ closeModal, updateList, idProduct }: P
 
   async function loadCategory(idCategory: string) {
     const response = await AsyncStorage.getItem(keyCategory)
-    const categories:ICategory[] = response ? JSON.parse(response) : []
+    const categories: ICategory[] = response ? JSON.parse(response) : []
     const category = categories.find(cat => cat.id === idCategory)
     return category
   }
 
   async function loadProduct(id: string) {
     const response = await AsyncStorage.getItem(keyProduct)
-    const products:IProduct[] = response ? JSON.parse(response) : []
+    const products: IProduct[] = response ? JSON.parse(response) : []
     const objProduct = products.find(pro => pro.id === id)
-    setCategorySelect({key:String(objProduct?.category?.id), value: String(objProduct?.category?.name)})
+    setCategorySelect({ key: String(objProduct?.category?.id), value: String(objProduct?.category?.name) })
     setNameProduct(String(objProduct?.name))
-    const code = mask("ABC1234","AAA-9999") // return ABC-1234
+    const code = mask("ABC1234", "AAA-9999") // return ABC-1234
     const priceFormatted = mask(String(objProduct?.price), "0.00")
     setPriceValue(String(objProduct?.price))
     console.log('preco: ', priceFormatted)
   }
 
   async function handleSave() {
+    if (selected === '') {
+      Alert.alert('Informe a categoria.')
+    }
     const dataCategory = {
       id: uuid.v4().toString(),
       category: await loadCategory(selected),
@@ -128,7 +134,7 @@ export default function RegisterProduct({ closeModal, updateList, idProduct }: P
 
   useEffect(() => {
     loadCategories()
-    if(idProduct !== '') {
+    if (idProduct !== '') {
       loadProduct(idProduct)
     }
   }, [])
@@ -149,24 +155,13 @@ export default function RegisterProduct({ closeModal, updateList, idProduct }: P
             save="key"
             defaultOption={categorySelect}
           />
+          {errCateogry !== '' && <Error>{errCateogry}</Error>}
 
           <InputForm
             placeholder='Nome do produto'
             onChangeText={text => setNameProduct(text)}
             value={nameProduct}
           />
-          
-          {/* <MaskedText
-            type="currency"
-            options={{
-              prefix: '$',
-              decimalSeparator: '.',
-              groupSeparator: ',',
-              precision: 2
-            }}
-          >
-            5999
-          </MaskedText> */}
 
           <InputMask
             type='currency'

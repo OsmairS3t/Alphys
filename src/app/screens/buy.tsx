@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Pressable, FlatList } from 'react-native'
+import { Alert, Modal, Pressable, FlatList } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { keyBuy } from '../../utils/keyStorage';
@@ -20,11 +20,14 @@ import {
 import {
   ContainerModal,
   GroupColumn,
+  GroupIconTextRow,
   ItemColumnList,
-  TextColumnList
+  TextColumnList,
+  IconColumnList
 } from '../styles/registerStyle';
 
 export default function Buy({ closeModal }: BuyProps) {
+  const [idBuy, setIdBuy] = useState('')
   const [buys, setBuys] = useState<IBuy[]>([])
   const [isNewModalOpen, setIsNewModalOpen] = useState(false)
 
@@ -37,11 +40,50 @@ export default function Buy({ closeModal }: BuyProps) {
       console.log(e)
     }
   }
-  
+
   function handleNewBuyModalOpen() {
+    setIdBuy('')
     setIsNewModalOpen(true)
   }
 
+  function handleEditBuyModalOpen(id: string) {
+    setIdBuy(id)
+    setIsNewModalOpen(true)
+  }
+
+  async function deleteBuy(id: string) {
+    try {
+      const responseBuy = await AsyncStorage.getItem(keyBuy)
+      const buys: IBuy[] = responseBuy ? JSON.parse(responseBuy) : []
+      const removedItem = buys.filter(buy => buy.id !== id)
+      await AsyncStorage.setItem(keyBuy, JSON.stringify(removedItem))
+      loadBuys()
+      Alert.alert('Compra excluída com sucesso!')
+    } catch (error) {
+      console.log('Erro ao tentar excluir: ', error)
+    }
+  }
+
+  function handleDeleteBuy(id: string) {
+    Alert.alert(
+      'Exclusao de Compra',
+      'Tem certeza que deseja excluir esta compra?',
+      [
+        {
+          text: 'Sim',
+          onPress: () => {
+            deleteBuy(id)
+          },
+          style: 'default',
+        },
+        {
+          text: 'Não',
+          style: 'cancel',
+        },
+      ],
+      { cancelable: true },
+    );
+  }
   useEffect(() => {
     loadBuys()
   }, [])
@@ -63,17 +105,28 @@ export default function Buy({ closeModal }: BuyProps) {
             data={buys}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) =>
-              <Pressable onPress={() => { }}>
-                <ItemColumnList>
-                  <TextColumnList>Descrição: {item.name}</TextColumnList>
-                  <TextColumnList>Quant.: {item.amount}</TextColumnList>
-                  <TextColumnList>
-                    Valor: {Intl
-                      .NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
-                      .format(item.price)}
-                  </TextColumnList>
-                </ItemColumnList>
-              </Pressable>
+              <GroupIconTextRow>
+                <Pressable onPress={() => { handleEditBuyModalOpen(item.id) }}>
+                  <ItemColumnList>
+                    <TextColumnList>Descrição: {item.name}</TextColumnList>
+                    <TextColumnList>Quant.: {item.amount}</TextColumnList>
+                    <TextColumnList>
+                      Valor: {Intl
+                        .NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
+                        .format(item.price)}
+                    </TextColumnList>
+                    <TextColumnList>
+                      Dia da compra: {item.datebuy}
+                    </TextColumnList>
+                  </ItemColumnList>
+                </Pressable>
+
+                <Pressable onPress={() => handleDeleteBuy(item.id)}>
+                  <ItemColumnList>
+                    <IconColumnList name='trash-2' size={24} />
+                  </ItemColumnList>
+                </Pressable>
+              </GroupIconTextRow>
             }
           />
           :
@@ -88,7 +141,11 @@ export default function Buy({ closeModal }: BuyProps) {
         onRequestClose={() => {
           setIsNewModalOpen(!isNewModalOpen)
         }}>
-        <RegisterBuy closeModal={setIsNewModalOpen} />
+        <RegisterBuy
+          closeModal={setIsNewModalOpen}
+          updateList={loadBuys}
+          idBuy={idBuy}
+        />
       </Modal>
 
     </ContainerModal>

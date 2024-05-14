@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, Pressable, Modal } from 'react-native';
+import { FlatList, Pressable, Modal, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from 'styled-components';
 
@@ -17,10 +17,10 @@ import {
 import {
   ContainerModal,
   GroupColumn,
-  ItemColumnList,
   GroupIconTextRow,
-  IconColumnList,
-  TextColumnList
+  ItemColumnList,
+  TextColumnList,
+  IconColumnList
 } from '../styles/registerStyle';
 
 type SaleProps = {
@@ -29,6 +29,7 @@ type SaleProps = {
 
 export default function Sale({ closeModal }: SaleProps) {
   const theme = useTheme();
+  const [idSale, setIdSale] = useState('')
   const [isNewModalOpen, setIsNewModalOpen] = useState(false)
   const [sales, setSales] = useState<ISale[]>([]);
 
@@ -43,7 +44,47 @@ export default function Sale({ closeModal }: SaleProps) {
   }
 
   function handleNewSaleModalOpen() {
+    setIdSale('')
     setIsNewModalOpen(true)
+  }
+
+  function handleEditSaleModalOpen(id: string) {
+    setIdSale(id)
+    setIsNewModalOpen(true)
+  }
+
+  async function deleteSale(id: string) {
+    try {
+      const responseSale = await AsyncStorage.getItem(keySale)
+      const sales: ISale[] = responseSale ? JSON.parse(responseSale) : []
+      const removedItem = sales.filter(sale => sale.id !== id)
+      await AsyncStorage.setItem(keySale, JSON.stringify(removedItem))
+      loadSales()
+      Alert.alert('Venda excluída com sucesso!')
+    } catch (error) {
+      console.log('Erro ao tentar excluir: ', error)
+    }
+  }
+
+  function handleDeleteSale(id: string) {
+    Alert.alert(
+      'Exclusao de Venda',
+      'Tem certeza que deseja excluir esta venda?',
+      [
+        {
+          text: 'Sim',
+          onPress: () => {
+            deleteSale(id)
+          },
+          style: 'default',
+        },
+        {
+          text: 'Não',
+          style: 'cancel',
+        },
+      ],
+      { cancelable: true },
+    );
   }
 
   useEffect(() => {
@@ -67,19 +108,25 @@ export default function Sale({ closeModal }: SaleProps) {
             data={sales}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) =>
-              <Pressable onPress={() => { }}>
-                <ItemColumnList>
-                  <TextColumnList>Cliente: {item.client?.name}</TextColumnList>
-                  <TextColumnList>Produto: {item.product?.name}</TextColumnList>
-                  <TextColumnList>Quant.: {item.amount}</TextColumnList>
-                  <TextColumnList>
-                    Valor: {Intl
-                      .NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
-                      .format(item.price)}
-                  </TextColumnList>
-                  <TextColumnList>Situação: {item.isPaid ? 'Pago' : 'A pagar'}</TextColumnList>
-                </ItemColumnList>
-              </Pressable>
+              <GroupIconTextRow>
+                <Pressable onPress={() => handleEditSaleModalOpen(item.id)}>
+                  <ItemColumnList>
+                    <TextColumnList>Cliente: {item.client?.name}</TextColumnList>
+                    <TextColumnList>Produto: {item.product?.name}</TextColumnList>
+                    <TextColumnList>Quant.: {item.amount}</TextColumnList>
+                    <TextColumnList>
+                      Valor: {Intl
+                        .NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
+                        .format(item.price)}
+                    </TextColumnList>
+                    <TextColumnList>Situação: {item.isPaid ? 'Pago' : 'A pagar'}</TextColumnList>
+                  </ItemColumnList>
+                </Pressable>
+
+                <Pressable onPress={() => handleDeleteSale(item.id)}>
+                  <IconColumnList name='trash-2' size={24} />
+                </Pressable>
+              </GroupIconTextRow>
             }
           />
           :
@@ -94,7 +141,11 @@ export default function Sale({ closeModal }: SaleProps) {
         onRequestClose={() => {
           setIsNewModalOpen(!isNewModalOpen)
         }}>
-        <RegisterSale closeModal={setIsNewModalOpen} />
+        <RegisterSale
+          closeModal={setIsNewModalOpen}
+          updateList={loadSales}
+          idSale={idSale}
+        />
       </Modal>
 
     </ContainerModal>

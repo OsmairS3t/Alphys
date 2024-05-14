@@ -23,16 +23,17 @@ type CategoryProps = {
 }
 
 const schema = z.object({
-  name: z.string().min(2, 'O nome da Categoria deve ter no mínimo 2 caracteres.')
+  name: z.string({ message: 'Informe o nome da categoria.' })
+    .min(2, 'O nome da Categoria deve ter no mínimo 2 caracteres.')
 })
 
 export default function RegisterCategory({ closeModal, updateList, idCategory }: CategoryProps) {
-  const { handleSubmit, control, setValue, formState:{errors} } = useForm<ICategory>({resolver: zodResolver(schema)})
+  const { handleSubmit, control, setValue, formState: { errors } } = useForm<ICategory>({ resolver: zodResolver(schema) })
   let title_page = idCategory === '' ? 'NOVO CADASTRO' : 'EDITAR CADASTRO'
 
   async function loadCategory(id: string) {
     const response = await AsyncStorage.getItem(keyCategory)
-    const categories:ICategory[] = response ? JSON.parse(response) : []
+    const categories: ICategory[] = response ? JSON.parse(response) : []
     const objCategory = categories.find(cat => cat.id === id)
     setValue('name', String(objCategory?.name))
   }
@@ -68,14 +69,14 @@ export default function RegisterCategory({ closeModal, updateList, idCategory }:
     if (idCategory) {
       loadCategory(idCategory)
     }
-  },[])
+  }, [])
 
   return (
     <Container>
       <HeaderModal closeModal={() => closeModal(false)} titleModal='CADASTRO DE CATEGORIAS' />
 
       <Title>{title_page}</Title>
-      <Controller 
+      <Controller
         name='name'
         control={control}
         render={({ field: { onChange, value } }) => (

@@ -35,8 +35,9 @@ export interface IStock {
 export interface IBuy {
   id: string;
   name: string;
-  amount: number;
+  amount: string;
   price: number;
+  datebuy: string;
 }
 export interface ISale {
   id: string;

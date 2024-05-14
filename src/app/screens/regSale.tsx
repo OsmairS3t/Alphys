@@ -19,10 +19,13 @@ import { ButtonForm, TextButton, InputMask } from '../styles/global';
 
 type SaleProps = {
   closeModal: (value: boolean) => void;
+  updateList: () => void;
+  idSale: string;
 }
 
-export default function RegisterSale({ closeModal }: SaleProps) {
+export default function RegisterSale({ closeModal, updateList, idSale }: SaleProps) {
   const theme = useTheme();
+  let title_page = idSale === '' ? 'NOVO CADASTRO' : 'EDITAR CADASTRO'
   const [dataClient, setDataClient] = useState<ISelectProps[]>([{ key: '', value: '' }]);
   const [dataProduct, setDataProduct] = useState<ISelectProps[]>([{ key: '', value: '' }]);
   const [selectedClient, setSelectedClient] = useState("")
@@ -129,7 +132,7 @@ export default function RegisterSale({ closeModal }: SaleProps) {
     <Container>
       <HeaderModal closeModal={() => closeModal(false)} titleModal='CADASTRO DE VENDAS' />
 
-      <Title>NOVA VENDA</Title>
+      <Title>{title_page}</Title>
       <SelectList
         placeholder='Cliente'
         boxStyles={{ backgroundColor: theme.colors.bg_input, marginBottom: 10 }}

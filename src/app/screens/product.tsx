@@ -41,7 +41,7 @@ export default function Product({ closeModal }: ProductProps) {
       console.log(e)
     }
   }
-  
+
   function handleEditProductModalOpen(id: string) {
     setIdProduct(id)
     setIsNewModalOpen(true)
@@ -50,9 +50,9 @@ export default function Product({ closeModal }: ProductProps) {
   async function deleteProduct(id: string) {
     try {
       const responseSale = await AsyncStorage.getItem(keySale)
-      const sales:ISale[] = responseSale ? JSON.parse(responseSale) : []
+      const sales: ISale[] = responseSale ? JSON.parse(responseSale) : []
       const saleProduct = sales.find(sal => sal.product?.id === id)
-      if(saleProduct) {
+      if (saleProduct) {
         Alert.alert('Produto possui venda, por isso não pode ser excuído.')
       } else {
         const response = await AsyncStorage.getItem(keyProduct)
@@ -63,29 +63,29 @@ export default function Product({ closeModal }: ProductProps) {
         Alert.alert('Produto excluído com sucesso!')
       }
     } catch (error) {
-      console.log('Erro ao tentar excluir: ', error)      
+      console.log('Erro ao tentar excluir: ', error)
     }
   }
 
   function handleDeleteProduct(id: string) {
     Alert.alert(
-    'Exclusao de Produtos',
-    'Tem certeza que deseja excluir este produto?',
-    [
-      {
-        text: 'Sim',
-        onPress: () => {
-          deleteProduct(id)
+      'Exclusao de Produtos',
+      'Tem certeza que deseja excluir este produto?',
+      [
+        {
+          text: 'Sim',
+          onPress: () => {
+            deleteProduct(id)
+          },
+          style: 'default',
         },
-        style: 'default',
-      },
-      {
-        text: 'Não',
-        style: 'cancel',
-      },
-    ],
-    { cancelable: true },
-  );
+        {
+          text: 'Não',
+          style: 'cancel',
+        },
+      ],
+      { cancelable: true },
+    );
   }
 
   function handleNewProductModalOpen() {
@@ -116,22 +116,23 @@ export default function Product({ closeModal }: ProductProps) {
             data={products}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) =>
-              <Pressable onPress={() => handleEditProductModalOpen(item.id) }>
-                <GroupIconTextRow>
+              <GroupIconTextRow>
+                <Pressable onPress={() => handleEditProductModalOpen(item.id)}>
                   <ItemColumnList>
                     <TextColumnList>Categoria: {item.category?.name}</TextColumnList>
                     <TextColumnList>Produto: {item.name}</TextColumnList>
                     <TextColumnList>
                       Valor: {Intl.NumberFormat('pt-BR',
-                      {style: 'currency', currency: 'BRL'})
-                      .format(item.price)}
+                        { style: 'currency', currency: 'BRL' })
+                        .format(item.price)}
                     </TextColumnList>
                   </ItemColumnList>
-                  <Pressable onPress={() => handleDeleteProduct(item.id)}>
-                    <IconColumnList name='trash-2' size={14} />
-                  </Pressable>
-                </GroupIconTextRow>
-              </Pressable>
+                </Pressable>
+
+                <Pressable onPress={() => handleDeleteProduct(item.id)}>
+                  <IconColumnList name='trash-2' size={24} />
+                </Pressable>
+              </GroupIconTextRow>
             }
           />
           :
@@ -147,8 +148,8 @@ export default function Product({ closeModal }: ProductProps) {
           setIsNewModalOpen(!isNewModalOpen)
         }}>
         <RegisterProduct
-          updateList={loadProducts} 
-          closeModal={setIsNewModalOpen} 
+          updateList={loadProducts}
+          closeModal={setIsNewModalOpen}
           idProduct={idProduct}
         />
       </Modal>

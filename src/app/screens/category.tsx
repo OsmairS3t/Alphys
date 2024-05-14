@@ -55,9 +55,9 @@ export default function Category({ closeModal }: CategoryProps) {
   async function deleteCategory(id: string) {
     try {
       const responseProduct = await AsyncStorage.getItem(keyProduct)
-      const products:IProduct[] = responseProduct ? JSON.parse(responseProduct) : []
+      const products: IProduct[] = responseProduct ? JSON.parse(responseProduct) : []
       const categoryProduct = products.find(prod => prod.category?.id === id)
-      if(categoryProduct) {
+      if (categoryProduct) {
         Alert.alert('Categoria já possui produto(s) cadastrado(s) a ela.')
       } else {
         const response = await AsyncStorage.getItem(keyCategory)
@@ -68,35 +68,35 @@ export default function Category({ closeModal }: CategoryProps) {
         Alert.alert('Categoria excluída com sucesso!')
       }
     } catch (error) {
-      console.log('Erro ao tentar excluir: ', error)      
+      console.log('Erro ao tentar excluir: ', error)
     }
   }
 
   function handleDeleteCategory(id: string) {
     Alert.alert(
-    'Exclusao de categorias',
-    'Tem certeza que deseja excluir esta categoria?',
-    [
-      {
-        text: 'Sim',
-        onPress: () => {
-          deleteCategory(id)
+      'Exclusao de categorias',
+      'Tem certeza que deseja excluir esta categoria?',
+      [
+        {
+          text: 'Sim',
+          onPress: () => {
+            deleteCategory(id)
+          },
+          style: 'default',
         },
-        style: 'default',
-      },
-      {
-        text: 'Não',
-        style: 'cancel',
-      },
-    ],
-    { cancelable: true },
-  );
+        {
+          text: 'Não',
+          style: 'cancel',
+        },
+      ],
+      { cancelable: true },
+    );
   }
 
   useEffect(() => {
-      loadCategories();
+    loadCategories();
   }, [])
-  
+
   return (
     <ContainerModal>
       <HeaderModal closeModal={() => closeModal(false)} titleModal='CADASTRO DE CATEGORIAS' />
@@ -120,10 +120,10 @@ export default function Category({ closeModal }: CategoryProps) {
                     <TextColumnList><IconList name='arrow-right' size={14} /> {item.name}</TextColumnList>
                   </Pressable>
                   <Pressable onPress={() => handleDeleteCategory(item.id)}>
-                    <IconList name='trash-2' size={14} />
+                    <IconList name='trash-2' size={24} />
                   </Pressable>
                 </GroupIconTextRow>
-             </ItemColumnList>
+              </ItemColumnList>
             }
           />
           :
@@ -138,10 +138,10 @@ export default function Category({ closeModal }: CategoryProps) {
         onRequestClose={() => {
           setIsNewModalOpen(!isNewModalOpen)
         }}>
-        <RegisterCategory 
-          closeModal={setIsNewModalOpen} 
-          updateList={loadCategories} 
-          idCategory={idCategory} 
+        <RegisterCategory
+          closeModal={setIsNewModalOpen}
+          updateList={loadCategories}
+          idCategory={idCategory}
         />
       </Modal>
 

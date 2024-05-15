@@ -65,7 +65,7 @@ export interface IIngredient {
 }
 export interface IRecipe {
   id: string;
-  product: IProduct | undefined;
+  nameproduct: string;
   ingredients: IIngredient[];
   preparation: string;
   cooking: string;

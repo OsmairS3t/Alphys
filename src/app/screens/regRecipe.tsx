@@ -34,12 +34,13 @@ export default function RegisterRecipe({ closeModal, updateList, idRecipe }: Rec
   let title_page = idRecipe === '' ? 'NOVO CADASTRO' : 'EDITAR CADASTRO'
   const [preparation, setPreparation] = useState('')
   const [cooking, setCooking] = useState('')
+  const [nameProduct, setNameProduct] = useState('')
 
 
   async function handleSave() {
     const data = {
       id: uuid.v4().toString(),
-      product: {} as IProduct,
+      nameproduct: nameProduct,
       ingredients: {} as IIngredient[],
       preparation: preparation,
       cooking: cooking
@@ -64,6 +65,16 @@ export default function RegisterRecipe({ closeModal, updateList, idRecipe }: Rec
       <HeaderModal closeModal={() => closeModal(false)} titleModal='CADASTRO DE RECEITAS' />
 
       <Title>{title_page}</Title>
+      <InputForm
+        placeholder='Nome do Produto'
+        onChangeText={text => setNameProduct(text)}
+        value={nameProduct}
+      />
+
+      <InputForm
+        placeholder='Ingrediente'
+      />
+
       <InputForm
         placeholder='Modo de preparo:'
         onChangeText={text => setPreparation(text)}

@@ -76,13 +76,19 @@ export default function Recipe({ closeModal }: RecipeProps) {
             data={recipes}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) =>
-              <Pressable onPress={() => { handleEditRecipeModalOpen(item.id) }}>
-                <ItemColumnList>
-                  <GroupIconTextRow>
-                    <TextColumnList>{item.product?.category?.name} - {item.product?.name}</TextColumnList>
-                  </GroupIconTextRow>
-                </ItemColumnList>
-              </Pressable>
+              <GroupIconTextRow>
+                <Pressable onPress={() => { handleEditRecipeModalOpen(item.id) }}>
+                  <ItemColumnList>
+                    <TextColumnList>{item.nameproduct}</TextColumnList>
+                  </ItemColumnList>
+                </Pressable>
+
+                <Pressable onPress={() => { }}>
+                  <ItemColumnList>
+                    <IconColumnList name='trash-2' size={20} />
+                  </ItemColumnList>
+                </Pressable>
+              </GroupIconTextRow>
             }
           />
           :

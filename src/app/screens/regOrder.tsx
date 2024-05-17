@@ -19,9 +19,12 @@ import HeaderModal from '../components/HeaderModal';
 
 type OrderProps = {
   closeModal: (value: boolean) => void;
+  updateList: (type: string, id: string) => void;
+  idOrder: string;
 }
 
-export default function RegisterOrder({ closeModal }: OrderProps) {
+export default function RegisterOrder({ closeModal, updateList, idOrder }: OrderProps) {
+  let title_page = idOrder === '' ? 'NOVO CADASTRO' : 'EDITAR CADASTRO'
   const theme = useTheme()
   const [dataClient, setDataClient] = useState<ISelectProps[]>([{ key: '', value: '' }]);
   const [dataProduct, setDataProduct] = useState<ISelectProps[]>([{ key: '', value: '' }]);
@@ -104,7 +107,7 @@ export default function RegisterOrder({ closeModal }: OrderProps) {
     <Container>
       <HeaderModal closeModal={() => closeModal(false)} titleModal='CADASTRO DE ENCOMENDAS' />
 
-      <Title>Encomendas de produtos:</Title>
+      <Title>{title_page}</Title>
       <SelectList
         placeholder='Cliente'
         boxStyles={{ backgroundColor: theme.colors.bg_input, marginBottom: 10 }}

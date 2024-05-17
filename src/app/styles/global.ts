@@ -195,9 +195,6 @@ export const ButtonFilterScreenPage = styled.Pressable`
 `;
 
 export const IconFilterScreenPage = styled(Feather)`
-  width: 28px;
-  height: 28px;
-  color: ${({ theme }) => theme.colors.secondary};
 `;
 
 export const ButtonNewScreenPage = styled.Pressable`

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { IIngredient, IProduct, IRecipe } from '../../utils/interface';
@@ -32,33 +32,53 @@ type RecipeProps = {
 
 export default function RegisterRecipe({ closeModal, updateList, idRecipe }: RecipeProps) {
   let title_page = idRecipe === '' ? 'NOVO CADASTRO' : 'EDITAR CADASTRO'
+  const [nameProduct, setNameProduct] = useState('')
   const [preparation, setPreparation] = useState('')
   const [cooking, setCooking] = useState('')
-  const [nameProduct, setNameProduct] = useState('')
 
+  async function loadRecipe(id: string) {
+    const response = await AsyncStorage.getItem(keyRecipe)
+    const objRecipe: IRecipe[] = response ? JSON.parse(response) : []
+    const foundRecipe = objRecipe.find(rec => rec.id === id)
+    setNameProduct(String(foundRecipe?.nameproduct))
+    setPreparation(String(foundRecipe?.preparation))
+    setCooking(String(foundRecipe?.cooking))
+  }
 
   async function handleSave() {
-    const data = {
+    const dataRecipe = {
       id: uuid.v4().toString(),
       nameproduct: nameProduct,
-      ingredients: {} as IIngredient[],
+      ingredients: [],
       preparation: preparation,
       cooking: cooking
     }
     try {
       const response = await AsyncStorage.getItem(keyRecipe)
       let oldData: IRecipe[] = response ? JSON.parse(response) : []
-
-      oldData.push(data)
-
-      // await AsyncStorage.removeItem(keyClient)
-      await AsyncStorage.setItem(keyRecipe, JSON.stringify(oldData))
-      Alert.alert('Receita incluída com sucesso!')
+      const foundRecipe = oldData.find(od => od.id === idRecipe)
+      if(!foundRecipe) {
+        oldData.push(dataRecipe)
+        await AsyncStorage.setItem(keyRecipe, JSON.stringify(oldData))
+        Alert.alert('Receita incluída com sucesso!')
+      } else {
+        const updateData = oldData.filter(od => od.id !== idRecipe)
+        updateData.push(dataRecipe)
+        await AsyncStorage.setItem(keyRecipe, JSON.stringify(updateData))
+        Alert.alert('Receita atualizada com sucesso!')
+      }
+      updateList()
       closeModal(false);
     } catch (error) {
       console.log('Ocorreu um erro ao tentar salvar: ', error)
     }
   }
+
+  useEffect(() => {
+    if(idRecipe !=='') {
+      loadRecipe(idRecipe)
+    }
+  },[])
 
   return (
     <Container>
@@ -69,10 +89,6 @@ export default function RegisterRecipe({ closeModal, updateList, idRecipe }: Rec
         placeholder='Nome do Produto'
         onChangeText={text => setNameProduct(text)}
         value={nameProduct}
-      />
-
-      <InputForm
-        placeholder='Ingrediente'
       />
 
       <InputForm

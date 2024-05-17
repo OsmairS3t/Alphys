@@ -1,47 +1,53 @@
 import React, { useEffect, useState } from 'react';
 import { FlatList, Pressable, Modal, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { useTheme } from 'styled-components';
 import HeaderModal from '../components/HeaderModal';
 
-import { ISale, IStock } from '../../utils/interface';
+import { IClient, IProduct, ISale, IStock } from '../../utils/interface';
 import { keySale, keyStock } from '../../utils/keyStorage';
 import RegisterSale from './regSale';
 
 import {
   HeaderScreenPage,
   ButtonNewScreenPage,
-  IconButtonNewScreenPage
+  IconButtonNewScreenPage,
+  IconFilterScreenPage
 } from '../styles/global';
 import {
   ContainerModal,
   GroupColumn,
   GroupIconTextRow,
-  ItemColumnList,
   TextColumnList,
-  IconColumnList
+  IconColumnList,
+  IconColumnListMaterial
 } from '../styles/registerStyle';
+import FilterSale from '../components/Filter/filtersale';
 
 type SaleProps = {
   closeModal: (value: boolean) => void;
 }
 
 export default function Sale({ closeModal }: SaleProps) {
+  const theme = useTheme()
+  const [statusPay, setStatusPay] = useState(false)
   const [idSale, setIdSale] = useState('')
   const [isNewModalOpen, setIsNewModalOpen] = useState(false)
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false)
   const [sales, setSales] = useState<ISale[]>([]);
   const [tot, setTot] = useState(0)
 
-  async function loadSales() {
+  async function loadSales(status: boolean) {
     try {
       const response = await AsyncStorage.getItem(keySale)
-      const sale: ISale[] = response ? JSON.parse(response) : []
+      const arraySales: ISale[] = response ? JSON.parse(response) : []
+      const filterSales = arraySales.filter(as => as.isPaid === status)
       let tot = 0
-      sale.map(s => {
+      filterSales.map(s => {
         tot += s.price
       })
       setTot(tot)
-      setSales(sale)
+      setSales(filterSales)
     } catch (e) {
       console.log(e)
     }
@@ -50,6 +56,10 @@ export default function Sale({ closeModal }: SaleProps) {
   function handleNewSaleModalOpen() {
     setIdSale('')
     setIsNewModalOpen(true)
+  }
+
+  function handleFilterSaleModalOpen() {
+    setIsFilterModalOpen(true)
   }
 
   function handleEditSaleModalOpen(id: string) {
@@ -88,10 +98,51 @@ export default function Sale({ closeModal }: SaleProps) {
 
       await AsyncStorage.setItem(keySale, JSON.stringify(removeSale))
       Alert.alert('Venda excluída com sucesso!')
-      loadSales()
+      loadSales(statusPay)
     } catch (error) {
       console.log('Erro ao tentar excluir: ', error)
     }
+  }
+
+  async function paySale(id: string) {
+    const responseSale = await AsyncStorage.getItem(keySale)
+    const sales: ISale[] = responseSale ? JSON.parse(responseSale) : []
+    const foundSale = sales.find(sale => sale.id === id)
+    const isPaidModified = Boolean(foundSale?.isPaid)
+    const dataNewSale = {
+      id: String(foundSale?.id),
+      client: foundSale?.client,
+      product: foundSale?.product,
+      amount: Number(foundSale?.amount),
+      price: Number(foundSale?.price),
+      isPaid: !isPaidModified,
+      dateSale: String(foundSale?.dateSale),
+    }
+    let updateSale = sales.filter(sale => sale.id !== id)
+    updateSale.push(dataNewSale)
+    await AsyncStorage.setItem(keySale, JSON.stringify(updateSale))
+    await loadSales(statusPay)
+  }
+
+  function handlePaySale(id: string) {
+    Alert.alert(
+      'Confirmação de pagamento',
+      'Tem certeza que deseja alterar este pagamento?',
+      [
+        {
+          text: 'Sim',
+          onPress: () => {
+            paySale(id)
+          },
+          style: 'default',
+        },
+        {
+          text: 'Não',
+          style: 'cancel',
+        },
+      ],
+      { cancelable: true },
+    );
   }
 
   function handleDeleteSale(id: string) {
@@ -116,14 +167,17 @@ export default function Sale({ closeModal }: SaleProps) {
   }
 
   useEffect(() => {
-    loadSales()
-  }, [])
+    loadSales(statusPay)
+  }, [statusPay])
 
   return (
     <ContainerModal>
       <HeaderModal closeModal={() => closeModal(false)} titleModal='CADASTRO DE VENDAS' />
 
       <HeaderScreenPage>
+        <ButtonNewScreenPage onPress={handleFilterSaleModalOpen}>
+          <IconFilterScreenPage color={theme.colors.primary} name='sliders' size={24} />
+        </ButtonNewScreenPage>
         <ButtonNewScreenPage onPress={handleNewSaleModalOpen}>
           <IconButtonNewScreenPage name='plus' size={24} />
         </ButtonNewScreenPage>
@@ -138,16 +192,29 @@ export default function Sale({ closeModal }: SaleProps) {
             keyExtractor={(item) => item.id}
             renderItem={({ item }) =>
               <GroupIconTextRow>
-                <Pressable onPress={() => handleEditSaleModalOpen(item.id)}>
-                  <ItemColumnList>
-                    <TextColumnList>
-                      {item.isPaid ? <IconColumnList name='dollar-sign' size={18} /> : 'A pagar'} - 
-                      {item.client?.name} - {Intl
-                          .NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
-                          .format(item.price)} 
-                    </TextColumnList>
-                  </ItemColumnList>
+                <Pressable onPress={() => handlePaySale(item.id)}>
+                  <TextColumnList>
+                    {item.isPaid ? 
+                      <IconColumnListMaterial isPaid={item.isPaid} name='attach-money' size={18} /> : 
+                      <IconColumnListMaterial isPaid={item.isPaid} name='money-off' size={18} />
+                    }
+                  </TextColumnList>
                 </Pressable>
+                    
+                <Pressable 
+                  onPress={() => handleEditSaleModalOpen(item.id)} 
+                  style={{flexDirection:'row', justifyContent:'space-between', width:'80%'}}
+                >
+                  <TextColumnList>
+                    {item.client?.name}
+                  </TextColumnList>
+                  <TextColumnList>
+                    {Intl
+                      .NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
+                      .format(item.price)} 
+                  </TextColumnList>
+                </Pressable>
+                    
 
                 <Pressable onPress={() => handleDeleteSale(item.id)}>
                   <IconColumnList name='trash-2' size={20} />
@@ -155,10 +222,12 @@ export default function Sale({ closeModal }: SaleProps) {
               </GroupIconTextRow>
             }
           />
-          <TextColumnList>Total: {tot}</TextColumnList>
+          <TextColumnList align='right'>
+            Total: {Intl.NumberFormat('pt-BR', {style:'currency', currency:'BRL'}).format(tot)}
+          </TextColumnList>
           </>
           :
-          <TextColumnList>Não há produtos cadastrados no estoque</TextColumnList>
+          <TextColumnList>Não há vendas {statusPay?'pagas':'a pagar'} para exibir.</TextColumnList>
         }
       </GroupColumn>
 
@@ -171,8 +240,22 @@ export default function Sale({ closeModal }: SaleProps) {
         }}>
         <RegisterSale
           closeModal={setIsNewModalOpen}
-          updateList={loadSales}
+          updateList={() => loadSales(statusPay)}
           idSale={idSale}
+        />
+      </Modal>
+
+      <Modal
+        transparent={true}
+        animationType='fade'
+        visible={isFilterModalOpen}
+        onRequestClose={() => {
+          setIsFilterModalOpen(!isFilterModalOpen)
+        }}>
+        <FilterSale
+          closeModal={setIsFilterModalOpen}
+          setStatusPay={setStatusPay}
+          status={statusPay}
         />
       </Modal>
 

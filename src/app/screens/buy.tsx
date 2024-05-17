@@ -84,6 +84,7 @@ export default function Buy({ closeModal }: BuyProps) {
       { cancelable: true },
     );
   }
+  
   useEffect(() => {
     loadBuys()
   }, [])

@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { FlatList, Pressable, Modal } from 'react-native';
+import { FlatList, Pressable, Modal, Alert } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -21,9 +21,10 @@ import {
   ItemColumnList,
   GroupIconTextRow,
   IconColumnList,
-  TextColumnList
+  TextColumnList,
+  BtnItem,
+  TextBtnItem
 } from '../styles/registerStyle';
-
 
 type RecipeProps = {
   closeModal: (value: boolean) => void;
@@ -53,6 +54,40 @@ export default function Recipe({ closeModal }: RecipeProps) {
     setIsNewModalOpen(true)
   }
 
+  async function deleteRecipe(id: string) {
+    try {
+      const response = await AsyncStorage.getItem(keyRecipe)
+      const recipes: IRecipe[] = response ? JSON.parse(response) : []
+      const removedItem = recipes.filter(rec => rec.id !== id)
+      await AsyncStorage.setItem(keyRecipe, JSON.stringify(removedItem))
+      loadRecipes()
+      Alert.alert('Receita excluída com sucesso!')
+    } catch (error) {
+      console.log('Erro ao tentar excluir: ', error)
+    }
+  }
+
+  function handleDeleteRecipe(id: string) {
+    Alert.alert(
+      'Exclusao de Receitas',
+      'Tem certeza que deseja excluir esta receita?',
+      [
+        {
+          text: 'Sim',
+          onPress: () => {
+            deleteRecipe(id)
+          },
+          style: 'default',
+        },
+        {
+          text: 'Não',
+          style: 'cancel',
+        },
+      ],
+      { cancelable: true },
+    );
+  }
+
   useFocusEffect(
     useCallback(() => {
       loadRecipes();
@@ -77,13 +112,17 @@ export default function Recipe({ closeModal }: RecipeProps) {
             keyExtractor={(item) => item.id}
             renderItem={({ item }) =>
               <GroupIconTextRow>
-                <Pressable onPress={() => { handleEditRecipeModalOpen(item.id) }}>
+                <Pressable onPress={() => { handleEditRecipeModalOpen(item.id) }} style={{flex:1}}>
                   <ItemColumnList>
                     <TextColumnList>{item.nameproduct}</TextColumnList>
                   </ItemColumnList>
                 </Pressable>
 
-                <Pressable onPress={() => { }}>
+                <BtnItem>
+                  <TextBtnItem>+ ING</TextBtnItem>
+                </BtnItem>
+
+                <Pressable onPress={() => handleDeleteRecipe(item.id)}>
                   <ItemColumnList>
                     <IconColumnList name='trash-2' size={20} />
                   </ItemColumnList>
@@ -103,7 +142,11 @@ export default function Recipe({ closeModal }: RecipeProps) {
         onRequestClose={() => {
           setIsNewModalOpen(!isNewModalOpen)
         }}>
-        <RegisterRecipe closeModal={setIsNewModalOpen} updateList={loadRecipes} idRecipe={idRecipe} />
+        <RegisterRecipe 
+          closeModal={setIsNewModalOpen} 
+          updateList={loadRecipes} 
+          idRecipe={idRecipe} 
+        />
       </Modal>
 
     </ContainerModal>

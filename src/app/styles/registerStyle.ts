@@ -2,6 +2,14 @@ import { Feather, MaterialIcons } from "@expo/vector-icons";
 import { RFValue } from "react-native-responsive-fontsize";
 import { styled } from "styled-components/native";
 
+interface IconProps {
+  isPaid: boolean;
+}
+
+interface PositionProps {
+  align?: string;
+}
+
 export const Container = styled.View`
   background-color: ${({ theme }) => theme.colors.background};
   flex: 1;
@@ -60,11 +68,18 @@ export const ContainerModal = styled.View`
 `;
 
 export const GroupColumn = styled.View`
-
 `;
 
 export const ItemColumnList = styled.View`
   margin: 4px 0px;
+`;
+
+export const GroupItemColumn = styled.View`
+  width: 100%;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  background-color: yellow;
 `;
 
 export const GroupIconTextRow = styled.View`
@@ -78,11 +93,30 @@ export const GroupIconTextRow = styled.View`
   border-bottom-color: ${({ theme }) => theme.colors.border_input};
 `;
 
+export const IconColumnListMaterial = styled(MaterialIcons)<IconProps>`
+  color: ${({ theme, isPaid }) => isPaid ? theme.colors.success : theme.colors.attention};
+`;
+
 export const IconColumnList = styled(Feather)`
   color: ${({ theme }) => theme.colors.text};
 `;
 
-export const TextColumnList = styled.Text`
+export const TextColumnList = styled.Text<PositionProps>`
   font-size: ${RFValue(14)}px;
   color: ${({ theme }) => theme.colors.text};
+  text-align: ${({ align }) => align ? align : 'left'};
+`;
+
+export const BtnItem = styled.Pressable`
+  justify-content: center;
+  align-items: center;
+  border-width: 0px;
+  border-style: solid;
+  border-color: ${({ theme }) => theme.colors.secondary};
+  padding: 2px;
+  width: 50px;
+`;
+
+export const TextBtnItem = styled.Text`
+  color: ${({ theme }) => theme.colors.secondary};
 `;

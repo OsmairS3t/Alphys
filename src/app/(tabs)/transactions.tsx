@@ -1,9 +1,11 @@
 import { useWindowDimensions, FlatList, Pressable } from 'react-native';
 import { HightLightCard } from '../components/HightLightCard';
 import { TransactionCard } from '../components/TransactionCard';
-import { ITransactionViewProps } from '../../utils/interface'
+import { ISale, ITransactionViewProps } from '../../utils/interface'
 
 import { Container, Title, HightLightCards, Content } from '../styles/transactionStyle'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { keySale } from '../../utils/keyStorage';
 
 export default function Transactions() {
   const { height } = useWindowDimensions();
@@ -70,6 +72,20 @@ export default function Transactions() {
       ispaid: true
     },
   ]
+
+  async function loadSales() {
+    const responseSales = await AsyncStorage.getItem(keySale)
+    const listSales: ISale[] = responseSales ? JSON.parse(responseSales) : []
+    listSales.map(ls => (
+      {
+        id: ls.id,
+        name: 'Vendas',
+        product: ls.product?.category?.name +' - '+ ls.product?.name,
+      }
+    ))
+  }
+
+  async function loadBuys() {}
 
   return (
     <Container>

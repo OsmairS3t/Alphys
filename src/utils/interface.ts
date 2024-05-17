@@ -70,6 +70,7 @@ export interface IRecipe {
   preparation: string;
   cooking: string;
 }
+
 //transactions: buy + sale = replications table
 export interface ITransactionViewProps {
   id: string;

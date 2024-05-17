@@ -15,7 +15,7 @@ import { ButtonFilterScreenPage, ButtonForm,
   HeaderScreenPage, 
   IconButtonNewScreenPage, 
   IconFilterScreenPage, 
-  InputMask, 
+  TitleModal, 
   TextButton } from '../styles/global'
 import {
   Title,
@@ -34,12 +34,17 @@ import {
 } from '../styles/orderStyle'
 import HeaderModal from '../components/HeaderModal';
 import RegisterOrder from '../screens/regOrder';
-import { GroupColumn, GroupIconTextRow, ItemColumnList, TextColumnList } from '../styles/registerStyle';
-import { InputForm } from '../components/Forms/InputForm';
+
+import { GroupColumn, 
+  GroupIconTextRow, 
+  IconColumnList, 
+  ItemColumnList, 
+  TextColumnList } from '../styles/registerStyle';
 import FilterOrder from '../components/Filter/filterorder';
 
 export default function Order() {
   const theme = useTheme()
+  const [idOrder, setIdOrder] = useState('')
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false)
   const [isNewModalOpen, setIsNewModalOpen] = useState(false)
   const [filterOrderType, setFilterOrderType] = useState('')
@@ -71,7 +76,47 @@ export default function Order() {
   }
 
   function handleNewBuyModalOpen() {
+    setIdOrder('')
     setIsNewModalOpen(true)
+  }
+
+  function handleEditBuyModalOpen(id: string) {
+    setIdOrder(id)
+    setIsNewModalOpen(true)
+  }
+
+  async function deleteOrder(id: string) {
+    try {
+      const responseOrder = await AsyncStorage.getItem(keyOrder)
+      const orders: IOrder[] = responseOrder ? JSON.parse(responseOrder) : []
+      const removedItem = orders.filter(order => order.id !== id)
+      await AsyncStorage.setItem(keyOrder, JSON.stringify(removedItem))
+      loadOrders(filterOrderType, filterOrderId)
+      Alert.alert('Encomenda excluída com sucesso!')
+    } catch (error) {
+      console.log('Erro ao tentar excluir: ', error)
+    }
+  }
+
+  function handleDeleteOrder(id: string) {
+    Alert.alert(
+      'Exclusao de Encomendas',
+      'Tem certeza que deseja excluir esta encomenda?',
+      [
+        {
+          text: 'Sim',
+          onPress: () => {
+            deleteOrder(id)
+          },
+          style: 'default',
+        },
+        {
+          text: 'Não',
+          style: 'cancel',
+        },
+      ],
+      { cancelable: true },
+    );
   }
 
   useEffect(() => {
@@ -80,10 +125,10 @@ export default function Order() {
 
   return (
     <Container>
-      <Title>Encomendas de produtos:</Title>
+      <TitleModal>ENCOMENDAS DE PRODUTOS:</TitleModal>
       <HeaderScreenPage>
         <ButtonFilterScreenPage onPress={handleFilterModalOpen}>
-          <IconFilterScreenPage name='sliders' size={24} />
+          <IconFilterScreenPage color={theme.colors.secondary} name='sliders' size={24} />
         </ButtonFilterScreenPage>
         <ButtonNewScreenPage onPress={handleNewBuyModalOpen}>
           <IconButtonNewScreenPage name='plus' size={24} />
@@ -97,14 +142,20 @@ export default function Order() {
             data={orders}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) =>
-              <Pressable onPress={() => { }}>
-                <ItemColumnList>
-                  <TextColumnList>Cliente: {item.client?.name}</TextColumnList>
-                  <TextColumnList>Produto: {item.product?.category?.name} - {item.product?.name}</TextColumnList>
-                  <TextColumnList>Qunatidade: {item.amount}</TextColumnList>
-                  <TextColumnList>Valor: {Intl.NumberFormat('pt-BR', {style: 'currency', currency: 'BRL'}).format(item.price)}</TextColumnList>
-                </ItemColumnList>
-              </Pressable>
+              <GroupIconTextRow>
+                <Pressable onPress={() => handleEditBuyModalOpen(item.id)}>
+                  <ItemColumnList>
+                    <TextColumnList>Cliente: {item.client?.name}</TextColumnList>
+                    <TextColumnList>Produto: {item.product?.category?.name} - {item.product?.name}</TextColumnList>
+                    <TextColumnList>Qunatidade: {item.amount}</TextColumnList>
+                    <TextColumnList>Valor: {Intl.NumberFormat('pt-BR', {style: 'currency', currency: 'BRL'}).format(item.price)}</TextColumnList>
+                  </ItemColumnList>
+                </Pressable>
+
+                <Pressable onPress={() => handleDeleteOrder(item.id)}>
+                  <IconColumnList name='trash-2' size={20} />
+                </Pressable>
+              </GroupIconTextRow>
             }
           />
           :
@@ -119,7 +170,11 @@ export default function Order() {
         onRequestClose={() => {
           setIsNewModalOpen(!isNewModalOpen)
         }}>
-        <RegisterOrder closeModal={setIsNewModalOpen} />
+        <RegisterOrder 
+          closeModal={setIsNewModalOpen} 
+          updateList={() => loadOrders(filterOrderType, filterOrderId)}
+          idOrder={idOrder}
+        />
       </Modal>
 
       <Modal

@@ -27,11 +27,11 @@ export default function FilterOrder({ closeModal, setFilterType, setFilterId }: 
     { key: 'idclient', value: 'Cliente' },
     { key: 'idproduct', value: 'Produto' },
   ]);
-  
+
   async function loadFilter(id: string) {
     const response = await AsyncStorage.getItem(keyOrder)
     const arrayOrder: IOrder[] = response ? JSON.parse(response) : []
-    if (id==='idclient') {
+    if (id === 'idclient') {
       const arrayClient: IClient[] = arrayOrder.map(arrOrd => {
         return {
           id: String(arrOrd.client?.id),
@@ -45,7 +45,7 @@ export default function FilterOrder({ closeModal, setFilterType, setFilterId }: 
       setDataFiltered(newArray)
     }
 
-    if (id==='idproduct') {
+    if (id === 'idproduct') {
       const arrayProduct: IProduct[] = arrayOrder.map(arrOrd => {
         return {
           id: String(arrOrd.product?.id),
@@ -56,7 +56,7 @@ export default function FilterOrder({ closeModal, setFilterType, setFilterId }: 
         }
       })
       let newArray: ISelectProps[] = arrayProduct.map(pro => {
-        return { key: String(pro.id), value: String(pro.category?.name) +' - '+ String(pro.name) }
+        return { key: String(pro.id), value: String(pro.category?.name) + ' - ' + String(pro.name) }
       })
       setDataFiltered(newArray)
     }
@@ -70,28 +70,28 @@ export default function FilterOrder({ closeModal, setFilterType, setFilterId }: 
 
   return (
     <Container>
-      <HeaderModal closeModal={()=>closeModal(false)} titleModal='FILTRAR ENCOMENDAS' />
+      <HeaderModal closeModal={() => closeModal(false)} titleModal='FILTRAR ENCOMENDAS' />
 
       <Title>INFORME:</Title>
-      <SelectList 
+      <SelectList
         placeholder='Tipo de filtro'
-        boxStyles={{backgroundColor: theme.colors.bg_input, marginBottom: 10}}
-        dropdownStyles={{backgroundColor: theme.colors.bg_input}}
-        setSelected={(val:string) => setSelectedFilter(val)} 
-        data={dataChosed} 
+        boxStyles={{ backgroundColor: theme.colors.bg_input, marginBottom: 10 }}
+        dropdownStyles={{ backgroundColor: theme.colors.bg_input }}
+        setSelected={(val: string) => setSelectedFilter(val)}
+        data={dataChosed}
         save="key"
         onSelect={() => loadFilter(selectedFilter)}
       />
-      
-      <SelectList 
+
+      <SelectList
         placeholder='Selecione...'
-        boxStyles={{backgroundColor: theme.colors.bg_input, marginBottom: 10}}
-        dropdownStyles={{backgroundColor: theme.colors.bg_input}}
-        setSelected={(val:string) => setSelectedClientProduct(val)} 
-        data={dataFiltered} 
+        boxStyles={{ backgroundColor: theme.colors.bg_input, marginBottom: 10 }}
+        dropdownStyles={{ backgroundColor: theme.colors.bg_input }}
+        setSelected={(val: string) => setSelectedClientProduct(val)}
+        data={dataFiltered}
         save="key"
       />
-      
+
       <ButtonForm onPress={handleFilter}>
         <TextButton>Enviar Filtro</TextButton>
       </ButtonForm>

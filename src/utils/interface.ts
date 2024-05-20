@@ -35,7 +35,7 @@ export interface IStock {
 export interface IBuy {
   id: string;
   name: string;
-  amount: string;
+  amount: number;
   price: number;
   datebuy: string;
 }
@@ -69,6 +69,15 @@ export interface IRecipe {
   ingredients: IIngredient[];
   preparation: string;
   cooking: string;
+}
+export interface ITransaction {
+  id: string;
+  description: string;
+  modality: string;
+  color: string;
+  datetransaction: string;
+  amount: number;
+  price: string;
 }
 
 //transactions: buy + sale = replications table

@@ -6,6 +6,8 @@ export default {
     secondary: '#D45C05',
     secondary_light: '#ffc59c',
     
+    terceary: '#faf0e8',
+
     success: '#12a454',
     success_light: 'rgba(18, 164, 84, 0.5)',
 
@@ -27,6 +29,9 @@ export default {
     border_input: '#999999',
     bg_input: '#f5f2f2',
     bg_form: '#ebebed',
+
+    sale: '#12a454',
+    buy: '#fa4141',
   },
 
   fonts: {

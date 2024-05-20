@@ -24,12 +24,13 @@
         {
           "photosPermission": "custom photos permission",
           "cameraPermission": "Permita o aplicativo Alpys abrir a camera",
-
           "//": "Disables the microphone permission",
           "microphonePermission": false
         }
       ],
-      ["@morrowdigital/watermelondb-expo-plugin"],
+      [
+        "@morrowdigital/watermelondb-expo-plugin"
+      ],
       [
         "expo-build-properties",
         {
@@ -41,6 +42,14 @@
               ]
             }
           }
+        }
+      ],
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./src/fonts/KoHo-Regular.ttf"
+          ]
         }
       ]
     ]

@@ -79,36 +79,3 @@ export interface ITransaction {
   amount: number;
   price: string;
 }
-
-//transactions: buy + sale = replications table
-export interface ITransactionViewProps {
-  id: string;
-  description: string;
-  modality: 'buy'|'sell';
-  modalityicon: string;
-  datetransaction: string;
-  amount: number;
-  price: string;
-}
-
-export interface ITransactionProps {
-  id: string;
-  idtransactiontype: string;
-  description: string;
-  modality: 'buy'|'sell';
-  modalityicon: string;
-  datetransaction: Date;
-  amount: number;
-  price: number;
-}
-
-interface HighlightTypeProps {
-  price: string;
-  lastTransaction: string;
-}
-
-export interface IHightLightProps {
-  buys: HighlightTypeProps;
-  sells: HighlightTypeProps;
-  total: HighlightTypeProps;
-}

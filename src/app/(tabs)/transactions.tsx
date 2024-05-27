@@ -21,12 +21,11 @@ export default function Transactions() {
   const theme = useTheme();
   const { height } = useWindowDimensions();
   const heightBuy = height * 0.3
-  const heightSale = height * 0.3
+  const heightSale = height * 0.2
   const heightResume = height * 0.2
   const [transactionsList, setTransactionsList] = useState<ITransaction[]>([]);
   const [priceBuy, setPriceBuy] = useState(0)
   const [priceSale, setPriceSale] = useState(0)
-  const [priceFinal, setPriceFinal] = useState(0)
   const [resumePriceBuy, setResumePriceBuy] = useState('')
   const [resumePriceSale, setResumePriceSale] = useState('')
   const [resumePriceFinal, setResumePriceFinal] = useState('')
@@ -54,56 +53,64 @@ export default function Transactions() {
 
   async function loadBuys() {
     let priceAccumulator = 0
-    const responseBuys = await AsyncStorage.getItem(keyBuy)
-    const listBuys: IBuy[] = responseBuys ? JSON.parse(responseBuys) : []
-    let arrayNewTransaction: ITransaction[] = listBuys.map(lb => {
-      priceAccumulator += lb.price
-      return {
-        id: String(lb.id),
-        description: lb.name,
-        modality: 'buy',
-        color: theme.colors.buy,
-        datetransaction: lb.datebuy,
-        amount: lb.amount,
-        price: String(lb.price)
-      }
-    })
-    setPriceBuy(priceAccumulator)
-    setResumePriceBuy(Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(priceBuy))
-    setTransactionsList(arrayNewTransaction)
+    try {
+      const responseBuys = await AsyncStorage.getItem(keyBuy)
+      const listBuys: IBuy[] = responseBuys ? JSON.parse(responseBuys) : []
+      let arrayNewTransaction: ITransaction[] = listBuys.map(lb => {
+        priceAccumulator += lb.price
+        return {
+          id: String(lb.id),
+          description: lb.name,
+          modality: 'buy',
+          color: theme.colors.buy,
+          datetransaction: lb.datebuy,
+          amount: lb.amount,
+          price: String(lb.price)
+        }
+      })
+      let newArraytransaction: ITransaction[]=[]
+      newArraytransaction = [...transactionsList, ...arrayNewTransaction]
+      setPriceBuy(priceAccumulator)
+      setResumePriceBuy(Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(priceBuy))
+      setTransactionsList(newArraytransaction)
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   async function loadSales() {
-    let priceAccumulator = 0
-    const responseSales = await AsyncStorage.getItem(keySale)
-    const listSales: ISale[] = responseSales ? JSON.parse(responseSales) : []
-    const filteredSales = listSales.filter(ls => ls.isPaid === false)
-    let arrayNewTransaction: ITransaction[] = filteredSales.map(ls => {
-      priceAccumulator += ls.price
-      return {
-        id: String(ls.id),
-        description: ls.product?.category?.name + ' - ' + ls.product?.name,
-        modality: 'sale',
-        color: theme.colors.sale,
-        datetransaction: ls.dateSale,
-        amount: ls.amount,
-        price: String(ls.price)
-      }
-    })
-    setPriceSale(priceAccumulator)
-    setResumePriceSale(Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(priceSale))
-    setTransactionsList(arrayNewTransaction)
-  }
-
-  async function loadTransactions() {
-    await loadBuys()
-    await loadSales()
-    const price = priceSale - priceBuy
-    setResumePriceFinal(Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(price))
+    try {
+      let priceAccumulator = 0
+      const responseSales = await AsyncStorage.getItem(keySale)
+      const listSales: ISale[] = responseSales ? JSON.parse(responseSales) : []
+      const filteredSales = listSales.filter(ls => ls.isPaid === false)
+      let arrayNewTransaction: ITransaction[] = filteredSales.map(ls => {
+        priceAccumulator += ls.price
+        return {
+          id: String(ls.id),
+          description: ls.product?.category?.name + ' - ' + ls.product?.name,
+          modality: 'sale',
+          color: theme.colors.sale,
+          datetransaction: ls.dateSale,
+          amount: ls.amount,
+          price: String(ls.price)
+        }
+      })
+      let newArraytransaction: ITransaction[]=[]
+      newArraytransaction = [...transactionsList, ...arrayNewTransaction]
+      setPriceSale(priceAccumulator)
+      setResumePriceSale(Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(priceSale))
+      setTransactionsList(newArraytransaction)
+    } catch (error) {
+      console.log(error)      
+    }
   }
 
   useEffect(() => {
-    loadTransactions()
+    loadBuys();
+    loadSales();
+    const price = priceSale - priceBuy
+    setResumePriceFinal(Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(price))
   }, [])
 
   return (
@@ -114,8 +121,8 @@ export default function Transactions() {
           <VictoryChart
             theme={VictoryTheme.material}
             domainPadding={10}
-            height={250}
-            padding={{ top: 20, bottom: 80, left: 30, right: 50 }}
+            height={200}
+            padding={{ top: 10, bottom: 100, left: 50, right: 50 }}
           >
             <VictoryBar
               style={{ data: { fill: theme.colors.buy } }}
@@ -135,8 +142,8 @@ export default function Transactions() {
           <VictoryChart
             theme={VictoryTheme.material}
             domainPadding={10}
-            height={250}
-            padding={{ top: 20, bottom: 80, left: 30, right: 50 }}
+            height={200}
+            padding={{ top: 10, bottom: 100, left: 50, right: 50 }}
           >
             <VictoryBar
               style={{ data: { fill: theme.colors.sale } }}
@@ -154,15 +161,15 @@ export default function Transactions() {
         <Title>RESUMO:</Title>
         <ContainerGraphic>
           <GroupTextResume>
-            <TextResume bold={600}>Compras:</TextResume>
+            <TextResume bold={800}>Compras:</TextResume>
             <TextResume>{resumePriceBuy}</TextResume>
           </GroupTextResume>
           <GroupTextResume>
-            <TextResume bold={600}>Vendas:</TextResume>
+            <TextResume bold={800}>Vendas:</TextResume>
             <TextResume>{resumePriceSale}</TextResume>
           </GroupTextResume>
           <GroupTextResume>
-            <TextResume bold={600}>Saldo:</TextResume>
+            <TextResume bold={800}>Saldo:</TextResume>
             <TextResume>{resumePriceFinal}</TextResume>
           </GroupTextResume>
         </ContainerGraphic>

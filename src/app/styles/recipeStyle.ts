@@ -3,6 +3,10 @@ import { styled } from "styled-components/native";
 import { Image as Img } from 'react-native'
 import { Feather } from "@expo/vector-icons";
 
+interface RecipeProps {
+    direction: string;
+}
+
 export const Container = styled.View`
   top: 90px;
   background-color: ${({ theme }) => theme.colors.bg_form};
@@ -20,6 +24,30 @@ export const Title = styled.Text`
   text-align: center;
   margin: 10px 0px;
   `;
+
+export const GroupRecipe = styled.View<RecipeProps>`
+    flex-direction: ${({ direction }) => direction};
+    margin: 10px 0px;
+`;
+
+export const TitleRecipe = styled.Text`
+  font-weight: 600;
+  font-size: ${RFValue(16)}px;
+  text-align: left;
+  color: ${({theme }) => theme.colors.text_title};
+`;
+
+export const TextRecipe = styled.Text`
+  width: 100%;
+  text-align: left;
+  font-size: ${RFValue(16)}px;
+  color: ${({theme }) => theme.colors.text_title};
+`;
+
+export const TextIngredient = styled.Text`
+  font-size: ${RFValue(16)}px;
+  color: ${({theme }) => theme.colors.text_title};
+`;
 
 export const GroupImage = styled.View`
     width: 100%;

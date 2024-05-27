@@ -33,6 +33,7 @@ type RecipeProps = {
 
 export default function Recipe({ closeModal }: RecipeProps) {
   const [idRecipe, setIdRecipe] = useState('')
+  const [viewRecipe, setViewRecipe] = useState(false)
   const [recipes, setRecipes] = useState<IRecipe[]>([])
   const [isIngModalOpen, setIsIngModalOpen] = useState(false)
   const [isNewModalOpen, setIsNewModalOpen] = useState(false)
@@ -52,11 +53,19 @@ export default function Recipe({ closeModal }: RecipeProps) {
   }
 
   function handleEditRecipeModalOpen(id: string) {
+    setViewRecipe(false)
+    setIdRecipe(id)
+    setIsNewModalOpen(true)
+  }
+
+  function handleViewRecipeModalOpen(id: string, view: boolean) {
+    setViewRecipe(true)
     setIdRecipe(id)
     setIsNewModalOpen(true)
   }
 
   function handleNewIngredientMOdalOpen(id: string) {
+    setViewRecipe(false)
     setIdRecipe(id)
     setIsIngModalOpen(true)
   }
@@ -124,6 +133,10 @@ export default function Recipe({ closeModal }: RecipeProps) {
                     <TextColumnList>{item.nameproduct}</TextColumnList>
                   </ItemColumnList>
                 </Pressable>
+                
+                <BtnItem onPress={() => handleViewRecipeModalOpen(item.id, viewRecipe)}>
+                  <IconColumnList name='eye' size={20} />
+                </BtnItem>
 
                 <BtnItem onPress={() => handleNewIngredientMOdalOpen(item.id)}>
                   <TextBtnItem>+ ING</TextBtnItem>
@@ -153,6 +166,7 @@ export default function Recipe({ closeModal }: RecipeProps) {
           closeModal={setIsNewModalOpen}
           updateList={loadRecipes}
           idRecipe={idRecipe}
+          viewRecipe={viewRecipe}
         />
       </Modal>
 

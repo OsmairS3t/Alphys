@@ -7,9 +7,9 @@ interface SizeProps {
 }
 
 export const Container = styled.View<SizeProps>`
+  justify-content: flex-start;
   height: ${({ height }) => height ? height : 350}px;
   background-color: ${({ theme }) => theme.colors.terceary};
-  padding: 20px 0px;
   gap: 4px;
 `;
 
@@ -18,23 +18,18 @@ export const ContainerGraphic = styled.View`
 `;
 
 export const BlockBuy = styled.View<SizeProps>`
-  justify-content: center;
-  padding-top: 10px;
-  width: '100%';
-  height: ${({ height }) => height}px;
+  justify-content: flex-start;
+  height: 27%;
 `;
 
 export const BlockSale = styled.View<SizeProps>`
-  justify-content: center;
-  padding-top: 10px;
-  width: '100%';
-  height: ${({ height }) => height}px;
+  justify-content: flex-start;
+  height: 27%;
 `;
 
 export const BlockResume = styled.View<SizeProps>`
-  justify-content: center;
-  padding-top: 10px;
-  height: ${({ height }) => height}px;
+  justify-content: flex-start;
+  height: 40%;
 `;
 
 export const Title = styled.Text`

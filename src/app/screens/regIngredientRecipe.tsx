@@ -40,8 +40,8 @@ export default function RegisterIngreditenRecipe({ closeModal, updateList, idRec
   async function loadIngredients(id: string) {
     const response = await AsyncStorage.getItem(keyRecipe)
     const objRecipe: IRecipe[] = response ? JSON.parse(response) : []
-    const foundRecipe = objRecipe.find(rec => rec.id === id)
-    setIngredients(foundRecipe ? foundRecipe.ingredients : [])
+    const foundedRecipe = objRecipe.find(rec => rec.id === id)
+    setIngredients(foundedRecipe ? foundedRecipe.ingredients : [])
   }
 
   async function handleSave() {
@@ -54,7 +54,7 @@ export default function RegisterIngreditenRecipe({ closeModal, updateList, idRec
     try {
       const response = await AsyncStorage.getItem(keyRecipe)
       let oldData: IRecipe[] = response ? JSON.parse(response) : []
-      const foundRecipe: IRecipe = oldData.find(od => od.id === idRecipe)
+      const foundRecipe = oldData.find(od => od.id === idRecipe)
       if (foundRecipe) {
         let ingredientsData: IIngredient[] = foundRecipe.ingredients
         ingredientsData.push(dataIng)

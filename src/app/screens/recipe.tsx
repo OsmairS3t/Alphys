@@ -8,6 +8,7 @@ import HeaderModal from '../components/HeaderModal';
 import { IClient, IRecipe } from '../../utils/interface';
 import { keyClient, keyRecipe } from '../../utils/keyStorage';
 import RegisterRecipe from './regRecipe';
+import RegisterIngreditenRecipe from './regIngredientRecipe';
 
 import {
   HeaderScreenPage,
@@ -33,6 +34,7 @@ type RecipeProps = {
 export default function Recipe({ closeModal }: RecipeProps) {
   const [idRecipe, setIdRecipe] = useState('')
   const [recipes, setRecipes] = useState<IRecipe[]>([])
+  const [isIngModalOpen, setIsIngModalOpen] = useState(false)
   const [isNewModalOpen, setIsNewModalOpen] = useState(false)
 
   async function loadRecipes() {
@@ -52,6 +54,11 @@ export default function Recipe({ closeModal }: RecipeProps) {
   function handleEditRecipeModalOpen(id: string) {
     setIdRecipe(id)
     setIsNewModalOpen(true)
+  }
+
+  function handleNewIngredientMOdalOpen(id: string) {
+    setIdRecipe(id)
+    setIsIngModalOpen(true)
   }
 
   async function deleteRecipe(id: string) {
@@ -112,13 +119,13 @@ export default function Recipe({ closeModal }: RecipeProps) {
             keyExtractor={(item) => item.id}
             renderItem={({ item }) =>
               <GroupIconTextRow>
-                <Pressable onPress={() => { handleEditRecipeModalOpen(item.id) }} style={{flex:1}}>
+                <Pressable onPress={() => handleEditRecipeModalOpen(item.id)} style={{ flex: 1 }}>
                   <ItemColumnList>
                     <TextColumnList>{item.nameproduct}</TextColumnList>
                   </ItemColumnList>
                 </Pressable>
 
-                <BtnItem>
+                <BtnItem onPress={() => handleNewIngredientMOdalOpen(item.id)}>
                   <TextBtnItem>+ ING</TextBtnItem>
                 </BtnItem>
 
@@ -142,10 +149,24 @@ export default function Recipe({ closeModal }: RecipeProps) {
         onRequestClose={() => {
           setIsNewModalOpen(!isNewModalOpen)
         }}>
-        <RegisterRecipe 
-          closeModal={setIsNewModalOpen} 
-          updateList={loadRecipes} 
-          idRecipe={idRecipe} 
+        <RegisterRecipe
+          closeModal={setIsNewModalOpen}
+          updateList={loadRecipes}
+          idRecipe={idRecipe}
+        />
+      </Modal>
+
+      <Modal
+        transparent={true}
+        animationType='fade'
+        visible={isIngModalOpen}
+        onRequestClose={() => {
+          setIsIngModalOpen(!isIngModalOpen)
+        }}>
+        <RegisterIngreditenRecipe
+          closeModal={setIsIngModalOpen}
+          updateList={loadRecipes}
+          idRecipe={idRecipe}
         />
       </Modal>
 

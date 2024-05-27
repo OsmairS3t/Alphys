@@ -27,6 +27,7 @@ import {
 } from '../styles/registerStyle';
 
 export default function Buy({ closeModal }: BuyProps) {
+  const [sumValues, setSumValues] = useState(0)
   const [idBuy, setIdBuy] = useState('')
   const [buys, setBuys] = useState<IBuy[]>([])
   const [isNewModalOpen, setIsNewModalOpen] = useState(false)
@@ -35,6 +36,11 @@ export default function Buy({ closeModal }: BuyProps) {
     try {
       const response = await AsyncStorage.getItem(keyBuy)
       const buy: IBuy[] = response ? JSON.parse(response) : []
+      let tot = 0
+      buy.map(b => {
+        tot += b.price
+      })
+      setSumValues(tot)
       setBuys(buy)
     } catch (e) {
       console.log(e)
@@ -84,7 +90,7 @@ export default function Buy({ closeModal }: BuyProps) {
       { cancelable: true },
     );
   }
-  
+
   useEffect(() => {
     loadBuys()
   }, [])
@@ -101,35 +107,42 @@ export default function Buy({ closeModal }: BuyProps) {
 
       <GroupColumn>
         {buys.length > 0 ?
-          <FlatList
-            style={{ height: 450 }}
-            data={buys}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) =>
-              <GroupIconTextRow>
-                <Pressable onPress={() => { handleEditBuyModalOpen(item.id) }}>
-                  <ItemColumnList>
-                    <TextColumnList>Descrição: {item.name}</TextColumnList>
-                    <TextColumnList>Quant.: {item.amount}</TextColumnList>
-                    <TextColumnList>
-                      Valor: {Intl
-                        .NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
-                        .format(item.price)}
-                    </TextColumnList>
-                    <TextColumnList>
-                      Dia da compra: {item.datebuy}
-                    </TextColumnList>
-                  </ItemColumnList>
-                </Pressable>
+          <>
+            <FlatList
+              style={{ height: 430 }}
+              data={buys}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) =>
+                <GroupIconTextRow>
+                  <Pressable onPress={() => { handleEditBuyModalOpen(item.id) }}>
+                    <ItemColumnList>
+                      <TextColumnList>Descrição: {item.name}</TextColumnList>
+                      <TextColumnList>Quant.: {item.amount}</TextColumnList>
+                      <TextColumnList>
+                        Valor: {Intl
+                          .NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
+                          .format(item.price)}
+                      </TextColumnList>
+                      <TextColumnList>
+                        Dia da compra: {item.datebuy}
+                      </TextColumnList>
+                    </ItemColumnList>
+                  </Pressable>
 
-                <Pressable onPress={() => handleDeleteBuy(item.id)}>
-                  <ItemColumnList>
-                    <IconColumnList name='trash-2' size={24} />
-                  </ItemColumnList>
-                </Pressable>
-              </GroupIconTextRow>
-            }
-          />
+                  <Pressable onPress={() => handleDeleteBuy(item.id)}>
+                    <ItemColumnList>
+                      <IconColumnList name='trash-2' size={24} />
+                    </ItemColumnList>
+                  </Pressable>
+                </GroupIconTextRow>
+              }
+            />
+            <ItemColumnList>
+              <TextColumnList align='right'>
+                Total: {Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(sumValues)}
+              </TextColumnList>
+            </ItemColumnList>
+          </>
           :
           <TextColumnList>Não há produtos cadastrados no estoque</TextColumnList>
         }

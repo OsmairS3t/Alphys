@@ -30,6 +30,27 @@ export default function Transactions() {
   const [resumePriceBuy, setResumePriceBuy] = useState('')
   const [resumePriceSale, setResumePriceSale] = useState('')
   const [resumePriceFinal, setResumePriceFinal] = useState('')
+  const sampleData = [
+    { x: "Jan", y: 200 },
+    { x: "Fev", y: 333 },
+    { x: "Mar", y: 525 },
+    { x: "Abr", y: 410 },
+    { x: "Mai", y: 315 },
+    { x: "Jun", y: 800 },
+    { x: "Jul", y: 650 },
+    { x: "Ago", y: 700 },
+    { x: "Set", y: 600 },
+    { x: "Out", y: 400 },
+    { x: "Nov", y: 500 },
+    { x: "Dez", y: 1500 }
+  ]
+  const dataSale = [
+    { x: "Jan", y: 200 },
+    { x: "Fev", y: 333 },
+    { x: "Mar", y: 525 },
+    { x: "Abr", y: 410 },
+    { x: "Mai", y: 625 }
+  ]
 
   async function loadBuys() {
     let priceAccumulator = 0
@@ -74,33 +95,16 @@ export default function Transactions() {
     setTransactionsList(arrayNewTransaction)
   }
 
-  function loadTransaction() {
+  async function loadTransactions() {
+    await loadBuys()
+    await loadSales()
     const price = priceSale - priceBuy
     setResumePriceFinal(Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(price))
   }
 
   useEffect(() => {
-    loadBuys()
-    loadSales()
-    loadTransaction()
+    loadTransactions()
   }, [])
-
-  const sampleData = [
-    { x: "Jan", y: 200 },
-    { x: "Fev", y: 333 },
-    { x: "Mar", y: 525 },
-    { x: "Abr", y: 410 },
-    { x: "Mai", y: 315 },
-    { x: "Jun", y: 800 }
-  ]
-
-  const dataSale = [
-    { x: "Jan", y: 200 },
-    { x: "Fev", y: 333 },
-    { x: "Mar", y: 525 },
-    { x: "Abr", y: 410 },
-    { x: "Mai", y: 625 }
-  ]
 
   return (
     <Container height={height}>

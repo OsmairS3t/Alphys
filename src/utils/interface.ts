@@ -1,6 +1,10 @@
 export interface IIcon {
   name: string;
 }
+export interface IGraphic {
+  x: string;
+  y: number;
+}
 export interface ISelectProps {
   key: string;
   value: string;
@@ -59,8 +63,7 @@ export interface IOrder {
 export interface IIngredient {
   id: string;
   name: string;
-  amount: number;
-  unit: string;
+  amount: string;
   conditions: string;
 }
 export interface IRecipe {

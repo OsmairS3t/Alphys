@@ -107,7 +107,7 @@ export const TextColumnList = styled.Text<PositionProps>`
   text-align: ${({ align }) => align ? align : 'left'};
 `;
 
-export const BtnItem = styled.Pressable`
+export const BtnItem = styled.TouchableOpacity`
   justify-content: center;
   align-items: center;
   border-width: 0px;

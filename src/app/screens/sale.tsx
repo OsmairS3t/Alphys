@@ -80,10 +80,10 @@ export default function Sale({ closeModal }: SaleProps) {
       const stocks: IStock[] = responseStock ? JSON.parse(responseStock) : []
       const foundProductStock = stocks.find(stock => stock.product?.id === foundProductSale?.product?.id)
       const amountStock = foundProductStock?.amount
-      
+
       //separa os demais para remover o produto a ser exluido do estoque
       const removeSale = sales.filter(sale => sale.id !== id)
-      
+
       //salva novo estoque
       const dataNewStock = {
         id: String(foundProductStock?.id),
@@ -186,48 +186,48 @@ export default function Sale({ closeModal }: SaleProps) {
       <GroupColumn>
         {sales.length > 0 ?
           <>
-          <FlatList
-            style={{ height: 300 }}
-            data={sales}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) =>
-              <GroupIconTextRow>
-                <Pressable onPress={() => handlePaySale(item.id)}>
-                  <TextColumnList>
-                    {item.isPaid ? 
-                      <IconColumnListMaterial isPaid={item.isPaid} name='attach-money' size={18} /> : 
-                      <IconColumnListMaterial isPaid={item.isPaid} name='money-off' size={18} />
-                    }
-                  </TextColumnList>
-                </Pressable>
-                    
-                <Pressable 
-                  onPress={() => handleEditSaleModalOpen(item.id)} 
-                  style={{flexDirection:'row', justifyContent:'space-between', width:'80%'}}
-                >
-                  <TextColumnList>
-                    {item.client?.name}
-                  </TextColumnList>
-                  <TextColumnList>
-                    {Intl
-                      .NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
-                      .format(item.price)} 
-                  </TextColumnList>
-                </Pressable>
-                    
+            <FlatList
+              style={{ height: 430 }}
+              data={sales}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) =>
+                <GroupIconTextRow>
+                  <Pressable onPress={() => handlePaySale(item.id)}>
+                    <TextColumnList>
+                      {item.isPaid ?
+                        <IconColumnListMaterial isPaid={item.isPaid} name='attach-money' size={18} /> :
+                        <IconColumnListMaterial isPaid={item.isPaid} name='money-off' size={18} />
+                      }
+                    </TextColumnList>
+                  </Pressable>
 
-                <Pressable onPress={() => handleDeleteSale(item.id)}>
-                  <IconColumnList name='trash-2' size={20} />
-                </Pressable>
-              </GroupIconTextRow>
-            }
-          />
-          <TextColumnList align='right'>
-            Total: {Intl.NumberFormat('pt-BR', {style:'currency', currency:'BRL'}).format(tot)}
-          </TextColumnList>
+                  <Pressable
+                    onPress={() => handleEditSaleModalOpen(item.id)}
+                    style={{ flexDirection: 'row', justifyContent: 'space-between', width: '80%' }}
+                  >
+                    <TextColumnList>
+                      {item.client?.name}
+                    </TextColumnList>
+                    <TextColumnList>
+                      {Intl
+                        .NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
+                        .format(item.price)}
+                    </TextColumnList>
+                  </Pressable>
+
+
+                  <Pressable onPress={() => handleDeleteSale(item.id)}>
+                    <IconColumnList name='trash-2' size={20} />
+                  </Pressable>
+                </GroupIconTextRow>
+              }
+            />
+            <TextColumnList align='right'>
+              Total: {Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(tot)}
+            </TextColumnList>
           </>
           :
-          <TextColumnList>Não há vendas {statusPay?'pagas':'a pagar'} para exibir.</TextColumnList>
+          <TextColumnList>Não há vendas {statusPay ? 'pagas' : 'a pagar'} para exibir.</TextColumnList>
         }
       </GroupColumn>
 

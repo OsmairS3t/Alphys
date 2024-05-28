@@ -42,6 +42,16 @@ import { GroupColumn,
   TextColumnList } from '../styles/registerStyle';
 import FilterOrder from '../components/Filter/filterorder';
 
+import api from '../services/Api'
+
+interface IUser {
+  id: number;
+  email: string;
+  name: string;
+  password: string;
+  photo: string;
+}
+
 export default function Order() {
   const theme = useTheme()
   const [idOrder, setIdOrder] = useState('')
@@ -50,7 +60,13 @@ export default function Order() {
   const [filterOrderType, setFilterOrderType] = useState('')
   const [filterOrderId, setFilterOrderId] = useState('')
   const [orders, setOrders] = useState<IOrder[]>([]);
+  const [users, setUsers] = useState<IUser[]>([])
  
+  async function loadUser() {
+    const response = await api.get('users')
+    setUsers(response.data)
+  }
+
   async function loadOrders(typeFilter: string, idfilter: string) {
     try {
       const response = await AsyncStorage.getItem(keyOrder)
@@ -134,6 +150,13 @@ export default function Order() {
           <IconButtonNewScreenPage name='plus' size={24} />
         </ButtonNewScreenPage>
       </HeaderScreenPage>
+
+<Pressable onPress={loadUser}>
+  <TextSale>CLIQUE AQUI</TextSale>
+</Pressable>
+{users.map(user => (
+  <TextSale key={user.id}>{user?.email}</TextSale>
+))}
 
       <GroupColumn>
         {orders.length > 0 ?

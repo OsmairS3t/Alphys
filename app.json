@@ -43,14 +43,6 @@
             }
           }
         }
-      ],
-      [
-        "expo-font",
-        {
-          "fonts": [
-            "./src/fonts/KoHo-Regular.ttf"
-          ]
-        }
       ]
     ]
   }

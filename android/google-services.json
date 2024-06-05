@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "966996072636",
+    "project_id": "alphys-1cd42",
+    "storage_bucket": "alphys-1cd42.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:966996072636:android:c105c1ad8a5b77e8af98b9",
+        "android_client_info": {
+          "package_name": "com.alphys"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAK4bfrxP1UI5bZ_kbLhnfFVZeKulRQPJ4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

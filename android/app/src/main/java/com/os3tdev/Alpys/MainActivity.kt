@@ -1,4 +1,4 @@
-package com.alphys
+package com.os3tdev.Alpys
 
 import android.os.Build
 import android.os.Bundle

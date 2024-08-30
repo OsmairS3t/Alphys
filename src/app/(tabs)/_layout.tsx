@@ -1,4 +1,5 @@
 import React from 'react';
+import { LoadingProvider } from '../../loadingContext';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Tabs } from 'expo-router';
 import Header from '../header';
@@ -8,7 +9,7 @@ export default function TabLayout() {
   const theme = useTheme();
 
   return (
-    <>
+    <LoadingProvider>
       <Header />
       <Tabs
         screenOptions={{
@@ -45,6 +46,6 @@ export default function TabLayout() {
           }}
         />
       </Tabs>
-    </>
+    </LoadingProvider>
   );
 }

@@ -1,8 +1,7 @@
-import { Text } from "react-native";
-import { Link, useRouter } from "expo-router";
+import { useState } from "react";
+import { useRouter } from "expo-router";
 import { useTheme } from "styled-components";
 import { Input } from "./components/Forms/InputForm/styles";
-import { useState } from "react";
 
 import {
   ContainerSignIn,
@@ -33,7 +32,7 @@ export default function Login() {
     // console.log(dataUser)
     router.replace('/(tabs)/transactions')
   }
-
+  
   return (
     <ContainerSignIn>
       <HeaderLogin>

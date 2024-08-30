@@ -4,10 +4,39 @@ import { MaskedTextInput } from 'react-native-mask-text'
 import styled from "styled-components/native";
 import { Link } from "expo-router";
 
+interface Props{
+  color: string;
+}
+
 export const Container = styled.View`
   flex: 1;
   background-color: ${({ theme }) => theme.colors.background};
   padding: 10px;
+`;
+
+export const ContainerNetInfo = styled.View`
+  position: absolute;
+  top: 30px;
+  width: 100%;
+`;
+
+export const NetInfo = styled.View<Props>`
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: ${({ color }) => color ? color : "#c9fcd4" };
+  height: 50px;
+  width: 100%;
+  padding: 10px;
+`;
+
+export const IconNetInfo = styled(Feather).attrs({ size: 24 })`
+  color: ${({ theme }) => theme.colors.primary};
+`;
+
+export const TextNetInfo = styled.Text`
+  font-size: 16px;
+  text-align: center;
 `;
 
 export const ContainerSignIn = styled.View`

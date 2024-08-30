@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
+import { useWindowDimensions, Alert } from 'react-native';
+import { LoadingContext } from '../../loadingContext';
 import { useTheme } from 'styled-components';
 import { VictoryBar, VictoryChart, VictoryTheme } from 'victory-native';
-import { useWindowDimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { IBuy, ISale, ITransaction } from '../../utils/interface'
 
@@ -18,6 +19,7 @@ import {
 } from '../styles/transactionStyle'
 
 export default function Transactions() {
+  const { isLoading, showLoading, hideLoading } = useContext(LoadingContext);
   const theme = useTheme();
   const { height } = useWindowDimensions();
   const heightBuy = height * 0.3
@@ -52,6 +54,9 @@ export default function Transactions() {
   ]
 
   async function loadBuys() {
+    if (isLoading) {
+      Alert.alert('Testando contexto Carregando')
+    }
     let priceAccumulator = 0
     try {
       const responseBuys = await AsyncStorage.getItem(keyBuy)

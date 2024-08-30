@@ -20,7 +20,8 @@ export interface ICategory {
 }
 export interface IProduct {
   id: string;
-  category: ICategory | undefined;
+  category: ICategory | undefined; //remover
+  categoryname: string;
   name: string;
   price: number;
   photo: string;
@@ -32,34 +33,36 @@ export interface IClient {
 }
 export interface IStock {
   id: string;
-  product: IProduct | undefined;
+  product_id: number;
+  product_name: string;
+  product: IProduct | undefined; //remover
   amount: number;
   hasStock: boolean;
 }
-export interface IBuy {
-  id: string;
-  name: string;
-  amount: number;
-  price: number;
-  datebuy: string;
-}
-export interface ISale {
-  id: string;
-  client: IClient | undefined;
-  product: IProduct | undefined;
-  amount: number;
-  price: number;
-  isPaid: boolean;
-  dateSale: string;
-}
 export interface IOrder {
   id: string;
-  client: IClient | undefined;
-  product: IProduct | undefined;
+  client_name: string;
+  product_name: string;
+  client: IClient | undefined; //remover
+  product: IProduct | undefined; //remover
   amount: number;
   price: number;
   obs: string;
 }
+// export interface ITransaction {
+//   id: number;
+//   modality: string;
+//   kind: string;
+//   place: string;
+//   description: string; //remover
+//   color: string; //remover
+//   product_name: string;
+//   client_name: string;
+//   amount: number;
+//   price: number;
+//   datetransaction: string;
+//   ispaid: boolean;
+// }
 export interface IIngredient {
   id: string;
   name: string;
@@ -73,6 +76,25 @@ export interface IRecipe {
   preparation: string;
   cooking: string;
 }
+//excluir
+export interface IBuy {
+  id: string;
+  name: string;
+  amount: number;
+  price: number;
+  datebuy: string;
+}
+//excluir
+export interface ISale {
+  id: string;
+  client: IClient | undefined;
+  product: IProduct | undefined;
+  amount: number;
+  price: number;
+  isPaid: boolean;
+  dateSale: string;
+}
+//excluir
 export interface ITransaction {
   id: string;
   description: string;

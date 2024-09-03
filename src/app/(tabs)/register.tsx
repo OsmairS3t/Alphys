@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Modal } from 'react-native';
-
+import { LoadingContext } from '../../loadingContext';
 import Category from '../screens/category';
 import Product from '../screens/product';
 import Buy from '../screens/buy';
@@ -12,6 +12,7 @@ import { Container, Title, ItemList, Item, TextItem, GroupList, IconList } from 
 import Recipe from '../screens/recipe';
 
 export default function Register() {
+  const { isLoading, showLoading, hideLoading } = useContext(LoadingContext);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false)
   const [isProductModalOpen, setIsProductModalOpen] = useState(false)
   const [isBuyModalOpen, setIsBuyModalOpen] = useState(false)

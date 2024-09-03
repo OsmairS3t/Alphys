@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, Pressable, Modal, Alert } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -26,6 +26,7 @@ import {
   BtnItem,
   TextBtnItem
 } from '../styles/registerStyle';
+import { supabase } from '../../databases/supabase';
 
 type RecipeProps = {
   closeModal: (value: boolean) => void;
@@ -40,9 +41,16 @@ export default function Recipe({ closeModal }: RecipeProps) {
 
   async function loadRecipes() {
     try {
-      const response = await AsyncStorage.getItem(keyRecipe)
-      const dataRecipe: IRecipe[] = response ? JSON.parse(response) : []
-      setRecipes(dataRecipe)
+      const { data, error } = await supabase.from('recipes').select('*')
+      if (data) {
+        setRecipes(data)
+      }
+      if (error) {
+        console.log(error)
+      }
+      // const response = await AsyncStorage.getItem(keyRecipe)
+      // const dataRecipe: IRecipe[] = response ? JSON.parse(response) : []
+      // setRecipes(dataRecipe)
     } catch (e) {
       console.log(e)
     }
@@ -50,6 +58,7 @@ export default function Recipe({ closeModal }: RecipeProps) {
 
   function handleNewRecipeModalOpen() {
     setIsNewModalOpen(true)
+    setIdRecipe('')
   }
 
   function handleEditRecipeModalOpen(id: string) {

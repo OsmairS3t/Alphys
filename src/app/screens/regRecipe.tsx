@@ -18,6 +18,7 @@ import {
   TextIngredient
 } from '../styles/recipeStyle';
 import {GroupList} from '../styles/registerStyle'
+import { supabase } from '../../databases/supabase';
 
 type RecipeProps = {
   closeModal: (value: boolean) => void;
@@ -34,13 +35,23 @@ export default function RegisterRecipe({ closeModal, updateList, idRecipe, viewR
   const [cooking, setCooking] = useState('')
 
   async function loadRecipe(id: string) {
-    const response = await AsyncStorage.getItem(keyRecipe)
-    const objRecipe: IRecipe[] = response ? JSON.parse(response) : []
-    const foundRecipe = objRecipe.find(rec => rec.id === id)
-    setRecipe(foundRecipe)
-    setNameProduct(String(foundRecipe?.nameproduct))
-    setPreparation(String(foundRecipe?.preparation))
-    setCooking(String(foundRecipe?.cooking))
+    const { data, error } = await supabase.from('recipes').select('*')
+    if (data) {
+      const objRecipe: IRecipe[] = data
+      const foundRecipe = objRecipe.find(rec => rec.id === id)
+      setRecipe(foundRecipe)
+      setNameProduct(String(foundRecipe?.nameproduct))
+      setPreparation(String(foundRecipe?.preparation))
+      setCooking(String(foundRecipe?.cooking))
+    }
+    if (error) { console.log(error) }
+    // const response = await AsyncStorage.getItem(keyRecipe)
+    // const objRecipe: IRecipe[] = response ? JSON.parse(response) : []
+    // const foundRecipe = objRecipe.find(rec => rec.id === id)
+    // setRecipe(foundRecipe)
+    // setNameProduct(String(foundRecipe?.nameproduct))
+    // setPreparation(String(foundRecipe?.preparation))
+    // setCooking(String(foundRecipe?.cooking))
   }
 
   async function handleSave() {
@@ -52,21 +63,44 @@ export default function RegisterRecipe({ closeModal, updateList, idRecipe, viewR
       cooking: cooking
     }
     try {
-      const response = await AsyncStorage.getItem(keyRecipe)
-      let oldData: IRecipe[] = response ? JSON.parse(response) : []
-      const foundRecipe = oldData.find(od => od.id === idRecipe)
-      if(!foundRecipe) {
-        oldData.push(dataRecipe)
-        await AsyncStorage.setItem(keyRecipe, JSON.stringify(oldData))
-        Alert.alert('Receita incluída com sucesso!')
-      } else {
-        const updateData = oldData.filter(od => od.id !== idRecipe)
-        updateData.push(dataRecipe)
-        await AsyncStorage.setItem(keyRecipe, JSON.stringify(updateData))
+      const {data, error} = await supabase.from('recipes').select('*').eq('id', idRecipe)
+      if (data) {
+        await supabase.from('recipes').update({
+          nameproduct: nameProduct,
+          preparation: preparation,
+          cooking: cooking,
+          ingredients: data[0].ingredients,
+        }).eq('id', idRecipe)
         Alert.alert('Receita atualizada com sucesso!')
-      }
+      } else {
+        await supabase.from('recipes').insert({
+          nameproduct: nameProduct,
+          preparation: preparation,
+          cooking: cooking,
+          ingredients: [],
+        })
+        Alert.alert('Receita incluída com sucesso!')
+      } 
       updateList()
       closeModal(false);
+      if (error) {
+        console.log(error)
+      }
+      // const response = await AsyncStorage.getItem(keyRecipe)
+      // let oldData: IRecipe[] = response ? JSON.parse(response) : []
+      // const foundRecipe = oldData.find(od => od.id === idRecipe)
+      // if(!foundRecipe) {
+      //   oldData.push(dataRecipe)
+      //   await AsyncStorage.setItem(keyRecipe, JSON.stringify(oldData))
+      //   Alert.alert('Receita incluída com sucesso!')
+      // } else {
+      //   const updateData = oldData.filter(od => od.id !== idRecipe)
+      //   updateData.push(dataRecipe)
+      //   await AsyncStorage.setItem(keyRecipe, JSON.stringify(updateData))
+      //   Alert.alert('Receita atualizada com sucesso!')
+      // }
+      // updateList()
+      // closeModal(false);
     } catch (error) {
       console.log('Ocorreu um erro ao tentar salvar: ', error)
     }
@@ -90,19 +124,6 @@ export default function RegisterRecipe({ closeModal, updateList, idRecipe, viewR
         </GroupRecipe>
 
         <GroupRecipe direction='column'>
-          <TitleRecipe>Ingredientes:</TitleRecipe>
-          <ScrollView>
-            {recipe?.ingredients.map(ing => (
-              <GroupList key={ing.id}>
-                <TextIngredient>{ing.name}</TextIngredient>
-                <TextIngredient>{ing.amount}</TextIngredient>
-                <TextIngredient>{ing.conditions}</TextIngredient>
-              </GroupList>
-            ))}
-          </ScrollView>
-        </GroupRecipe>
-
-        <GroupRecipe direction='column'>
           <TitleRecipe>Modo de preparo: </TitleRecipe>
           <TextRecipe>{preparation}</TextRecipe>
         </GroupRecipe>
@@ -112,6 +133,20 @@ export default function RegisterRecipe({ closeModal, updateList, idRecipe, viewR
           <TextRecipe>{cooking}</TextRecipe>
         </GroupRecipe>
   
+        <GroupRecipe direction='column'>
+          <TitleRecipe>Ingredientes:</TitleRecipe>
+          <ScrollView>
+            {recipe?.ingredients.map(ing => (
+              <GroupList key={ing.id}>
+                <TextIngredient>-</TextIngredient>
+                <TextIngredient>{ing.name}</TextIngredient>
+                <TextIngredient>{ing.amount}</TextIngredient>
+                <TextIngredient>{ing.conditions}</TextIngredient>
+              </GroupList>
+            ))}
+          </ScrollView>
+        </GroupRecipe>
+
       </Container>
     )
   } else {
@@ -125,16 +160,6 @@ export default function RegisterRecipe({ closeModal, updateList, idRecipe, viewR
           value={nameProduct}
         />
   
-        <ScrollView>
-          {recipe?.ingredients.map(ing => (
-            <GroupList key={ing.id}>
-              <TextIngredient>{ing.name}</TextIngredient>
-              <TextIngredient>{ing.amount}</TextIngredient>
-              <TextIngredient>{ing.conditions}</TextIngredient>
-            </GroupList>
-          ))}
-        </ScrollView>
-  
         <InputForm
           placeholder='Modo de preparo:'
           onChangeText={text => setPreparation(text)}
@@ -146,7 +171,20 @@ export default function RegisterRecipe({ closeModal, updateList, idRecipe, viewR
           onChangeText={text => setCooking(text)}
           value={cooking}
         />
-  
+        
+        <GroupRecipe direction='column'>
+          <ScrollView>
+            {recipe?.ingredients.map(ing => (
+              <GroupList key={ing.id}>
+                <TextIngredient>-</TextIngredient>
+                <TextIngredient>{ing.name}</TextIngredient>
+                <TextIngredient>{ing.amount}</TextIngredient>
+                <TextIngredient>{ing.conditions}</TextIngredient>
+              </GroupList>
+            ))}
+          </ScrollView>
+        </GroupRecipe>
+
         <ButtonForm onPress={handleSave}>
           <TextButton>Salvar</TextButton>
         </ButtonForm>

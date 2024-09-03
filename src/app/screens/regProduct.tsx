@@ -87,10 +87,10 @@ export default function RegisterProduct({ closeModal, updateList, idProduct }: P
     setData(newArray)
   }
 
-  async function loadCategory(idCategory: string) {
+  async function loadCategory(nameCategory: string) {
     const response = await AsyncStorage.getItem(keyCategory)
     const categories: ICategory[] = response ? JSON.parse(response) : []
-    const category = categories.find(cat => cat.id === idCategory)
+    const category = categories.find(cat => cat.name === nameCategory)
     return category
   }
 
@@ -113,6 +113,7 @@ export default function RegisterProduct({ closeModal, updateList, idProduct }: P
     const dataCategory = {
       id: uuid.v4().toString(),
       category: await loadCategory(selected),
+      categoryname: selected,
       name: nameProduct,
       price: Number(priceValue),
       photo: imgPhoto,
@@ -152,7 +153,7 @@ export default function RegisterProduct({ closeModal, updateList, idProduct }: P
             dropdownStyles={{ backgroundColor: theme.colors.bg_input }}
             setSelected={(val: string) => setSelected(val)}
             data={data}
-            save="key"
+            save="value"
             defaultOption={categorySelect}
           />
           {errCateogry !== '' && <Error>{errCateogry}</Error>}

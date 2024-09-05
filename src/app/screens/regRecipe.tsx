@@ -139,9 +139,9 @@ export default function RegisterRecipe({ closeModal, updateList, idRecipe, viewR
             {recipe?.ingredients.map(ing => (
               <GroupList key={ing.id}>
                 <TextIngredient>-</TextIngredient>
-                <TextIngredient>{ing.name}</TextIngredient>
-                <TextIngredient>{ing.amount}</TextIngredient>
-                <TextIngredient>{ing.conditions}</TextIngredient>
+                <TextIngredient>
+                  {ing.name} - {ing.amount} {ing.conditions}
+                </TextIngredient>
               </GroupList>
             ))}
           </ScrollView>
@@ -173,13 +173,13 @@ export default function RegisterRecipe({ closeModal, updateList, idRecipe, viewR
         />
         
         <GroupRecipe direction='column'>
+          <TitleRecipe>Ingredientes:</TitleRecipe>
           <ScrollView>
             {recipe?.ingredients.map(ing => (
               <GroupList key={ing.id}>
-                <TextIngredient>-</TextIngredient>
-                <TextIngredient>{ing.name}</TextIngredient>
-                <TextIngredient>{ing.amount}</TextIngredient>
-                <TextIngredient>{ing.conditions}</TextIngredient>
+                <TextIngredient>
+                  - {ing.name} - {ing.amount} {ing.conditions}
+                </TextIngredient>
               </GroupList>
             ))}
           </ScrollView>

@@ -15,11 +15,12 @@ import { keyCategory } from '../../utils/keyStorage';
 
 import { Container, Title } from '../styles/categoryStyle';
 import { ButtonForm, TextButton, TextError } from '../styles/global';
+import { useCategoryDatabase } from '../../databases/useCategoryDatabase';
 
 type CategoryProps = {
   closeModal: (value: boolean) => void;
   updateList: () => void;
-  idCategory: string;
+  idCategory: number;
 }
 
 const schema = z.object({
@@ -28,48 +29,61 @@ const schema = z.object({
 })
 
 export default function RegisterCategory({ closeModal, updateList, idCategory }: CategoryProps) {
+  const categoryDatabase = useCategoryDatabase()
   const { handleSubmit, control, setValue, formState: { errors } } = useForm<ICategory>({ resolver: zodResolver(schema) })
-  let title_page = idCategory === '' ? 'NOVO CADASTRO' : 'EDITAR CADASTRO'
+  let title_page = idCategory === 0 ? 'NOVO CADASTRO' : 'EDITAR CADASTRO'
 
-  async function loadCategory(id: string) {
-    const response = await AsyncStorage.getItem(keyCategory)
-    const categories: ICategory[] = response ? JSON.parse(response) : []
-    const objCategory = categories.find(cat => cat.id === id)
-    setValue('name', String(objCategory?.name))
-  }
+  // async function loadCategory(id: string) {
+  //   const response = await AsyncStorage.getItem(keyCategory)
+  //   const categories: ICategory[] = response ? JSON.parse(response) : []
+  //   const objCategory = categories.find(cat => cat.id === id)
+  //   setValue('name', String(objCategory?.name))
+  // }
 
-  async function handleSave(formData: ICategory) {
-    const dataCategory = {
-      id: uuid.v4().toString(),
-      name: String(formData.name),
-    }
+  // async function handleSave(formData: ICategory) {
+  //   const dataCategory = {
+  //     id: uuid.v4().toString(),
+  //     name: String(formData.name),
+  //   }
+  //   try {
+  //     const response = await AsyncStorage.getItem(keyCategory)
+  //     let oldData: ICategory[] = response ? JSON.parse(response) : []
+
+  //     const foundedData = oldData.find(od => od.id === idCategory)
+  //     if (!foundedData) {
+  //       oldData.push(dataCategory)
+  //       await AsyncStorage.setItem(keyCategory, JSON.stringify(oldData))
+  //       Alert.alert('Categoria incluída com sucesso!')
+  //     } else {
+  //       const updateData = oldData.filter(od => od.id !== idCategory)
+  //       updateData.push(dataCategory)
+  //       await AsyncStorage.setItem(keyCategory, JSON.stringify(updateData))
+  //       Alert.alert('Categoria alterada com sucesso!')
+  //     }
+  //     updateList();
+  //     closeModal(false);
+  //   } catch (error) {
+  //     console.log('Ocorreu um erro ao tentar salvar: ', error)
+  //   }
+  // }
+
+  async function create(formData: ICategory) {
     try {
-      const response = await AsyncStorage.getItem(keyCategory)
-      let oldData: ICategory[] = response ? JSON.parse(response) : []
-
-      const foundedData = oldData.find(od => od.id === idCategory)
-      if (!foundedData) {
-        oldData.push(dataCategory)
-        await AsyncStorage.setItem(keyCategory, JSON.stringify(oldData))
-        Alert.alert('Categoria incluída com sucesso!')
-      } else {
-        const updateData = oldData.filter(od => od.id !== idCategory)
-        updateData.push(dataCategory)
-        await AsyncStorage.setItem(keyCategory, JSON.stringify(updateData))
-        Alert.alert('Categoria alterada com sucesso!')
-      }
-      updateList();
-      closeModal(false);
+      const response = await categoryDatabase.create({
+        name: formData.name
+      })
+      Alert.alert('Categoria cadastrada com sucesso.')
+      // list()
     } catch (error) {
-      console.log('Ocorreu um erro ao tentar salvar: ', error)
+      console.log(error)
     }
   }
 
-  useEffect(() => {
-    if (idCategory!=='') {
-      loadCategory(idCategory)
-    }
-  }, [])
+  // useEffect(() => {
+  //   if (idCategory > 0) {
+  //     loadCategory(idCategory)
+  //   }
+  // }, [])
 
   return (
     <Container>
@@ -89,7 +103,7 @@ export default function RegisterCategory({ closeModal, updateList, idCategory }:
       />
       {errors.name && <TextError>{errors.name.message}</TextError>}
 
-      <ButtonForm onPress={handleSubmit(handleSave)}>
+      <ButtonForm onPress={handleSubmit(create)}>
         <TextButton>Salvar</TextButton>
       </ButtonForm>
     </Container>

@@ -22,57 +22,69 @@ import {
   IconColumnList,
   TextColumnList
 } from '../styles/registerStyle';
+import { CategoryDatabase, useCategoryDatabase } from '../../databases/useCategoryDatabase';
 
 type CategoryProps = {
   closeModal: (value: boolean) => void;
 }
 
 export default function Category({ closeModal }: CategoryProps) {
-  const [idCategory, setIdCategory] = useState('')
-  const [categories, setCategories] = useState<ICategory[]>([])
+  const categoryDatabase = useCategoryDatabase()
+  const [search, setSearch] = useState('')
+  const [idCategory, setIdCategory] = useState(0)
+  const [categories, setCategories] = useState<CategoryDatabase[]>([])
   const [isNewModalOpen, setIsNewModalOpen] = useState(false)
 
-  async function loadCategories() {
+  async function list() {
     try {
-      const response = await AsyncStorage.getItem(keyCategory)
-      const dataCategory: ICategory[] = response ? JSON.parse(response) : []
-      setCategories(dataCategory)
-    } catch (e) {
-      console.log(e)
+      const response = await categoryDatabase.searchByName(search)
+      setCategories(response)
+    } catch (error) {
+      console.log(error)
     }
   }
 
+  // async function loadCategories() {
+  //   try {
+  //     const response = await AsyncStorage.getItem(keyCategory)
+  //     const dataCategory: ICategory[] = response ? JSON.parse(response) : []
+  //     setCategories(dataCategory)
+  //   } catch (e) {
+  //     console.log(e)
+  //   }
+  // }
+
   function handleNewCategoryModalOpen() {
-    setIdCategory('')
+    setIdCategory(0)
     setIsNewModalOpen(true)
   }
 
-  function handleEditCategoryModalOpen(id: string) {
+  function handleEditCategoryModalOpen(id: number) {
     setIdCategory(id)
     setIsNewModalOpen(true)
   }
 
-  async function deleteCategory(id: string) {
-    try {
-      const responseProduct = await AsyncStorage.getItem(keyProduct)
-      const products: IProduct[] = responseProduct ? JSON.parse(responseProduct) : []
-      const categoryProduct = products.find(prod => prod.category?.id === id)
-      if (categoryProduct) {
-        Alert.alert('Categoria já possui produto(s) cadastrado(s) a ela.')
-      } else {
-        const response = await AsyncStorage.getItem(keyCategory)
-        const categories: ICategory[] = response ? JSON.parse(response) : []
-        const removedItem = categories.filter(cat => cat.id !== id)
-        await AsyncStorage.setItem(keyCategory, JSON.stringify(removedItem))
-        loadCategories()
-        Alert.alert('Categoria excluída com sucesso!')
-      }
-    } catch (error) {
-      console.log('Erro ao tentar excluir: ', error)
-    }
-  }
+  // async function deleteCategory(id: string) {
+  //   try {
+  //     const responseProduct = await AsyncStorage.getItem(keyProduct)
+  //     const products: IProduct[] = responseProduct ? JSON.parse(responseProduct) : []
+  //     const categoryProduct = products.find(prod => prod.category?.id === id)
+  //     if (categoryProduct) {
+  //       Alert.alert('Categoria já possui produto(s) cadastrado(s) a ela.')
+  //     } else {
+  //       const response = await AsyncStorage.getItem(keyCategory)
+  //       const categories: ICategory[] = response ? JSON.parse(response) : []
+  //       const removedItem = categories.filter(cat => cat.id !== id)
+  //       await AsyncStorage.setItem(keyCategory, JSON.stringify(removedItem))
+  //       loadCategories()
+  //       Alert.alert('Categoria excluída com sucesso!')
+  //     }
+  //   } catch (error) {
+  //     console.log('Erro ao tentar excluir: ', error)
+  //   }
+  // }
 
-  function handleDeleteCategory(id: string) {
+  function handleDeleteCategory(id: number) {
     Alert.alert(
       'Exclusao de categorias',
       'Tem certeza que deseja excluir esta categoria?',
@@ -80,7 +92,7 @@ export default function Category({ closeModal }: CategoryProps) {
         {
           text: 'Sim',
           onPress: () => {
-            deleteCategory(id)
+            categoryDatabase.del(id)
           },
           style: 'default',
         },
@@ -94,7 +106,7 @@ export default function Category({ closeModal }: CategoryProps) {
   }
 
   useEffect(() => {
-    loadCategories();
+    list();
   }, [])
 
   return (
@@ -112,7 +124,7 @@ export default function Category({ closeModal }: CategoryProps) {
           <FlatList
             style={{ height: 450 }}
             data={categories}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => String(item.id)}
             renderItem={({ item }) =>
               <ItemColumnList>
                 <GroupIconTextRow>
@@ -140,7 +152,7 @@ export default function Category({ closeModal }: CategoryProps) {
         }}>
         <RegisterCategory
           closeModal={setIsNewModalOpen}
-          updateList={loadCategories}
+          updateList={list}
           idCategory={idCategory}
         />
       </Modal>

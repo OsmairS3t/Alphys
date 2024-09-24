@@ -15,7 +15,7 @@ export interface IUser {
   password: string;
 }
 export interface ICategory {
-  id: string;
+  id: number;
   name: string;
 }
 export interface IProduct {

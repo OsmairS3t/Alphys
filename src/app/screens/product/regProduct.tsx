@@ -2,20 +2,20 @@ import React, { useEffect, useState } from 'react';
 import { Alert, TouchableWithoutFeedback, KeyboardAvoidingView, Keyboard } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useTheme } from 'styled-components';
-import HeaderModal from '../components/HeaderModal';
+import HeaderModal from '../../components/HeaderModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { keyCategory, keyProduct } from '../../utils/keyStorage';
+import { keyCategory, keyProduct } from '../../../utils/keyStorage';
 import { MaskedText, mask } from "react-native-mask-text";
 
 // import { categories } from '../../utils/database';
-import { ICategory, IProduct, ISelectProps } from '../../utils/interface';
+import { ICategory, IProduct, ISelectProps } from '../../../utils/interface';
 
 import uuid from 'react-native-uuid';
 
-import { InputForm } from '../components/Forms/InputForm';
+import { InputForm } from '../../components/Forms/InputForm';
 import { SelectList } from 'react-native-dropdown-select-list';
 
-import { ButtonForm, TextButton, InputMask, Error } from '../styles/global';
+import { ButtonForm, TextButton, InputMask, Error } from '../../styles/global';
 import {
   Container,
   Title,
@@ -27,17 +27,22 @@ import {
   IconCamera,
   PhotoImage,
   ImgCapture
-} from '../styles/productStyle';
+} from '../../styles/productStyle';
+import { useCategoryDatabase } from '../../../hooks/useCategoryDatabase';
+import { useProductDatabase } from '../../../hooks/useProductDatabase';
 
 type ProductProps = {
   closeModal: (value: boolean) => void;
   updateList: () => void;
-  idProduct: string;
+  product: IProduct | undefined;
 }
 
-export default function RegisterProduct({ closeModal, updateList, idProduct }: ProductProps) {
+export default function RegisterProduct({ closeModal, updateList, product }: ProductProps) {
+  let title_page = product ? 'EDITAR CADASTRO' : 'NOVO CADASTRO'
   const theme = useTheme()
-  let title_page = idProduct === '' ? 'NOVO CADASTRO' : 'EDITAR CADASTRO'
+  const categoryDatabase = useCategoryDatabase()
+  const productDatabase = useProductDatabase()
+  const [search, setSearch] = useState('')
   const [errCateogry, setErrCategory] = useState('')
   const [errName, setErrName] = useState('')
   const [errPrice, setErrPrice] = useState('')
@@ -78,53 +83,43 @@ export default function RegisterProduct({ closeModal, updateList, idProduct }: P
   }
 
   async function loadCategories() {
-    const response = await AsyncStorage.getItem(keyCategory)
-    const categories: ICategory[] = response ? JSON.parse(response) : []
-    setCategories(categories)
-    let newArray: ISelectProps[] = categories.map(cat => {
-      return { key: cat.id, value: cat.name }
+    const response = await categoryDatabase.searchByName(search)
+    setCategories(response)
+    let newArray: ISelectProps[] = response.map(cat => {
+      return { key: String(cat.id), value: cat.name }
     })
     setData(newArray)
   }
 
   async function loadCategory(nameCategory: string) {
-    const response = await AsyncStorage.getItem(keyCategory)
-    const categories: ICategory[] = response ? JSON.parse(response) : []
-    const category = categories.find(cat => cat.name === nameCategory)
-    return category
+    const response = await categoryDatabase.findByName(nameCategory)
+    return response
   }
 
-  async function loadProduct(id: string) {
-    const response = await AsyncStorage.getItem(keyProduct)
-    const products: IProduct[] = response ? JSON.parse(response) : []
-    const objProduct = products.find(pro => pro.id === id)
-    setCategorySelect({ key: String(objProduct?.category?.id), value: String(objProduct?.category?.name) })
-    setNameProduct(String(objProduct?.name))
-    const code = mask("ABC1234", "AAA-9999") // return ABC-1234
-    const priceFormatted = mask(String(objProduct?.price), "0.00")
-    setPriceValue(String(objProduct?.price))
-    console.log('preco: ', priceFormatted)
+  async function loadProduct(id: number) {
+    const response = await productDatabase.searchById(id)
+    if (response) {
+      const cat: ICategory = await loadCategory(response.categoryname)
+      setCategorySelect({ key: String(cat.id), value: cat.name })
+      setNameProduct(String(response.name))
+      const priceFormatted = mask(String(response.price), "0.00")
+      setPriceValue(String(response.price))
+      // const code = mask("ABC1234", "AAA-9999")
+      // console.log('preco: ', priceFormatted)
+    }
   }
 
   async function handleSave() {
     if (selected === '') {
       Alert.alert('Informe a categoria.')
     }
-    const dataCategory = {
-      id: uuid.v4().toString(),
-      category: await loadCategory(selected),
-      categoryname: selected,
-      name: nameProduct,
-      price: Number(priceValue),
-      photo: imgPhoto,
-    }
     try {
-      const response = await AsyncStorage.getItem(keyProduct)
-      let oldData: IProduct[] = response ? JSON.parse(response) : []
-
-      oldData.push(dataCategory)
-
-      await AsyncStorage.setItem(keyProduct, JSON.stringify(oldData))
+      await productDatabase.create({
+        categoryname: selected,
+        name: nameProduct,
+        price: Number(priceValue),
+        photo: imgPhoto,
+      })
       updateList()
       Alert.alert('Produto incluído com sucesso!')
       closeModal(false);
@@ -135,8 +130,8 @@ export default function RegisterProduct({ closeModal, updateList, idProduct }: P
 
   useEffect(() => {
     loadCategories()
-    if (idProduct !== '') {
-      loadProduct(idProduct)
+    if (product) {
+      loadProduct(product.id)
     }
   }, [])
 

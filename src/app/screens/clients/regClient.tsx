@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from 'react';
+import { Alert } from 'react-native';
 import uuid from 'react-native-uuid';
 import * as ImagePicker from 'expo-image-picker';
-import { InputForm } from '../components/Forms/InputForm';
+import { InputForm } from '../../components/Forms/InputForm';
+import { IClient } from '../../../utils/interface';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { keyClient } from '../../../utils/keyStorage';
 
-import HeaderModal from '../components/HeaderModal';
+import HeaderModal from '../../components/HeaderModal';
 
-import { ButtonForm, TextButton } from '../styles/global';
+import { ButtonForm, TextButton } from '../../styles/global';
 import {
   Container,
   Title,
@@ -17,21 +21,20 @@ import {
   IconCamera,
   PhotoImage,
   ImgCapture
-} from '../styles/clientStyle';
+} from '../../styles/clientStyle';
+import { useClientDatabase } from '../../../hooks/useClientDatabase';
 
-import { IClient } from '../../utils/interface';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { keyClient } from '../../utils/keyStorage';
-import { Alert } from 'react-native';
 
 type ClientProps = {
   closeModal: (value: boolean) => void;
   updateList: () => void;
-  idClient: string;
+  client: IClient | undefined;
 }
 
-export default function RegisterClient({ closeModal, updateList, idClient }: ClientProps) {
-  let title_page = idClient === '' ? 'NOVO CADASTRO' : 'EDITAR CADASTRO'
+export default function RegisterClient({ closeModal, updateList, client }: ClientProps) {
+  const clientDatabase = useClientDatabase()
+  let title_page = client ? 'EDITAR CADASTRO' : 'NOVO CADASTRO'
+  const [id, setId] = useState(0)
   const [name, setName] = useState('')
   const [imgPhoto, setImgPhoto] = useState('../../assets/foto_cliente.png')
 
@@ -63,33 +66,23 @@ export default function RegisterClient({ closeModal, updateList, idClient }: Cli
     }
   }
 
-  async function loadClient(id: string) {
-    const response = await AsyncStorage.getItem(keyClient)
-    const clients: IClient[] = response ? JSON.parse(response) : []
-    const foundClient = clients.find(cli => cli.id === id)
-    setName(String(foundClient?.name))
-    setImgPhoto(String(foundClient?.photo))
+  async function loadClient(id: number) {
+    const response = await clientDatabase.searchById(id)
+    if (response) {
+      setId(response.id)
+      setName(String(response.name))
+      setImgPhoto(String(response.photo))
+    }
   }
 
   async function handleSave() {
-    const dataClient = {
-      id: uuid.v4().toString(),
-      name: name,
-      photo: imgPhoto,
-    }
     try {
-      const response = await AsyncStorage.getItem(keyClient)
-      let oldData: IClient[] = response ? JSON.parse(response) : []
-      const foundedData = oldData.find(od => od.id === idClient)
-      if(!foundedData){
-        oldData.push(dataClient)
-        await AsyncStorage.setItem(keyClient, JSON.stringify(oldData))
-        Alert.alert('Cliente incluído com sucesso!')
-      } else {
-        const updateData = oldData.filter(od => od.id !== idClient)
-        updateData.push(dataClient)
-        await AsyncStorage.setItem(keyClient, JSON.stringify(updateData))
+      if(id > 0) {
+        await clientDatabase.update({ id: id, name: name, photo: imgPhoto })
         Alert.alert('Cliente alterado com sucesso!')
+      } else {
+        await clientDatabase.create({ name: name, photo: imgPhoto })
+        Alert.alert('Cliente incluído com sucesso!')
       }
       updateList()
       closeModal(false);
@@ -99,8 +92,8 @@ export default function RegisterClient({ closeModal, updateList, idClient }: Cli
   }
 
   useEffect(() => {
-    if(idClient !== '') {
-      loadClient(idClient)
+    if(client) {
+      loadClient(client.id)
     }
   }, [])
 

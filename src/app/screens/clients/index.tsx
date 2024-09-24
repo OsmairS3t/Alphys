@@ -1,19 +1,15 @@
 import React, { useCallback, useState } from 'react';
 import { FlatList, Pressable, Modal, Alert } from 'react-native';
 import { useFocusEffect } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-import HeaderModal from '../components/HeaderModal';
-
-import { IClient, ISale } from '../../utils/interface';
-import { keyClient, keySale } from '../../utils/keyStorage';
+import { IClient, ISale } from '../../../utils/interface';
+import HeaderModal from '../../components/HeaderModal';
 import RegisterClient from './regClient';
 
 import {
   HeaderScreenPage,
   ButtonNewScreenPage,
   IconButtonNewScreenPage
-} from '../styles/global';
+} from '../../styles/global';
 
 import {
   ContainerModal,
@@ -22,59 +18,62 @@ import {
   GroupIconTextRow,
   IconColumnList,
   TextColumnList
-} from '../styles/registerStyle';
-
+} from '../../styles/registerStyle';
+import { useClientDatabase } from '../../../hooks/useClientDatabase';
+import { useTransactionDatabase } from '../../../hooks/useTransactionDatabase';
 
 type ClientProps = {
   closeModal: (value: boolean) => void;
 }
 
 export default function Client({ closeModal }: ClientProps) {
-  const [idClient, setIdClient] = useState('')
+  const clientDatabase = useClientDatabase()
+  const transactionDatabase = useTransactionDatabase()
+  const [search, setSearch] = useState('')
+  const [name, setName] = useState('')
+  const [photo, setPhoto] = useState('')
+  const [client, setClient] = useState<IClient>()
   const [clients, setClients] = useState<IClient[]>([])
   const [isNewModalOpen, setIsNewModalOpen] = useState(false)
 
   async function loadClients() {
     try {
-      const response = await AsyncStorage.getItem(keyClient)
-      const dataClient: IClient[] = response ? JSON.parse(response) : []
-      setClients(dataClient)
+      const response = await clientDatabase.searchByName(search)
+      setClients(response)
     } catch (e) {
       console.log(e)
     }
   }
 
   function handleNewCategoryModalOpen() {
-    setIdClient('')
+    setClient(undefined)
     setIsNewModalOpen(true)
   }
 
-  function handleEditCategoryModalOpen(id: string) {
-    setIdClient(id)
+  function handleEditCategoryModalOpen(cli: IClient) {
+    setClient(cli)
     setIsNewModalOpen(true)
   }
 
-  async function deleteClient(id: string) {
+  async function deleteClient(id: number) {
     try {
-      const responseSale = await AsyncStorage.getItem(keySale)
-      const sales: ISale[] = responseSale ? JSON.parse(responseSale) : []
-      const saleClient = sales.find(sale => sale.client?.id === id)
-      if (saleClient) {
-        Alert.alert('Cliente possui venda em seu nome.')
+      const responseCli = await clientDatabase.searchById(id)
+      if(responseCli) {
+        const responseSale = await transactionDatabase.searchByClient(responseCli.name)
+        if (responseSale) {
+          Alert.alert('Cliente possui venda em seu nome e não pode ser removido.')
+        }
       } else {
-        const responseClient = await AsyncStorage.getItem(keyClient)
-        const clients: IClient[] = responseClient ? JSON.parse(responseClient) : []
-        const removedItem = clients.filter(cli => cli.id !== id)
-        await AsyncStorage.setItem(keyClient, JSON.stringify(removedItem))
-        loadClients()
+        await clientDatabase.remove(id)
         Alert.alert('Cliente excluído com sucesso!')
       }
+      loadClients()
     } catch (error) {
       console.log('Erro ao tentar excluir: ', error)
     }
   }
 
-  function handleDeleteClient(id: string) {
+  function handleDeleteClient(id: number) {
     Alert.alert(
       'Exclusao de Clientes',
       'Tem certeza que deseja excluir este Cliente?',
@@ -116,10 +115,10 @@ export default function Client({ closeModal }: ClientProps) {
           <FlatList
             style={{ height: 450 }}
             data={clients}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => String(item.id)}
             renderItem={({ item }) =>
               <GroupIconTextRow>
-                <Pressable onPress={() => handleEditCategoryModalOpen(item.id)}>
+                <Pressable onPress={() => handleEditCategoryModalOpen(item)}>
                   <ItemColumnList>
                       <TextColumnList> {item.name}</TextColumnList>
                   </ItemColumnList>
@@ -134,7 +133,7 @@ export default function Client({ closeModal }: ClientProps) {
             }
           />
           :
-          <TextColumnList>Não há produtos cadastrados no estoque</TextColumnList>
+          <TextColumnList>Não há clientes cadastrados</TextColumnList>
         }
       </GroupColumn>
 
@@ -148,7 +147,7 @@ export default function Client({ closeModal }: ClientProps) {
         <RegisterClient 
           updateList={loadClients}
           closeModal={setIsNewModalOpen} 
-          idClient={idClient}
+          client={client}
         />
       </Modal>
 

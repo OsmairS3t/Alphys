@@ -3,17 +3,17 @@ import { FlatList, Pressable, Modal, Alert } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import HeaderModal from '../components/HeaderModal';
+import HeaderModal from '../../components/HeaderModal';
 
-import { IProduct, ISale } from '../../utils/interface';
-import { keyProduct, keySale } from '../../utils/keyStorage';
+import { IProduct, ISale } from '../../../utils/interface';
+import { keyProduct, keySale } from '../../../utils/keyStorage';
 import RegisterProduct from './regProduct';
 
 import {
   HeaderScreenPage,
   ButtonNewScreenPage,
   IconButtonNewScreenPage
-} from '../styles/global';
+} from '../../styles/global';
 import {
   ContainerModal,
   GroupColumn,
@@ -21,53 +21,60 @@ import {
   GroupIconTextRow,
   IconColumnList,
   TextColumnList
-} from '../styles/registerStyle';
+} from '../../styles/registerStyle';
+import { useProductDatabase } from '../../../hooks/useProductDatabase';
+import { useTransactionDatabase } from '../../../hooks/useTransactionDatabase';
+import { unknown } from 'zod';
 
 type ProductProps = {
   closeModal: (value: boolean) => void;
 }
 
 export default function Product({ closeModal }: ProductProps) {
-  const [idProduct, setIdProduct] = useState('')
+  const productDatabase = useProductDatabase()
+  const transactionDatabase = useTransactionDatabase()
+  const [search, setSeach] = useState('')
+  const [product, setProduct] = useState<IProduct>()
   const [isNewModalOpen, setIsNewModalOpen] = useState(false);
+  const [categoryName, setCategoryName] = useState('')
+  const [name, setName] = useState('')
+  const [price, setPrice] = useState('')
+  const [photo, setPhoto] = useState('')
   const [products, setProducts] = useState<IProduct[]>([]);
 
   async function loadProducts() {
     try {
-      const response = await AsyncStorage.getItem(keyProduct)
-      const dataProduct: IProduct[] = response ? JSON.parse(response) : []
-      setProducts(dataProduct)
+      const response = await productDatabase.searchByName(search)
+      setProducts(response)
     } catch (e) {
       console.log(e)
     }
   }
 
-  function handleEditProductModalOpen(id: string) {
-    setIdProduct(id)
+  function handleEditProductModalOpen(prod: IProduct) {
+    setProduct(prod)
     setIsNewModalOpen(true)
   }
 
-  async function deleteProduct(id: string) {
+  async function deleteProduct(id: number) {
     try {
-      const responseSale = await AsyncStorage.getItem(keySale)
-      const sales: ISale[] = responseSale ? JSON.parse(responseSale) : []
-      const saleProduct = sales.find(sal => sal.product?.id === id)
-      if (saleProduct) {
-        Alert.alert('Produto possui venda, por isso não pode ser excuído.')
+      const responseProduct = await productDatabase.searchById(id)
+      if(responseProduct) {
+        const responseSale = await transactionDatabase.searchByProduct(responseProduct.name)
+        if (responseSale) {
+          Alert.alert('Produto possui venda, por isso não pode ser excuído.')
+        }
       } else {
-        const response = await AsyncStorage.getItem(keyProduct)
-        const products: IProduct[] = response ? JSON.parse(response) : []
-        const removedItem = products.filter(pro => pro.id !== id)
-        await AsyncStorage.setItem(keyProduct, JSON.stringify(removedItem))
-        loadProducts()
+        await productDatabase.remove(id)
         Alert.alert('Produto excluído com sucesso!')
       }
+      loadProducts()
     } catch (error) {
       console.log('Erro ao tentar excluir: ', error)
     }
   }
 
-  function handleDeleteProduct(id: string) {
+  function handleDeleteProduct(id: number) {
     Alert.alert(
       'Exclusao de Produtos',
       'Tem certeza que deseja excluir este produto?',
@@ -89,7 +96,7 @@ export default function Product({ closeModal }: ProductProps) {
   }
 
   function handleNewProductModalOpen() {
-    setIdProduct('')
+    setProduct(undefined)
     setIsNewModalOpen(true)
   }
 
@@ -114,12 +121,12 @@ export default function Product({ closeModal }: ProductProps) {
           <FlatList
             style={{ height: 450 }}
             data={products}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => String(item.id)}
             renderItem={({ item }) =>
               <GroupIconTextRow>
-                <Pressable onPress={() => handleEditProductModalOpen(item.id)}>
+                <Pressable onPress={() => handleEditProductModalOpen(item)}>
                   <ItemColumnList>
-                    <TextColumnList>Categoria: {item.category?.name}</TextColumnList>
+                    <TextColumnList>Categoria: {item.categoryname}</TextColumnList>
                     <TextColumnList>Produto: {item.name}</TextColumnList>
                     <TextColumnList>
                       Valor: {Intl.NumberFormat('pt-BR',
@@ -150,7 +157,7 @@ export default function Product({ closeModal }: ProductProps) {
         <RegisterProduct
           updateList={loadProducts}
           closeModal={setIsNewModalOpen}
-          idProduct={idProduct}
+          product={product}
         />
       </Modal>
     </ContainerModal>

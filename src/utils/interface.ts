@@ -19,15 +19,14 @@ export interface ICategory {
   name: string;
 }
 export interface IProduct {
-  id: string;
-  category: ICategory | undefined; //remover
+  id: number;
   categoryname: string;
   name: string;
   price: number;
   photo: string;
 }
 export interface IClient {
-  id: string;
+  id: number;
   name: string;
   photo: string;
 }
@@ -49,20 +48,18 @@ export interface IOrder {
   price: number;
   obs: string;
 }
-// export interface ITransaction {
-//   id: number;
-//   modality: string;
-//   kind: string;
-//   place: string;
-//   description: string; //remover
-//   color: string; //remover
-//   product_name: string;
-//   client_name: string;
-//   amount: number;
-//   price: number;
-//   datetransaction: string;
-//   ispaid: boolean;
-// }
+export interface ITransaction {
+  id: number;
+  modality: string;
+  kind: string;
+  place: string;
+  product_name: string;
+  client_name: string;
+  amount: number;
+  price: number;
+  datetransaction: string;
+  ispaid: boolean;
+}
 export interface IIngredient {
   id: string;
   name: string;
@@ -95,7 +92,7 @@ export interface ISale {
   dateSale: string;
 }
 //excluir
-export interface ITransaction {
+export interface ITransactionOld {
   id: string;
   description: string;
   modality: string;

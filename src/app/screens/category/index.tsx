@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { router } from 'expo-router';
 import { FlatList, Pressable, Modal, Alert } from 'react-native';
 import HeaderModal from '../../components/HeaderModal';
 
 import { ICategory, IProduct } from '../../../utils/interface';
 import RegisterCategory from './regCategory';
+import { useCategoryDatabase } from '../../../hooks/useCategoryDatabase';
 
 import {
   HeaderScreenPage,
@@ -17,10 +17,8 @@ import {
   GroupColumn,
   ItemColumnList,
   GroupIconTextRow,
-  IconColumnList,
   TextColumnList
 } from '../../styles/registerStyle';
-import { useCategoryDatabase } from '../../../hooks/useCategoryDatabase';
 
 type CategoryProps = {
   closeModal: (value: boolean) => void;
@@ -29,7 +27,7 @@ type CategoryProps = {
 export default function Category({ closeModal }: CategoryProps) {
   const categoryDatabase = useCategoryDatabase()
   const [search, setSearch] = useState('')
-  const [idCategory, setIdCategory] = useState(0)
+  const [category, setCategory] = useState<ICategory>()
   const [categories, setCategories] = useState<ICategory[]>([])
   const [isNewModalOpen, setIsNewModalOpen] = useState(false)
 
@@ -43,24 +41,25 @@ export default function Category({ closeModal }: CategoryProps) {
   }
 
   function handleNewCategoryModalOpen() {
-    setIdCategory(0)
+    setCategory(undefined)
     setIsNewModalOpen(true)
   }
 
-  function handleEditCategoryModalOpen(id: number) {
-    setIdCategory(id)
+  function handleEditCategoryModalOpen(item: ICategory) {
+    setCategory(item)
     setIsNewModalOpen(true)
   }
 
-  function handleDeleteCategory(id: number) {
+  async function handleDeleteCategory(id: number) {
     Alert.alert(
       'Exclusao de categorias',
       'Tem certeza que deseja excluir esta categoria?',
       [
         {
           text: 'Sim',
-          onPress: () => {
-            categoryDatabase.del(id)
+          onPress: async() => {
+            await categoryDatabase.remove(id)
+            closeModal(false)
           },
           style: 'default',
         },
@@ -71,7 +70,6 @@ export default function Category({ closeModal }: CategoryProps) {
       ],
       { cancelable: true },
     );
-
   }
 
   useEffect(() => {
@@ -97,7 +95,7 @@ export default function Category({ closeModal }: CategoryProps) {
             renderItem={({ item }) =>
               <ItemColumnList>
                 <GroupIconTextRow>
-                  <Pressable onPress={() => handleEditCategoryModalOpen(item.id)}>
+                  <Pressable onPress={() => handleEditCategoryModalOpen(item)}>
                     <TextColumnList><IconList name='arrow-right' size={14} /> {item.name}</TextColumnList>
                   </Pressable>
                   <Pressable onPress={() => handleDeleteCategory(item.id)}>
@@ -122,7 +120,7 @@ export default function Category({ closeModal }: CategoryProps) {
         <RegisterCategory
           closeModal={setIsNewModalOpen}
           updateList={loadCategories}
-          idCategory={idCategory}
+          category={category}
         />
       </Modal>
 

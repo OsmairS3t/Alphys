@@ -8,6 +8,9 @@ export function useCategoryDatabase() {
   async function create(data: Omit<ICategory, 'id'>) {
     const statement = await database.prepareAsync("INSERT INTO categories(name) VALUES($name)")
     try {
+      // if(isNaN(Number(amount))) {
+      //   return Alert.alert('A quantidade deve ser um número')
+      // }
       const result = await statement.executeAsync({
         $name: data.name
       })
@@ -21,26 +24,33 @@ export function useCategoryDatabase() {
   }
 
   async function update(category: ICategory) {
+    const statement = await database.prepareAsync("UPDATE categories SET name=$name WHERE id=$id")
     try {
-      await database
-        .runAsync('UPDATE FROM categories SET name=$name WHERE id=$id', 
-          { 
-            $name: category.name, 
-            $id: category.id 
-          }
-        )
+      await statement.executeAsync({
+        $id: category.id,
+        $name: category.name
+      })
+    } catch (error) {
+      throw error
+    } finally{
+      statement.finalizeAsync()
+    }
+  }
+
+  async function remove(id: number) {
+    //verificar se existe produto cadastrado nessa categoria antes
+    try {
+      await database.runAsync("DELETE FROM categories WHERE id=" + id)
+      Alert.alert('Categoria excluída com sucesso!')
     } catch (error) {
       throw error
     }
   }
 
-  async function searchById(id: number) {
+  async function findByName(name: string) {
     try {
-      const query = "SELECT * FROM categories WHERE id=?"
-      const response = await database.getFirstAsync<ICategory>(query, `%${id}%`)
-      if(response) {
-        return response
-      }
+      const response = await database.getFirstAsync<ICategory>("SELECT * FROM categories WHERE name=" + name)
+      return response
     } catch (error) {
       throw error
     }
@@ -56,16 +66,5 @@ export function useCategoryDatabase() {
     }
   }
 
-  
-  async function del(id: number) {
-    //verificar se existe produto cadastrado nessa categoria antes
-    try {
-      await database.runAsync("DELETE FROM categories WHERE id=$id", { $id: id })
-      Alert.alert('Categoria excluída com sucesso!')
-    } catch (error) {
-      throw error
-    }
-  }
-
-  return { create, del, searchById, searchByName }
+  return { create, update, remove, findByName, searchByName }
 }

@@ -5,7 +5,7 @@ import Category from '../screens/category';
 import Product from '../screens/product';
 import Buy from '../screens/buy';
 import Sale from '../screens/sale';
-import Client from '../screens/client';
+import Client from '../screens/clients';
 import Stock from '../screens/stock';
 
 import { Container, Title, ItemList, Item, TextItem, GroupList, IconList } from '../styles/registerStyle';

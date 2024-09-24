@@ -107,7 +107,7 @@ export const TextButtonSignIn = styled.Text`
   color: ${({ theme }) => theme.colors.secondary};
 `;
 
-export const ButtonForm = styled.Pressable`
+export const ButtonForm = styled.TouchableOpacity`
   border-radius: 4px;
   width: 100%;
   height: 40px;

@@ -33,7 +33,7 @@ import {
   Separator
 } from '../styles/orderStyle'
 import HeaderModal from '../components/HeaderModal';
-import RegisterOrder from '../screens/regOrder';
+import RegisterOrder from '../screens/order/regOrder';
 
 import { GroupColumn, 
   GroupIconTextRow, 

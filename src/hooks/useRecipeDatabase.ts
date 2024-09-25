@@ -51,6 +51,14 @@ export function useRecipeDatabase() {
     }
   }
 
+  async function searchById(id: number) {
+    try {
+      const response = await database.getFirstAsync<IRecipe>("SELECT * FROM recipes WHERE id=" + id)
+      return response
+    } catch (error) {
+      throw error
+    }
+  }
   async function searchByName(name: string) {
     try {
       const query = "SELECT * FROM recipes WHERE nameproduct LIKE ?"
@@ -61,5 +69,5 @@ export function useRecipeDatabase() {
     }
   }
 
-  return { create, update, remove, searchByName }
+  return { create, update, remove, searchById, searchByName }
 }

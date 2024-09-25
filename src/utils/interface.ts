@@ -31,12 +31,11 @@ export interface IClient {
   photo: string;
 }
 export interface IStock {
-  id: string;
+  id: number;
   product_id: number;
   product_name: string;
-  product: IProduct | undefined; //remover
   amount: number;
-  hasStock: boolean;
+  hasstock: boolean;
 }
 export interface IOrder {
   id: string;
@@ -59,15 +58,16 @@ export interface ITransaction {
   price: number;
   datetransaction: string;
   ispaid: boolean;
+  stock_id: number;
 }
 export interface IIngredient {
-  id: string;
+  id: number;
   name: string;
   amount: string;
   conditions: string;
 }
 export interface IRecipe {
-  id: string;
+  id: number;
   nameproduct: string;
   ingredients: IIngredient[];
   preparation: string;

@@ -4,10 +4,10 @@ import { useFocusEffect } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import RegisterStock from './regStock';
-import FilterStock from '../components/Filter/filterstock';
+import FilterStock from '../../components/Filter/filterstock';
 
-import { keyStock } from '../../utils/keyStorage';
-import { IStock } from '../../utils/interface';
+import { keyStock } from '../../../utils/keyStorage';
+import { IStock } from '../../../utils/interface';
 
 import {
   ContainerModal,
@@ -16,33 +16,33 @@ import {
   GroupIconTextRow,
   IconColumnList,
   TextColumnList
-} from '../styles/registerStyle';
+} from '../../styles/registerStyle';
 import {
   HeaderStock,
   ButtonFilterStock,
   IconFilterStock,
   ButtonNewStock,
   IconButtonNewStock
-} from '../styles/stockStyle'
-import HeaderModal from '../components/HeaderModal';
+} from '../../styles/stockStyle'
+import HeaderModal from '../../components/HeaderModal';
+import { useStockDatabase } from '../../../hooks/useStockDatabase';
 
 type StockProps = {
   closeModal: (value: boolean) => void;
 }
 
 export default function Stock({ closeModal }: StockProps) {
-  const [stocks, setStocks] = useState<IStock[]>([])
+  const stockDatabase = useStockDatabase()
+  const [search, setSearch] = useState('')
   const [stock, setStock] = useState<IStock>()
-  const [idStock, setIdStock] = useState('')
+  const [stocks, setStocks] = useState<IStock[]>([])
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false)
   const [isStockModalOpen, setIsStockModalOpen] = useState(false)
 
   async function loadStock() {
     try {
-      //await AsyncStorage.removeItem(keyStock)
-      const result = await AsyncStorage.getItem(keyStock)
-      const stock: IStock[] = result !== null ? JSON.parse(result) : []
-      setStocks(stock)
+      const response = await stockDatabase.list()
+      setStocks(response)
     } catch (e) {
       console.log(e)
     }
@@ -53,12 +53,12 @@ export default function Stock({ closeModal }: StockProps) {
   }
 
   function handleNewStockModalOpen() {
-    setIdStock('')
+    setStock(undefined)
     setIsStockModalOpen(true)
   }
 
-  function handleEditStockModalOpen(id: string) {
-    setIdStock(id)
+  function handleEditStockModalOpen(item: IStock) {
+    setStock(item)
     setIsStockModalOpen(true)
   }
 
@@ -85,12 +85,12 @@ export default function Stock({ closeModal }: StockProps) {
           <FlatList
             style={{ height: 450 }}
             data={stocks}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => String(item.id)}
             renderItem={({ item }) =>
               <GroupIconTextRow>
-                <Pressable onPress={() => handleEditStockModalOpen(item.id)}>
+                <Pressable onPress={() => handleEditStockModalOpen(item)}>
                   <ItemColumnList>
-                      <TextColumnList>{item.product?.category?.name} - {item.product?.name}</TextColumnList>
+                      <TextColumnList>{item.product_name}</TextColumnList>
                       <TextColumnList>{item.amount} itens</TextColumnList>
                   </ItemColumnList>
                 </Pressable>
@@ -128,7 +128,7 @@ export default function Stock({ closeModal }: StockProps) {
         <RegisterStock 
           closeModal={setIsStockModalOpen} 
           updateList={loadStock}
-          idStock={idStock} 
+          stock={stock} 
         />
       </Modal>
     </ContainerModal>

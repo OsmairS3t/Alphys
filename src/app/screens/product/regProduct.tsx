@@ -3,8 +3,6 @@ import { Alert, TouchableWithoutFeedback, KeyboardAvoidingView, Keyboard } from 
 import * as ImagePicker from 'expo-image-picker';
 import { useTheme } from 'styled-components';
 import HeaderModal from '../../components/HeaderModal';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { keyCategory, keyProduct } from '../../../utils/keyStorage';
 import { MaskedText, mask } from "react-native-mask-text";
 
 // import { categories } from '../../utils/database';
@@ -99,8 +97,8 @@ export default function RegisterProduct({ closeModal, updateList, product }: Pro
   async function loadProduct(id: number) {
     const response = await productDatabase.searchById(id)
     if (response) {
-      const cat: ICategory = await loadCategory(response.categoryname)
-      setCategorySelect({ key: String(cat.id), value: cat.name })
+      const cat = await loadCategory(response.categoryname)
+      setCategorySelect({ key: String(cat?.id), value: cat?.name || '' })
       setNameProduct(String(response.name))
       const priceFormatted = mask(String(response.price), "0.00")
       setPriceValue(String(response.price))

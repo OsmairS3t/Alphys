@@ -6,16 +6,16 @@ import { useFocusEffect } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import StockProducts from '../screens/regStock';
-import FilterStock from '../components/Filter/filterstock';
+import FilterStock from '../../components/Filter/filterstock';
 
-import { keyClient, keyOrder, keyProduct, keySale, keyStock } from '../../utils/keyStorage';
-import { IClient, IOrder, IProduct, ISale, ISelectProps, IStock } from '../../utils/interface';
+import { keyClient, keyOrder, keyProduct, keySale, keyStock } from '../../../utils/keyStorage';
+import { IClient, IOrder, IProduct, ISale, ISelectProps, IStock } from '../../../utils/interface';
 
-import { ButtonForm, InputMask, TextButton } from '../styles/global'
-import { Container, Title } from '../styles/orderStyle'
+import { ButtonForm, InputMask, TextButton } from '../../styles/global'
+import { Container, Title } from '../../styles/orderStyle'
 import { SelectList } from 'react-native-dropdown-select-list';
-import { InputForm } from '../components/Forms/InputForm';
-import HeaderModal from '../components/HeaderModal';
+import { InputForm } from '../../components/Forms/InputForm';
+import HeaderModal from '../../components/HeaderModal';
 
 type OrderProps = {
   closeModal: (value: boolean) => void;

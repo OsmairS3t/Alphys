@@ -1,12 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, Pressable, Modal, Alert } from 'react-native';
 import { useFocusEffect } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import HeaderModal from '../../components/HeaderModal';
 
 import { IProduct, ISale } from '../../../utils/interface';
-import { keyProduct, keySale } from '../../../utils/keyStorage';
 import RegisterProduct from './regProduct';
 
 import {
@@ -24,7 +22,6 @@ import {
 } from '../../styles/registerStyle';
 import { useProductDatabase } from '../../../hooks/useProductDatabase';
 import { useTransactionDatabase } from '../../../hooks/useTransactionDatabase';
-import { unknown } from 'zod';
 
 type ProductProps = {
   closeModal: (value: boolean) => void;
@@ -37,9 +34,6 @@ export default function Product({ closeModal }: ProductProps) {
   const [product, setProduct] = useState<IProduct>()
   const [isNewModalOpen, setIsNewModalOpen] = useState(false);
   const [categoryName, setCategoryName] = useState('')
-  const [name, setName] = useState('')
-  const [price, setPrice] = useState('')
-  const [photo, setPhoto] = useState('')
   const [products, setProducts] = useState<IProduct[]>([]);
 
   async function loadProducts() {

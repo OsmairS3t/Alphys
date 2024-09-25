@@ -2,11 +2,12 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, Pressable, Modal, Alert } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { supabase } from '../../../databases/supabase';
 
-import HeaderModal from '../components/HeaderModal';
+import HeaderModal from '../../components/HeaderModal';
 
-import { IClient, IRecipe } from '../../utils/interface';
-import { keyClient, keyRecipe } from '../../utils/keyStorage';
+import { IClient, IRecipe } from '../../../utils/interface';
+import { keyClient, keyRecipe } from '../../../utils/keyStorage';
 import RegisterRecipe from './regRecipe';
 import RegisterIngreditenRecipe from './regIngredientRecipe';
 
@@ -14,7 +15,7 @@ import {
   HeaderScreenPage,
   ButtonNewScreenPage,
   IconButtonNewScreenPage
-} from '../styles/global';
+} from '../../styles/global';
 
 import {
   ContainerModal,
@@ -25,15 +26,17 @@ import {
   TextColumnList,
   BtnItem,
   TextBtnItem
-} from '../styles/registerStyle';
-import { supabase } from '../../databases/supabase';
+} from '../../styles/registerStyle';
+import { useRecipeDatabase } from '../../../hooks/useRecipeDatabase';
 
 type RecipeProps = {
   closeModal: (value: boolean) => void;
 }
 
 export default function Recipe({ closeModal }: RecipeProps) {
-  const [idRecipe, setIdRecipe] = useState('')
+  const recipeDatabase = useRecipeDatabase()
+  const [search, setSearch] = useState('')
+  const [recipe, setRecipe] = useState<IRecipe>()
   const [viewRecipe, setViewRecipe] = useState(false)
   const [recipes, setRecipes] = useState<IRecipe[]>([])
   const [isIngModalOpen, setIsIngModalOpen] = useState(false)
@@ -41,16 +44,17 @@ export default function Recipe({ closeModal }: RecipeProps) {
 
   async function loadRecipes() {
     try {
-      const { data, error } = await supabase.from('recipes').select('*')
-      if (data) {
-        setRecipes(data)
+      const response = await recipeDatabase.searchByName(search)
+      if (response) {
+        setRecipes(response)
       }
-      if (error) {
-        console.log(error)
-      }
-      // const response = await AsyncStorage.getItem(keyRecipe)
-      // const dataRecipe: IRecipe[] = response ? JSON.parse(response) : []
-      // setRecipes(dataRecipe)
+      // const { data, error } = await supabase.from('recipes').select('*')
+      // if (data) {
+      //   setRecipes(data)
+      // }
+      // if (error) {
+      //   console.log(error)
+      // }
     } catch (e) {
       console.log(e)
     }
@@ -58,33 +62,30 @@ export default function Recipe({ closeModal }: RecipeProps) {
 
   function handleNewRecipeModalOpen() {
     setIsNewModalOpen(true)
-    setIdRecipe('')
+    setRecipe(undefined)
   }
 
-  function handleEditRecipeModalOpen(id: string) {
+  function handleEditRecipeModalOpen(item: IRecipe) {
     setViewRecipe(false)
-    setIdRecipe(id)
+    setRecipe(item)
     setIsNewModalOpen(true)
   }
 
-  function handleViewRecipeModalOpen(id: string, view: boolean) {
+  function handleViewRecipeModalOpen(item: IRecipe, view: boolean) {
     setViewRecipe(true)
-    setIdRecipe(id)
+    setRecipe(item)
     setIsNewModalOpen(true)
   }
 
-  function handleNewIngredientMOdalOpen(id: string) {
+  function handleNewIngredientMOdalOpen(item: IRecipe) {
     setViewRecipe(false)
-    setIdRecipe(id)
+    setRecipe(item)
     setIsIngModalOpen(true)
   }
 
-  async function deleteRecipe(id: string) {
+  async function deleteRecipe(id: number) {
     try {
-      const response = await AsyncStorage.getItem(keyRecipe)
-      const recipes: IRecipe[] = response ? JSON.parse(response) : []
-      const removedItem = recipes.filter(rec => rec.id !== id)
-      await AsyncStorage.setItem(keyRecipe, JSON.stringify(removedItem))
+      await recipeDatabase.remove(id)
       loadRecipes()
       Alert.alert('Receita excluída com sucesso!')
     } catch (error) {
@@ -92,7 +93,7 @@ export default function Recipe({ closeModal }: RecipeProps) {
     }
   }
 
-  function handleDeleteRecipe(id: string) {
+  function handleDeleteRecipe(id: number) {
     Alert.alert(
       'Exclusao de Receitas',
       'Tem certeza que deseja excluir esta receita?',
@@ -134,20 +135,20 @@ export default function Recipe({ closeModal }: RecipeProps) {
           <FlatList
             style={{ height: 450 }}
             data={recipes}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => String(item.id)}
             renderItem={({ item }) =>
               <GroupIconTextRow>
-                <Pressable onPress={() => handleEditRecipeModalOpen(item.id)} style={{ flex: 1 }}>
+                <Pressable onPress={() => handleEditRecipeModalOpen(item)} style={{ flex: 1 }}>
                   <ItemColumnList>
                     <TextColumnList>{item.nameproduct}</TextColumnList>
                   </ItemColumnList>
                 </Pressable>
                 
-                <BtnItem onPress={() => handleViewRecipeModalOpen(item.id, viewRecipe)}>
+                <BtnItem onPress={() => handleViewRecipeModalOpen(item, viewRecipe)}>
                   <IconColumnList name='eye' size={20} />
                 </BtnItem>
 
-                <BtnItem onPress={() => handleNewIngredientMOdalOpen(item.id)}>
+                <BtnItem onPress={() => handleNewIngredientMOdalOpen(item)}>
                   <TextBtnItem>+ ING</TextBtnItem>
                 </BtnItem>
 
@@ -174,7 +175,7 @@ export default function Recipe({ closeModal }: RecipeProps) {
         <RegisterRecipe
           closeModal={setIsNewModalOpen}
           updateList={loadRecipes}
-          idRecipe={idRecipe}
+          recipe={recipe}
           viewRecipe={viewRecipe}
         />
       </Modal>
@@ -189,7 +190,7 @@ export default function Recipe({ closeModal }: RecipeProps) {
         <RegisterIngreditenRecipe
           closeModal={setIsIngModalOpen}
           updateList={loadRecipes}
-          idRecipe={idRecipe}
+          recipe={recipe}
         />
       </Modal>
 

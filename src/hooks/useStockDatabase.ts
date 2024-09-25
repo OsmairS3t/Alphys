@@ -12,7 +12,7 @@ export function useStockDatabase() {
         $product_id: data.product_id,
         $product_name: data.product_name,
         $amount: data.amount,
-        $hasstock: data.hasStock,
+        $hasstock: data.hasstock,
       })
       const insertedRow = result.lastInsertRowId.toString()
       return { insertedRow }
@@ -31,7 +31,7 @@ export function useStockDatabase() {
         $product_id: data.product_id,
         $product_name: data.product_name,
         $amount: data.amount,
-        $hasstock: data.hasStock
+        $hasstock: data.hasstock
       })
     } catch (error) {
       throw error
@@ -50,6 +50,33 @@ export function useStockDatabase() {
     }
   }
 
+  async function list() {
+    try {
+      const response = await database.getAllAsync<IStock>("SELECT * FROM stocks ORDER BY product_name;")
+      return response
+    } catch (error) {
+      throw error      
+    }
+  }
+
+  async function getStock(id: number) {
+    try {
+      const response = await database.getFirstAsync<IStock>("SELECT * FROM stocks WHERE id=" + id)
+      return response
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async function searchByProductId(id: number) {
+    try {
+      const response = await database.getFirstAsync<IStock>("SELECT * FROM stocks WHERE product_id=" + id)
+      return response
+    } catch (error) {
+      throw error
+    }
+  }
+
   async function searchByProduct(name: string) {
     try {
       const query = "SELECT * FROM stocks WHERE product_name LIKE ? ORDER BY product_name"
@@ -60,5 +87,5 @@ export function useStockDatabase() {
     }
   }
 
-  return { create, update, remove, searchByProduct }
+  return { create, update, remove, getStock, list, searchByProductId, searchByProduct }
 }

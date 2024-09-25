@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Alert, Modal, Pressable, FlatList } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { keyBuy } from '../../utils/keyStorage';
-import { IBuy } from '../../utils/interface';
+import { keyBuy } from '../../../utils/keyStorage';
+import { IBuy, ITransaction } from '../../../utils/interface';
 
-import HeaderModal from '../components/HeaderModal';
+import HeaderModal from '../../components/HeaderModal';
 import RegisterBuy from './regBuy';
 
 type BuyProps = {
@@ -16,7 +16,7 @@ import {
   HeaderScreenPage,
   ButtonNewScreenPage,
   IconButtonNewScreenPage
-} from '../styles/global';
+} from '../../styles/global';
 import {
   ContainerModal,
   GroupColumn,
@@ -24,45 +24,43 @@ import {
   ItemColumnList,
   TextColumnList,
   IconColumnList
-} from '../styles/registerStyle';
+} from '../../styles/registerStyle';
+import { useTransactionDatabase } from '../../../hooks/useTransactionDatabase';
 
 export default function Buy({ closeModal }: BuyProps) {
+  const transactionDatabase = useTransactionDatabase()
   const [sumValues, setSumValues] = useState(0)
-  const [idBuy, setIdBuy] = useState('')
-  const [buys, setBuys] = useState<IBuy[]>([])
+  const [buy, setBuy] = useState<ITransaction>()
+  const [buys, setBuys] = useState<ITransaction[]>([])
   const [isNewModalOpen, setIsNewModalOpen] = useState(false)
 
   async function loadBuys() {
     try {
-      const response = await AsyncStorage.getItem(keyBuy)
-      const buy: IBuy[] = response ? JSON.parse(response) : []
+      const response = await transactionDatabase.searchByModality('buy')
       let tot = 0
-      buy.map(b => {
+      response.map(b => {
         tot += b.price
       })
       setSumValues(tot)
-      setBuys(buy)
+      setBuys(response)
     } catch (e) {
       console.log(e)
     }
   }
 
   function handleNewBuyModalOpen() {
-    setIdBuy('')
+    setBuy(undefined)
     setIsNewModalOpen(true)
   }
 
-  function handleEditBuyModalOpen(id: string) {
-    setIdBuy(id)
+  function handleEditBuyModalOpen(item: ITransaction) {
+    setBuy(item)
     setIsNewModalOpen(true)
   }
 
-  async function deleteBuy(id: string) {
+  async function deleteBuy(id: number) {
     try {
-      const responseBuy = await AsyncStorage.getItem(keyBuy)
-      const buys: IBuy[] = responseBuy ? JSON.parse(responseBuy) : []
-      const removedItem = buys.filter(buy => buy.id !== id)
-      await AsyncStorage.setItem(keyBuy, JSON.stringify(removedItem))
+      await transactionDatabase.remove(id)
       loadBuys()
       Alert.alert('Compra excluída com sucesso!')
     } catch (error) {
@@ -70,7 +68,7 @@ export default function Buy({ closeModal }: BuyProps) {
     }
   }
 
-  function handleDeleteBuy(id: string) {
+  function handleDeleteBuy(id: number) {
     Alert.alert(
       'Exclusao de Compra',
       'Tem certeza que deseja excluir esta compra?',
@@ -111,12 +109,12 @@ export default function Buy({ closeModal }: BuyProps) {
             <FlatList
               style={{ height: 430 }}
               data={buys}
-              keyExtractor={(item) => item.id}
+              keyExtractor={(item) => String(item.id)}
               renderItem={({ item }) =>
                 <GroupIconTextRow>
-                  <Pressable onPress={() => { handleEditBuyModalOpen(item.id) }}>
+                  <Pressable onPress={() => { handleEditBuyModalOpen(item) }}>
                     <ItemColumnList>
-                      <TextColumnList>Descrição: {item.name}</TextColumnList>
+                      <TextColumnList>Descrição: {item.product_name}</TextColumnList>
                       <TextColumnList>Quant.: {item.amount}</TextColumnList>
                       <TextColumnList>
                         Valor: {Intl
@@ -124,7 +122,7 @@ export default function Buy({ closeModal }: BuyProps) {
                           .format(item.price)}
                       </TextColumnList>
                       <TextColumnList>
-                        Dia da compra: {item.datebuy}
+                        Dia da compra: {item.datetransaction}
                       </TextColumnList>
                     </ItemColumnList>
                   </Pressable>
@@ -158,7 +156,7 @@ export default function Buy({ closeModal }: BuyProps) {
         <RegisterBuy
           closeModal={setIsNewModalOpen}
           updateList={loadBuys}
-          idBuy={idBuy}
+          buy={buy}
         />
       </Modal>
 

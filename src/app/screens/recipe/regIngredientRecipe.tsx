@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { IIngredient, IProduct, IRecipe } from '../../utils/interface';
-import { keyRecipe } from '../../utils/keyStorage';
+import { IIngredient, IProduct, IRecipe } from '../../../utils/interface';
+import { keyRecipe } from '../../../utils/keyStorage';
 import uuid from 'react-native-uuid';
 import * as ImagePicker from 'expo-image-picker';
-import { InputForm } from '../components/Forms/InputForm';
+import { InputForm } from '../../components/Forms/InputForm';
 
-import HeaderModal from '../components/HeaderModal';
+import HeaderModal from '../../components/HeaderModal';
 
-import { ButtonForm, TextButton, TitleForm } from '../styles/global';
+import { ButtonForm, TextButton, TitleForm } from '../../styles/global';
 import {
   Container,
   Title,
@@ -23,42 +23,29 @@ import {
   IconCamera,
   PhotoImage,
   ImgCapture
-} from '../styles/recipeStyle';
-import { supabase } from '../../databases/supabase';
-
+} from '../../styles/recipeStyle';
+import { supabase } from '../../../databases/supabase';
+import { useRecipeDatabase } from '../../../hooks/useRecipeDatabase';
 
 type RecipeProps = {
   closeModal: (value: boolean) => void;
   updateList: () => void;
-  idRecipe: string;
+  recipe: IRecipe | undefined;
 }
 
-export default function RegisterIngreditenRecipe({ closeModal, updateList, idRecipe }: RecipeProps) {
+export default function RegisterIngreditenRecipe({ closeModal, updateList, recipe }: RecipeProps) {
   let title_page = 'NOVO CADASTRO'
   let idLastIngredient = 0
-  const [recipe, setRecipe] = useState<IRecipe>()
+  const recipeDatabase = useRecipeDatabase()
   const [ingredients, setIngredients] = useState<IIngredient[]>([])
   const [name, setName] = useState('')
   const [amount, setAmount] = useState('')
   const [conditions, setConditions] = useState('')
 
-  async function loadIngredients(id: string) {
-    const { data, error } = await supabase
-      .from('recipes')
-      .select('*')
-      .eq('id', idRecipe)
-    if (data) {
-      setRecipe(data[0])
-      setIngredients(data[0].ingredients)
+  async function loadIngredients() {
+    if (recipe) {
+      setIngredients(recipe.ingredients)
     }
-    if (error) {
-      console.log(error)
-    }
-
-    const response = await AsyncStorage.getItem(keyRecipe)
-    const objRecipe: IRecipe[] = response ? JSON.parse(response) : []
-    const foundedRecipe = objRecipe.find(rec => rec.id === id)
-    setIngredients(foundedRecipe ? foundedRecipe.ingredients : [])
   }
 
   function obterProximoIdIngrediente(receita: IRecipe): number {
@@ -78,39 +65,32 @@ export default function RegisterIngreditenRecipe({ closeModal, updateList, idRec
       conditions: conditions
     }
     try {
-      const {data, error} = await supabase.from('recipes')
-        .select('*')
-        .eq('id', idRecipe)
-      if (data) {
-        oldingredients = data[0].ingredients
-        console.log(oldingredients)
+      if(recipe) {
+        oldingredients = recipe.ingredients
+        oldingredients.push(dataIng)
+        await recipeDatabase.update({
+          id: recipe.id,
+          nameproduct: recipe.nameproduct,
+          ingredients: oldingredients,
+          preparation: recipe.preparation,
+          cooking: recipe.cooking
+        })
       }
-      if (error) {
-        console.log('Inclusao de ingredientes: ', error)
-      }
-      oldingredients.push(dataIng)
-      await supabase.from('recipes').update({
-        ingredients: oldingredients,
-      }).eq('id', idRecipe)
 
-      // const response = await AsyncStorage.getItem(keyRecipe)
-      // let oldData: IRecipe[] = response ? JSON.parse(response) : []
-      // const foundRecipe = oldData.find(od => od.id === idRecipe)
-      // if (foundRecipe) {
-      //   let ingredientsData: IIngredient[] = foundRecipe.ingredients
-      //   ingredientsData.push(dataIng)
-      //   const dataRecipe = {
-      //     id: foundRecipe.id,
-      //     nameproduct: foundRecipe.nameproduct,
-      //     ingredients: ingredientsData,
-      //     cooking: foundRecipe.cooking,
-      //     preparation: foundRecipe.preparation
-      //   }
-      //   let updateData = oldData.filter(od => od.id !== idRecipe)
-      //   updateData.push(dataRecipe)
-      //   await AsyncStorage.setItem(keyRecipe, JSON.stringify(updateData))
-      //   Alert.alert('Ingrediente incluído na receita com sucesso!')
+      // const {data, error} = await supabase.from('recipes')
+      //   .select('*')
+      //   .eq('id', recipe.id)
+      // if (data) {
+      //   oldingredients = data[0].ingredients
+      //   // console.log(oldingredients)
       // }
+      // if (error) {
+      //   console.log('Inclusao de ingredientes: ', error)
+      // }
+      // oldingredients.push(dataIng)
+      // await supabase.from('recipes').update({
+      //   ingredients: oldingredients,
+      // }).eq('id', recipe.id)
 
       updateList()
       closeModal(false);
@@ -120,8 +100,8 @@ export default function RegisterIngreditenRecipe({ closeModal, updateList, idRec
   }
 
   useEffect(() => {
-    if (idRecipe !== '') {
-      loadIngredients(idRecipe)
+    if (recipe) {
+      loadIngredients()
     }
   }, [])
 

@@ -65,10 +65,19 @@ export function useTransactionDatabase() {
     }
   }
 
-  async function searchByName(name: string) {
+  async function searchById(id: number) {
+    try {
+      const response = await database.getFirstAsync<ITransaction>("SELECT * FROM transactions WHERE id="+ id)
+      return response
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async function searchByModality(modality: string) {
     try {
       const query = "SELECT * FROM transactions WHERE modality LIKE ? ORDER BY client_name, product_name"
-      const response = await database.getAllAsync<ITransaction>(query, `%${name}%`)
+      const response = await database.getAllAsync<ITransaction>(query, `%${modality}%`)
       return response
     } catch (error) {
       throw error
@@ -77,7 +86,16 @@ export function useTransactionDatabase() {
 
   async function searchByClient(client_name: string) {
     try {
-      const response = await database.getFirstAsync("SELECT * FROM transactions WHERE client_name=" + client_name)
+      const response = await database.getFirstAsync<ITransaction>("SELECT * FROM transactions WHERE client_name=" + client_name)
+      return response
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async function searchByStock(stock_id: number) {
+    try {
+      const response = await database.getAllAsync<ITransaction>("SELECT * FROM transactions WHERE stock_id=" + stock_id)
       return response
     } catch (error) {
       throw error
@@ -93,5 +111,5 @@ export function useTransactionDatabase() {
     }
   }
 
-  return { create, update, remove, searchByName, searchByClient, searchByProduct }
+  return { create, update, remove, searchById, searchByModality, searchByClient, searchByStock, searchByProduct }
 }

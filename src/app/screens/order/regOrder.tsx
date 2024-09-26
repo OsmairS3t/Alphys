@@ -1,31 +1,29 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Modal, FlatList, Pressable, Alert } from 'react-native';
-import uuid from 'react-native-uuid';
+import { useState, useEffect } from 'react';
+import { Modal, Alert } from 'react-native';
 import { useTheme } from 'styled-components';
-import { useFocusEffect } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-import StockProducts from '../screens/regStock';
 import FilterStock from '../../components/Filter/filterstock';
-
-import { keyClient, keyOrder, keyProduct, keySale, keyStock } from '../../../utils/keyStorage';
-import { IClient, IOrder, IProduct, ISale, ISelectProps, IStock } from '../../../utils/interface';
-
+import { IOrder, ISelectProps } from '../../../utils/interface';
 import { ButtonForm, InputMask, TextButton } from '../../styles/global'
 import { Container, Title } from '../../styles/orderStyle'
 import { SelectList } from 'react-native-dropdown-select-list';
 import { InputForm } from '../../components/Forms/InputForm';
 import HeaderModal from '../../components/HeaderModal';
+import { useOrderDatabase } from '../../../hooks/useOrderDatabase';
+import { useClientDatabase } from '../../../hooks/useClientDatabase';
+import { useProductDatabase } from '../../../hooks/useProductDatabase';
 
 type OrderProps = {
   closeModal: (value: boolean) => void;
   updateList: (type: string, id: string) => void;
-  idOrder: string;
+  order: IOrder | undefined;
 }
 
-export default function RegisterOrder({ closeModal, updateList, idOrder }: OrderProps) {
-  let title_page = idOrder === '' ? 'NOVO CADASTRO' : 'EDITAR CADASTRO'
+export default function RegisterOrder({ closeModal, updateList, order }: OrderProps) {
+  let title_page = order ? 'EDITAR CADASTRO' : 'NOVO CADASTRO'
   const theme = useTheme()
+  const orderDatabase = useOrderDatabase()
+  const clientDatabase = useClientDatabase()
+  const productDatabase = useProductDatabase()
   const [dataClient, setDataClient] = useState<ISelectProps[]>([{ key: '', value: '' }]);
   const [dataProduct, setDataProduct] = useState<ISelectProps[]>([{ key: '', value: '' }]);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
@@ -35,18 +33,19 @@ export default function RegisterOrder({ closeModal, updateList, idOrder }: Order
   const [price, setPrice] = useState('')
   const [obs, setObs] = useState('')
 
-  async function loadClientOnce(idClient: string) {
-    const response = await AsyncStorage.getItem(keyClient)
-    const arrayClients: IClient[] = response ? JSON.parse(response) : []
-    const clientFound = arrayClients.find(ac => ac.id === idClient)
-    return clientFound
+  async function loadClientOnce(idClient: number) {
+    const response = await clientDatabase.searchById(idClient)
+    if(response) {
+      return response.name
+    } else {
+      return ''
+    }
   }
 
   async function loadClients() {
     try {
-      const response = await AsyncStorage.getItem(keyClient)
-      const arrayClients: IClient[] = response ? JSON.parse(response) : []
-      let newArray: ISelectProps[] = arrayClients.map(cli => {
+      const response = await clientDatabase.searchByName('')
+      let newArray: ISelectProps[] = response.map(cli => {
         return { key: String(cli.id), value: String(cli.name) }
       })
       setDataClient(newArray)
@@ -55,19 +54,20 @@ export default function RegisterOrder({ closeModal, updateList, idOrder }: Order
     }
   }
 
-  async function loadProductOnce(idProduct: string) {
-    const response = await AsyncStorage.getItem(keyProduct)
-    const arrayProducts: IProduct[] = response ? JSON.parse(response) : []
-    const productFound = arrayProducts.find(ap => ap.id === idProduct)
-    return productFound
+  async function loadProductOnce(idProduct: number) {
+    const response = await productDatabase.searchById(idProduct)
+    if(response) {
+      return response.name
+    } else {
+      return ''
+    }
   }
 
   async function loadProducts() {
     try {
-      const response = await AsyncStorage.getItem(keyProduct)
-      const arrayProducts: IProduct[] = response ? JSON.parse(response) : []
-      let newArray: ISelectProps[] = arrayProducts.map(pro => {
-        return { key: String(pro.id), value: String(pro.category?.name) +' - '+ String(pro.name) }
+      const response = await productDatabase.searchByName('')
+      let newArray: ISelectProps[] = response.map(pro => {
+        return { key: String(pro.id), value: String(pro.categoryname) +' - '+ String(pro.name) }
       })
       setDataProduct(newArray)
     } catch (e) {
@@ -76,21 +76,14 @@ export default function RegisterOrder({ closeModal, updateList, idOrder }: Order
   }
 
   async function handleSave() {
-    const dataOrder = {
-      id: uuid.v4().toString(),
-      client: await loadClientOnce(selectedClient),
-      product: await loadProductOnce(selectedProduct),
-      amount: Number(amount),
-      price: Number(price),
-      obs: obs
-    }
     try {
-      const response = await AsyncStorage.getItem(keyOrder)
-      let oldData: IOrder[] = response ? JSON.parse(response) : []
-
-      oldData.push(dataOrder)
-
-      await AsyncStorage.setItem(keyOrder, JSON.stringify(oldData))
+      await orderDatabase.create({
+        client_name: await loadClientOnce(Number(selectedClient)),
+        product_name: await loadProductOnce(Number(selectedProduct)),
+        amount: Number(amount),
+        price: Number(price),
+        obs: obs
+      })
       Alert.alert('Encomenda incluída com sucesso!')   
       closeModal(false) 
     } catch(error) {

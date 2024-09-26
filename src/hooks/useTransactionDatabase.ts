@@ -111,5 +111,23 @@ export function useTransactionDatabase() {
     }
   }
 
-  return { create, update, remove, searchById, searchByModality, searchByClient, searchByStock, searchByProduct }
+  async function searchSalesPay(ispaid: boolean) {
+    try {
+      const response = await database.getAllAsync<ITransaction>("SELECT * FROM transactions WHERE modality='sale' ispaid=" + ispaid)
+      return response
+    } catch (error) {
+      throw error
+    }
+  }
+
+  return { 
+    create, 
+    update, 
+    remove, 
+    searchById, 
+    searchByModality, 
+    searchByClient, 
+    searchByStock, 
+    searchByProduct, 
+    searchSalesPay }
 }

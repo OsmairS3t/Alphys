@@ -3,10 +3,7 @@ import { useWindowDimensions, Alert } from 'react-native';
 import { LoadingContext } from '../../loadingContext';
 import { useTheme } from 'styled-components';
 import { VictoryBar, VictoryChart, VictoryTheme } from 'victory-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { IBuy, ISale, ITransaction } from '../../utils/interface'
-
-import { keyBuy, keySale } from '../../utils/keyStorage';
+import { ITransaction } from '../../utils/interface'
 import {
   Container,
   BlockBuy,
@@ -17,10 +14,12 @@ import {
   GroupTextResume,
   TextResume
 } from '../styles/transactionStyle'
+import { useTransactionDatabase } from '../../hooks/useTransactionDatabase';
 
 export default function Transactions() {
   const { isLoading, showLoading, hideLoading } = useContext(LoadingContext);
   const theme = useTheme();
+  const transactionDatabase = useTransactionDatabase()
   const { height } = useWindowDimensions();
   const heightBuy = height * 0.3
   const heightSale = height * 0.2
@@ -59,25 +58,13 @@ export default function Transactions() {
     }
     let priceAccumulator = 0
     try {
-      const responseBuys = await AsyncStorage.getItem(keyBuy)
-      const listBuys: IBuy[] = responseBuys ? JSON.parse(responseBuys) : []
-      let arrayNewTransaction: ITransaction[] = listBuys.map(lb => {
+      const responseBuys = await transactionDatabase.searchByModality('buy')
+      responseBuys.map(lb => {
         priceAccumulator += lb.price
-        return {
-          id: String(lb.id),
-          description: lb.name,
-          modality: 'buy',
-          color: theme.colors.buy,
-          datetransaction: lb.datebuy,
-          amount: lb.amount,
-          price: String(lb.price)
-        }
       })
-      let newArraytransaction: ITransaction[]=[]
-      newArraytransaction = [...transactionsList, ...arrayNewTransaction]
       setPriceBuy(priceAccumulator)
       setResumePriceBuy(Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(priceBuy))
-      setTransactionsList(newArraytransaction)
+      setTransactionsList(responseBuys)
     } catch (error) {
       console.log(error)
     }
@@ -86,26 +73,13 @@ export default function Transactions() {
   async function loadSales() {
     try {
       let priceAccumulator = 0
-      const responseSales = await AsyncStorage.getItem(keySale)
-      const listSales: ISale[] = responseSales ? JSON.parse(responseSales) : []
-      const filteredSales = listSales.filter(ls => ls.isPaid === false)
-      let arrayNewTransaction: ITransaction[] = filteredSales.map(ls => {
-        priceAccumulator += ls.price
-        return {
-          id: String(ls.id),
-          description: ls.product?.category?.name + ' - ' + ls.product?.name,
-          modality: 'sale',
-          color: theme.colors.sale,
-          datetransaction: ls.dateSale,
-          amount: ls.amount,
-          price: String(ls.price)
-        }
+      const filteredSales = await transactionDatabase.searchSalesPay(false)
+      filteredSales.map(item => {
+        priceAccumulator += item.price
       })
-      let newArraytransaction: ITransaction[]=[]
-      newArraytransaction = [...transactionsList, ...arrayNewTransaction]
       setPriceSale(priceAccumulator)
       setResumePriceSale(Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(priceSale))
-      setTransactionsList(newArraytransaction)
+      setTransactionsList(filteredSales)
     } catch (error) {
       console.log(error)      
     }

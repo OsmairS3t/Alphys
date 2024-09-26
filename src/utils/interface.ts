@@ -38,27 +38,12 @@ export interface IStock {
   hasstock: boolean;
 }
 export interface IOrder {
-  id: string;
+  id: number;
   client_name: string;
   product_name: string;
-  client: IClient | undefined; //remover
-  product: IProduct | undefined; //remover
   amount: number;
   price: number;
   obs: string;
-}
-export interface ITransaction {
-  id: number;
-  modality: string;
-  kind: string;
-  place: string;
-  product_name: string;
-  client_name: string;
-  amount: number;
-  price: number;
-  datetransaction: string;
-  ispaid: boolean;
-  stock_id: number;
 }
 export interface IIngredient {
   id: number;
@@ -73,31 +58,16 @@ export interface IRecipe {
   preparation: string;
   cooking: string;
 }
-//excluir
-export interface IBuy {
-  id: string;
-  name: string;
-  amount: number;
-  price: number;
-  datebuy: string;
-}
-//excluir
-export interface ISale {
-  id: string;
-  client: IClient | undefined;
-  product: IProduct | undefined;
-  amount: number;
-  price: number;
-  isPaid: boolean;
-  dateSale: string;
-}
-//excluir
-export interface ITransactionOld {
-  id: string;
-  description: string;
+export interface ITransaction {
+  id: number;
   modality: string;
-  color: string;
-  datetransaction: string;
+  kind: string;
+  place: string;
+  product_name: string;
+  client_name: string;
   amount: number;
-  price: string;
+  price: number;
+  datetransaction: string;
+  ispaid: boolean;
+  stock_id: number;
 }

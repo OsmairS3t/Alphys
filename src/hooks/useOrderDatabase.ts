@@ -55,6 +55,15 @@ export function useOrderDatabase() {
     }
   }
 
+  async function list() {
+    try {
+      const response = await database.getAllAsync<IOrder>("SELECT * FROM orders ORDER BY client_name, product_name")
+      return response
+    } catch (error) {
+      throw error
+    }
+  }
+
   async function searchByName(name: string, type: string) {
     let query = "SELECT * FROM orders WHERE client_name LIKE ?"
     try {
@@ -70,5 +79,5 @@ export function useOrderDatabase() {
     }
   }
 
-  return { create, update, remove, searchByName }
+  return { create, update, remove, list, searchByName }
 }

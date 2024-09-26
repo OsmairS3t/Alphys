@@ -41,6 +41,7 @@ import { GroupColumn,
   ItemColumnList, 
   TextColumnList } from '../styles/registerStyle';
 import FilterOrder from '../components/Filter/filterorder';
+import { useOrderDatabase } from '../../hooks/useOrderDatabase';
 
 interface IUser {
   id: number;
@@ -52,28 +53,23 @@ interface IUser {
 
 export default function Order() {
   const theme = useTheme()
-  const [idOrder, setIdOrder] = useState('')
+  const orderDatabase = useOrderDatabase()
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false)
   const [isNewModalOpen, setIsNewModalOpen] = useState(false)
-  const [filterOrderType, setFilterOrderType] = useState('')
+  const [filterOrderType, setFilterOrderType] = useState('C') //C (client) or P (product)
   const [filterOrderId, setFilterOrderId] = useState('')
+  const [order, setOrder] = useState<IOrder>()
   const [orders, setOrders] = useState<IOrder[]>([]);
   const [users, setUsers] = useState<IUser[]>([])
  
-  async function loadOrders(typeFilter: string, idfilter: string) {
+  async function loadOrders(typeFilter: string, filter: string) {
     try {
-      const response = await AsyncStorage.getItem(keyOrder)
-      const arrayOrders: IOrder[] = response ? JSON.parse(response) : []
       if (typeFilter === '') {
-        setOrders(arrayOrders)
-      }
-      if (typeFilter === 'idclient') {
-        const arrayClient = arrayOrders.filter(arrOrder => arrOrder.client?.id === idfilter)
-        setOrders(arrayClient)
-      }
-      if (typeFilter === 'idproduct') {
-        const arrayProduct = arrayOrders.filter(arrOrder => arrOrder.product?.id === idfilter)
-        setOrders(arrayProduct)
+        const response = await orderDatabase.list()
+        setOrders(response)
+      } else {
+        const response = await orderDatabase.searchByName(filter, typeFilter)
+        setOrders(response)
       }
     } catch (e) {
       console.log(e)
@@ -85,21 +81,18 @@ export default function Order() {
   }
 
   function handleNewBuyModalOpen() {
-    setIdOrder('')
+    setOrder(undefined)
     setIsNewModalOpen(true)
   }
 
-  function handleEditBuyModalOpen(id: string) {
-    setIdOrder(id)
+  function handleEditBuyModalOpen(item: IOrder) {
+    setOrder(item)
     setIsNewModalOpen(true)
   }
 
-  async function deleteOrder(id: string) {
+  async function deleteOrder(id: number) {
     try {
-      const responseOrder = await AsyncStorage.getItem(keyOrder)
-      const orders: IOrder[] = responseOrder ? JSON.parse(responseOrder) : []
-      const removedItem = orders.filter(order => order.id !== id)
-      await AsyncStorage.setItem(keyOrder, JSON.stringify(removedItem))
+      await orderDatabase.remove(id)
       loadOrders(filterOrderType, filterOrderId)
       Alert.alert('Encomenda excluída com sucesso!')
     } catch (error) {
@@ -107,7 +100,7 @@ export default function Order() {
     }
   }
 
-  function handleDeleteOrder(id: string) {
+  function handleDeleteOrder(id: number) {
     Alert.alert(
       'Exclusao de Encomendas',
       'Tem certeza que deseja excluir esta encomenda?',
@@ -149,13 +142,13 @@ export default function Order() {
           <FlatList
             style={{ height: 450 }}
             data={orders}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => String(item.id)}
             renderItem={({ item }) =>
               <GroupIconTextRow>
-                <Pressable onPress={() => handleEditBuyModalOpen(item.id)}>
+                <Pressable onPress={() => handleEditBuyModalOpen(item)}>
                   <ItemColumnList>
-                    <TextColumnList>Cliente: {item.client?.name}</TextColumnList>
-                    <TextColumnList>Produto: {item.product?.category?.name} - {item.product?.name}</TextColumnList>
+                    <TextColumnList>Cliente: {item.client_name}</TextColumnList>
+                    <TextColumnList>Produto: {item.product_name}</TextColumnList>
                     <TextColumnList>Qunatidade: {item.amount}</TextColumnList>
                     <TextColumnList>Valor: {Intl.NumberFormat('pt-BR', {style: 'currency', currency: 'BRL'}).format(item.price)}</TextColumnList>
                   </ItemColumnList>
@@ -182,7 +175,7 @@ export default function Order() {
         <RegisterOrder 
           closeModal={setIsNewModalOpen} 
           updateList={() => loadOrders(filterOrderType, filterOrderId)}
-          idOrder={idOrder}
+          order={order}
         />
       </Modal>
 
@@ -196,7 +189,7 @@ export default function Order() {
         <FilterOrder 
           closeModal={setIsFilterModalOpen} 
           setFilterType={setFilterOrderType} 
-          setFilterId={setFilterOrderId} 
+          setFilterSearch={setFilterOrderId} 
         />
       </Modal>
       

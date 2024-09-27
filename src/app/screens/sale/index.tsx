@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from 'styled-components';
 import HeaderModal from '../../components/HeaderModal';
 
-import { IClient, IProduct, ISale, IStock, ITransaction } from '../../../utils/interface';
+import { IClient, IProduct, IStock, ITransaction } from '../../../utils/interface';
 import { keySale, keyStock } from '../../../utils/keyStorage';
 import RegisterSale from './regSale';
 
@@ -233,7 +233,7 @@ export default function Sale({ closeModal }: SaleProps) {
         <RegisterSale
           closeModal={setIsNewModalOpen}
           updateList={() => loadSales(statusPay)}
-          idSale={idSale}
+          sale={sale}
         />
       </Modal>
 

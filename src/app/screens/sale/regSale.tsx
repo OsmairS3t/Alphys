@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { Alert, Switch, Text, View } from 'react-native';
 import { useTheme } from 'styled-components';
-import HeaderModal from '../components/HeaderModal';
+import HeaderModal from '../../components/HeaderModal';
 
-import { IClient, IProduct, ISale, ISelectProps, IStock } from '../../utils/interface';
+import { IClient, IProduct, ISelectProps, IStock, ITransaction } from '../../../utils/interface';
 // import { clients, products } from '../../utils/database';
 
 import uuid from 'react-native-uuid';
-import { InputForm } from '../components/Forms/InputForm';
+import { InputForm } from '../../components/Forms/InputForm';
 import { SelectList } from 'react-native-dropdown-select-list';
 
-import { keyClient, keyProduct, keySale, keyStock } from '../../utils/keyStorage';
+import { keyClient, keyProduct, keySale, keyStock } from '../../../utils/keyStorage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { actualDate } from '../../utils/functions';
+import { actualDate } from '../../../utils/functions';
 
 import {
   ContainerModal,
@@ -21,19 +21,27 @@ import {
   ItemColumnList,
   TextColumnList,
   IconColumnList
-} from '../styles/registerStyle';
-import { Container, Title, GroupSwitch, TitleSwitch, TextSwitch, GroupInput, GroupAmount, ItemAmount } from '../styles/saleStyle';
-import { ButtonForm, TextButton } from '../styles/global';
+} from '../../styles/registerStyle';
+import { Container, Title, GroupSwitch, TitleSwitch, TextSwitch, GroupInput, GroupAmount, ItemAmount } from '../../styles/saleStyle';
+import { ButtonForm, TextButton } from '../../styles/global';
+import { useTransactionDatabase } from '../../../hooks/useTransactionDatabase';
+import { useProductDatabase } from '../../../hooks/useProductDatabase';
+import { useClientDatabase } from '../../../hooks/useClientDatabase';
+import { useStockDatabase } from '../../../hooks/useStockDatabase';
 
 type SaleProps = {
   closeModal: (value: boolean) => void;
   updateList: () => void;
-  idSale: string;
+  sale: ITransaction | undefined;
 }
 
-export default function RegisterSale({ closeModal, updateList, idSale }: SaleProps) {
+export default function RegisterSale({ closeModal, updateList, sale }: SaleProps) {
   const theme = useTheme();
-  let title_page = idSale === '' ? 'NOVA VENDA' : 'VER VENDA'
+  let title_page = sale ? 'VER VENDA' : 'NOVA VENDA'
+  const transactionDatabase = useTransactionDatabase()
+  const productDatabase = useProductDatabase()
+  const clientDatabase = useClientDatabase()
+  const stockDatabase = useStockDatabase()
   const [dataClient, setDataClient] = useState<ISelectProps[]>([{ key: '', value: '' }]);
   const [dataProduct, setDataProduct] = useState<ISelectProps[]>([{ key: '', value: '' }]);
   const [selectedClient, setSelectedClient] = useState("")
@@ -49,57 +57,49 @@ export default function RegisterSale({ closeModal, updateList, idSale }: SalePro
   const [isPaidSale, setIsPaidSale] = useState(false)
   const [dataSale, setDataSale] = useState('')
 
-  async function loadClient(idClient: string) {
-    const response = await AsyncStorage.getItem(keyClient)
-    const clients: IClient[] = response ? JSON.parse(response) : []
-    const objClient = clients.find(cli => cli.id === idClient)
-    return objClient
+  async function loadClient(idClient: number) {
+    const response = transactionDatabase.searchById(idClient)
+    return response
   }
 
-  async function loadProduct(idProduct: string) {
-    const response = await AsyncStorage.getItem(keyProduct)
-    const products: IProduct[] = response ? JSON.parse(response) : []
-    const objProduct = products.find(pro => pro.id === idProduct)
-    return objProduct
+  async function loadProduct(idProduct: number) {
+    const response = await productDatabase.searchById(idProduct)
+    return response
   }
 
-  async function loadStockProduct(idProduct: string) {
-    const response = await AsyncStorage.getItem(keyStock)
-    const dataStock: IStock[] = response ? JSON.parse(response) : null
-    const stockProduct = dataStock.find(ds => ds.product?.id === idProduct)
-    setAmountStock(String(stockProduct?.amount))
-    setPriceProduct(String(stockProduct?.product?.price))
+  async function loadStockProduct(idProduct: number) {
+    const response = await stockDatabase.searchByProductId(idProduct)
+    const stockProduct = await productDatabase.searchById(idProduct)
+    setAmountStock(String(response?.amount))
+    setPriceProduct(String(stockProduct?.price))
   }
 
   async function loadSelectClients() {
-    const response = await AsyncStorage.getItem(keyClient)
-    const clients: IClient[] = response ? JSON.parse(response) : []
-    let newArray: ISelectProps[] = clients.map(cli => {
+    const response = await clientDatabase.searchByName('')
+    let newArray: ISelectProps[] = response.map(cli => {
       return { key: String(cli.id), value: String(cli.name) }
     })
     setDataClient(newArray)
   }
 
   async function loadSelectProducts() {
-    const response = await AsyncStorage.getItem(keyStock)
-    const dataStock: IStock[] = response ? JSON.parse(response) : []
-    let newArray: ISelectProps[] = dataStock.map(ds => {
-      return { key: String(ds.product?.id), value: String(ds.product?.category?.name + ' - ' + ds.product?.name) }
+    const response = await productDatabase.searchByName('')
+    let newArray: ISelectProps[] = response.map(ds => {
+      return { key: String(ds.id), value: String(ds.categoryname + ' - ' + ds.name) }
     })
     setDataProduct(newArray)
   }
 
-  async function loadSales(id: string) {
-    const response = await AsyncStorage.getItem(keySale)
-    const dataSales: ISale[] = response ? JSON.parse(response) : []
+  async function loadSales(id: number) {
+    const response = await transactionDatabase.searchByModality('sale')
     //listar tambem apenas os que não foram pagos
-    const foundSales = dataSales.find(ds => ds.id === id)
-    setClientSale(String(foundSales?.client?.name))
-    setProductSale(String(foundSales?.product?.category?.name) +' - '+String(foundSales?.product?.name))
+    const foundSales = response.find(ds => ds.id === id)
+    setClientSale(String(foundSales?.client_name))
+    setProductSale(String(foundSales?.product_name))
     setAmountSale(String(foundSales?.amount))
     setPriceSale(String(foundSales?.price))
-    setIsPaidSale(Boolean(foundSales?.isPaid))
-    setDataSale(String(foundSales?.dateSale))
+    setIsPaidSale(Boolean(foundSales?.ispaid))
+    setDataSale(String(foundSales?.datetransaction))
   }
 
   async function handleSave() {

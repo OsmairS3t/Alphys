@@ -25,6 +25,7 @@ export default function Transactions() {
   const heightSale = height * 0.2
   const heightResume = height * 0.2
   const [transactionsList, setTransactionsList] = useState<ITransaction[]>([]);
+  const [isPay, setIsPay] = useState(false)
   const [priceBuy, setPriceBuy] = useState(0)
   const [priceSale, setPriceSale] = useState(0)
   const [resumePriceBuy, setResumePriceBuy] = useState('')
@@ -73,7 +74,7 @@ export default function Transactions() {
   async function loadSales() {
     try {
       let priceAccumulator = 0
-      const filteredSales = await transactionDatabase.searchSalesPay(false)
+      const filteredSales = await transactionDatabase.searchSalesPay(isPay)
       filteredSales.map(item => {
         priceAccumulator += item.price
       })

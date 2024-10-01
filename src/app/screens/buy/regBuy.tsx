@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Alert } from 'react-native'
 import HeaderModal from '../../components/HeaderModal';
-import uuid from 'react-native-uuid';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { keyBuy } from '../../../utils/keyStorage';
-import { IBuy } from '../../../utils/interface';
 import { InputForm } from '../../components/Forms/InputForm';
 import { actualDate } from '../../../utils/functions';
 
@@ -45,25 +41,14 @@ export default function RegisterBuy({ closeModal, updateList, buy }: BuyProps) {
       console.log(e)
     }
   }
-
+  
   async function handleSave() {
     try {
-      const foundedData = await transactionDatabase.searchById(Number(buy?.id))
-      if (!foundedData) {
-        await transactionDatabase.create({
-          modality: modality,
-          kind: kind,
-          place: place,
-          product_name: productName,
-          client_name: String(buy?.client_name),
-          amount: Number(amount),
-          price: Number(price),
-          datetransaction: dateBuy,
-          ispaid: ispaid,
-          stock_id: 0
-        })
-        Alert.alert('Compra incluída com sucesso!')
-      } else {
+      let foundedData = null
+      if(Number(buy?.id)) {
+        foundedData = await transactionDatabase.searchById(Number(buy?.id))
+      }
+      if(foundedData) {
         await transactionDatabase.update({
           id: Number(buy?.id),
           modality: modality,
@@ -78,6 +63,20 @@ export default function RegisterBuy({ closeModal, updateList, buy }: BuyProps) {
           stock_id: 0
         })
         Alert.alert('Compra atualizada com sucesso!')
+      } else {
+        await transactionDatabase.create({
+          modality: modality,
+          kind: kind,
+          place: place,
+          product_name: productName,
+          client_name: String(buy?.client_name),
+          amount: Number(amount),
+          price: Number(price),
+          datetransaction: dateBuy,
+          ispaid: ispaid,
+          stock_id: 0
+        })
+        Alert.alert('Compra incluída com sucesso!')
       }
       updateList();
       closeModal(false);

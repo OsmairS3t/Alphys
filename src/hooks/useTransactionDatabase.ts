@@ -113,7 +113,7 @@ export function useTransactionDatabase() {
 
   async function searchSalesPay(ispaid: boolean) {
     try {
-      const response = await database.getAllAsync<ITransaction>("SELECT * FROM transactions WHERE modality='sale' ispaid=" + ispaid)
+      const response = await database.getAllAsync<ITransaction>("SELECT * FROM transactions WHERE modality='sale' and ispaid=" + ispaid)
       return response
     } catch (error) {
       throw error

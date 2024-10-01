@@ -4,7 +4,7 @@ import { useFocusEffect } from 'expo-router';
 
 import HeaderModal from '../../components/HeaderModal';
 
-import { IProduct, ISale } from '../../../utils/interface';
+import { IProduct } from '../../../utils/interface';
 import RegisterProduct from './regProduct';
 
 import {
@@ -64,7 +64,7 @@ export default function Product({ closeModal }: ProductProps) {
       }
       loadProducts()
     } catch (error) {
-      console.log('Erro ao tentar excluir: ', error)
+      console.log('Erro ao tentar excluir prod: ', error)
     }
   }
 

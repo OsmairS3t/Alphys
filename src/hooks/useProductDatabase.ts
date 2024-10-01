@@ -41,7 +41,6 @@ export function useProductDatabase() {
   }
 
   async function remove(id: number) {
-    //verificar se existe venda cadastrada pra esse produto antes
     try {
       await database.runAsync("DELETE FROM products WHERE id=" + id)
       Alert.alert('Produto excluído com sucesso!')

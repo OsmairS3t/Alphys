@@ -8,8 +8,6 @@ import { MaskedText, mask } from "react-native-mask-text";
 // import { categories } from '../../utils/database';
 import { ICategory, IProduct, ISelectProps } from '../../../utils/interface';
 
-import uuid from 'react-native-uuid';
-
 import { InputForm } from '../../components/Forms/InputForm';
 import { SelectList } from 'react-native-dropdown-select-list';
 

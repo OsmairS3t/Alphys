@@ -13,7 +13,6 @@ import {
   TextIngredient
 } from '../../styles/recipeStyle';
 import {GroupList} from '../../styles/registerStyle'
-import { supabase } from '../../../databases/supabase';
 import { useRecipeDatabase } from '../../../hooks/useRecipeDatabase';
 
 type RecipeProps = {

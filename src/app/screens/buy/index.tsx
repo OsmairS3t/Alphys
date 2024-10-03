@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Alert, Modal, Pressable, FlatList } from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-import { keyBuy } from '../../../utils/keyStorage';
-import { IBuy, ITransaction } from '../../../utils/interface';
-
+import { ITransaction } from '../../../utils/interface';
 import HeaderModal from '../../components/HeaderModal';
 import RegisterBuy from './regBuy';
 
@@ -38,11 +34,13 @@ export default function Buy({ closeModal }: BuyProps) {
     try {
       const response = await transactionDatabase.searchByModality('buy')
       let tot = 0
-      response.map(b => {
-        tot += b.price
-      })
-      setSumValues(tot)
-      setBuys(response)
+      if(response) {
+        response.map(b => {
+          tot += b.price
+        })
+        setSumValues(tot)
+        setBuys(response)
+      }
     } catch (e) {
       console.log(e)
     }

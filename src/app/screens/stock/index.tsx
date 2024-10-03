@@ -41,8 +41,10 @@ export default function Stock({ closeModal }: StockProps) {
 
   async function loadStock() {
     try {
-      const response = await stockDatabase.list()
-      setStocks(response)
+      const response = await stockDatabase.find()
+      if(response) {
+        setStocks(response)
+      }
     } catch (e) {
       console.log(e)
     }

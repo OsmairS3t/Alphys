@@ -60,12 +60,14 @@ export default function Transactions() {
     let priceAccumulator = 0
     try {
       const responseBuys = await transactionDatabase.searchByModality('buy')
-      responseBuys.map(lb => {
-        priceAccumulator += lb.price
-      })
-      setPriceBuy(priceAccumulator)
-      setResumePriceBuy(Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(priceBuy))
-      setTransactionsList(responseBuys)
+      if(responseBuys) {
+        responseBuys.map(lb => {
+          priceAccumulator += lb.price
+        })
+        setPriceBuy(priceAccumulator)
+        setResumePriceBuy(Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(priceBuy))
+        setTransactionsList(responseBuys)
+      }
     } catch (error) {
       console.log(error)
     }
@@ -75,12 +77,14 @@ export default function Transactions() {
     try {
       let priceAccumulator = 0
       const filteredSales = await transactionDatabase.searchSalesPay(isPay)
-      filteredSales.map(item => {
-        priceAccumulator += item.price
-      })
-      setPriceSale(priceAccumulator)
-      setResumePriceSale(Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(priceSale))
-      setTransactionsList(filteredSales)
+      if(filteredSales) {
+        filteredSales.map(item => {
+          priceAccumulator += item.price
+        })
+        setPriceSale(priceAccumulator)
+        setResumePriceSale(Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(priceSale))
+        setTransactionsList(filteredSales)
+      }
     } catch (error) {
       console.log(error)      
     }

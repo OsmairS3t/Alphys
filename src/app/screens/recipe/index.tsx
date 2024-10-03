@@ -44,7 +44,7 @@ export default function Recipe({ closeModal }: RecipeProps) {
 
   async function loadRecipes() {
     try {
-      const response = await recipeDatabase.searchByName(search)
+      const response = await recipeDatabase.find()
       if (response) {
         setRecipes(response)
       }

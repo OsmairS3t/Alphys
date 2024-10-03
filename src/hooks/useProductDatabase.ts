@@ -1,48 +1,45 @@
 import { Alert } from 'react-native'
-import { useSQLiteContext } from "expo-sqlite"
 import { IProduct } from '../utils/interface'
+import { supabase } from '../databases/supabase'
 
 export function useProductDatabase() {
-  const database = useSQLiteContext()
 
   async function create(data: Omit<IProduct, 'id'>) {
-    const statement = await database.prepareAsync("INSERT INTO products(categoryname, name, price, photo) VALUES($categoryname, $name, $price, $photo)")
     try {
-      const result = await statement.executeAsync({
-        $categoryname: data.categoryname,
-        $name: data.name,
-        $price: data.price,
-        $photo: data.photo,
-      })
-      const insertedRow = result.lastInsertRowId.toString()
+      const insertedRow = await supabase
+        .from('products')
+        .insert({
+          categoryname: data.categoryname,
+          name: data.name,
+          price: data.price,
+          photo: data.photo,
+        })
+        .select('id')
       return { insertedRow }
     } catch (error) {
       throw error
-    } finally {
-      statement.finalizeAsync()
     }
   }
 
   async function update(data: IProduct) {
-    const statement = await database.prepareAsync("UPDATE products SET categoryname=$categoryname, name=$name, price=$price, photo=$photo WHERE id=$id")
     try {
-      await statement.executeAsync({
-        $id: data.id,
-        $categoryname: data.categoryname,
-        $name: data.name,
-        $price: data.price,
-        $photo: data.photo
-      })
+      await supabase
+        .from('products')
+        .update({
+          categoryname: data.categoryname,
+          name: data.name,
+          price: data.price,
+          photo: data.photo
+        })
+        .eq('id', data.id)
     } catch (error) {
       throw error
-    } finally{
-      statement.finalizeAsync()
     }
   }
 
   async function remove(id: number) {
     try {
-      await database.runAsync("DELETE FROM products WHERE id=" + id)
+      await supabase.from('products').delete().eq('id', id)
       Alert.alert('Produto excluído com sucesso!')
     } catch (error) {
       throw error
@@ -51,8 +48,10 @@ export function useProductDatabase() {
 
   async function searchById(id: number) {
     try {
-      const response = await database.getFirstAsync<IProduct>("SELECT * FROM products WHERE id=" + id)
-      return response
+      const {data} = await supabase.from('products').select('*').eq('id', id)
+      if(data) {
+        return data[0]
+      }
     } catch (error) {
       throw error
     }
@@ -60,13 +59,23 @@ export function useProductDatabase() {
 
   async function searchByName(name: string) {
     try {
-      const query = "SELECT * FROM products WHERE name LIKE ?"
-      const response = await database.getAllAsync<IProduct>(query, `%${name}%`)
-      return response
+      const { data } = await supabase.from('products').select('*').eq('name', name)
+      if (data){
+        return data[0]
+      }
     } catch (error) {
       throw error
     }
   }
 
-  return { create, update, remove, searchById, searchByName }
+  async function find() {
+    try {
+      const response = await supabase.from('products').select('*')
+      return response.data
+    } catch (error) {
+      throw error
+    }
+  }
+
+  return { create, update, remove, searchById, searchByName, find }
 }

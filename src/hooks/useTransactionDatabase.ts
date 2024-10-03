@@ -1,64 +1,55 @@
 import { Alert } from 'react-native'
-import { useSQLiteContext } from "expo-sqlite"
+import { supabase } from '../databases/supabase'
 import { ITransaction } from '../utils/interface'
 
 export function useTransactionDatabase() {
-  const database = useSQLiteContext()
 
    async function create(data: Omit<ITransaction, 'id'>) {
-    const statement = await database.prepareAsync(`
-      INSERT INTO transactions(modality, kind, place, product_name, client_name, amount, price, datetransaction, ispaid) 
-      VALUES($modality, $kind, $place, $product_name, $client_name, $amount, $price, $datetransaction, $ispaid)`)
     try {
-      const result = await statement.executeAsync({
-        $modality: data.modality,
-        $kind: data.kind,
-        $place: data.place,
-        $product_name: data.product_name,
-        $client_name: data.client_name,
-        $amount: data.amount,
-        $price: data.price,
-        $datetransaction: data.datetransaction,
-        $ispaid: data.ispaid
+      const insertedRow = await supabase
+      .from('transactions')
+      .insert({
+        modality: data.modality,
+        kind: data.kind,
+        place: data.place,
+        product_name: data.product_name,
+        client_name: data.client_name,
+        amount: data.amount,
+        price: data.price,
+        datetransaction: data.datetransaction,
+        ispaid: data.ispaid
       })
-      const insertedRow = result.lastInsertRowId.toString()
+      .select('id')
       return { insertedRow }
     } catch (error) {
       throw error
-    } finally {
-      statement.finalizeAsync()
     }
   }
 
   async function update(data: ITransaction) {
-    const statement = await database.prepareAsync(`
-      UPDATE transactions SET modality=$modality, kind=$kind, place=$place, 
-      product_name=$product_name, client_name=$client_name, amount, 
-      price=$price, datetransaction=$datetransaction, ispaid=$ispaid 
-      WHERE id=$id`)
     try {
-      await statement.executeAsync({
-        $id: data.id,
-        $modality: data.modality,
-        $kind: data.kind,
-        $place: data.place,
-        $product_name: data.product_name,
-        $client_name: data.client_name,
-        $amount: data.amount,
-        $price: data.price,
-        $datetransaction: data.datetransaction,
-        $ispaid: data.ispaid
-      })
+      await supabase
+        .from('transactions')
+        .update({
+          modality: data.modality,
+          kind: data.kind,
+          place: data.place,
+          product_name: data.product_name,
+          client_name: data.client_name,
+          amount: data.amount,
+          price: data.price,
+          datetransaction: data.datetransaction,
+          ispaid: data.ispaid
+        })
+        .eq('id', data.id)
     } catch (error) {
       throw error
-    } finally{
-      statement.finalizeAsync()
     }
   }
 
   async function remove(id: number) {
     try {
-      await database.runAsync("DELETE FROM transactions WHERE id=" + id)
+      await supabase.from('transactions').delete().eq('id', id)
       Alert.alert('Transação (Compra/Venda) excluída com sucesso!')
     } catch (error) {
       throw error
@@ -67,8 +58,10 @@ export function useTransactionDatabase() {
 
   async function searchById(id: number) {
     try {
-      const response = await database.getFirstAsync<ITransaction>("SELECT * FROM transactions WHERE id="+ id)
-      return response
+      const { data } = await supabase.from('transactions').select('*').eq('id', id)
+      if (data) {
+        return data[0]
+      }
     } catch (error) {
       throw error
     }
@@ -76,9 +69,15 @@ export function useTransactionDatabase() {
 
   async function searchByModality(modality: string) {
     try {
-      const query = "SELECT * FROM transactions WHERE modality LIKE ? ORDER BY client_name, product_name"
-      const response = await database.getAllAsync<ITransaction>(query, `%${modality}%`)
-      return response
+      const { data } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('modality', modality)
+        .order('client_name', { ascending: true })
+        .order('product_name', { ascending: true })
+      if(data) {
+        return data
+      }
     } catch (error) {
       throw error
     }
@@ -86,8 +85,14 @@ export function useTransactionDatabase() {
 
   async function searchByClient(client_name: string) {
     try {
-      const response = await database.getFirstAsync<ITransaction>("SELECT * FROM transactions WHERE client_name=" + client_name)
-      return response
+      const { data } = await supabase
+        .from('transactions')
+        .select('*')
+        .like('client_name', client_name)
+        .order('product_name', {ascending: true})
+      if(data) {
+        return data
+      }
     } catch (error) {
       throw error
     }
@@ -95,8 +100,10 @@ export function useTransactionDatabase() {
 
   async function searchByStock(stock_id: number) {
     try {
-      const response = await database.getAllAsync<ITransaction>("SELECT * FROM transactions WHERE stock_id=" + stock_id)
-      return response
+      const { data } = await supabase.from('transactions').select('*').eq('stock_id', stock_id)
+      if(data) {
+        return data
+      }
     } catch (error) {
       throw error
     }
@@ -104,8 +111,10 @@ export function useTransactionDatabase() {
 
   async function searchByProduct(product_name: string) {
     try {
-      const response = await database.getFirstAsync("SELECT * FROM transactions WHERE product_name=" + product_name)
-      return response
+      const { data } = await supabase.from('transactions').select('*').like('product_name', product_name)
+      if(data) {
+        return data
+      }
     } catch (error) {
       throw error
     }
@@ -113,8 +122,14 @@ export function useTransactionDatabase() {
 
   async function searchSalesPay(ispaid: boolean) {
     try {
-      const response = await database.getAllAsync<ITransaction>("SELECT * FROM transactions WHERE modality='sale' and ispaid=" + ispaid)
-      return response
+      const { data } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('modality', 'sale')
+        .eq('ispaid', ispaid)
+      if(data) {
+        return data
+      }
     } catch (error) {
       throw error
     }

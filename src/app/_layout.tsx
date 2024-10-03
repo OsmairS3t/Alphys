@@ -1,7 +1,5 @@
 import { Stack } from "expo-router";
 import { ThemeProvider } from "styled-components";
-import { SQLiteProvider } from 'expo-sqlite';
-import { initializeDatabase } from '../databases/initializeDatabase';
 
 import {
   useFonts,
@@ -24,22 +22,20 @@ export default function Layout() {
 
   return (
     <ThemeProvider theme={ theme }>
-      <SQLiteProvider databaseName='alpys.db' onInit={initializeDatabase}>
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            headerStyle: {
-              backgroundColor: '#f4511e',
-            },
-            headerTintColor: '#fff',
-            headerTitleStyle: {
-              fontWeight: 'bold',
-            },
-          }}
-        >
-          <Stack.Screen name="index" />
-        </Stack>
-      </SQLiteProvider>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          headerStyle: {
+            backgroundColor: '#f4511e',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+        }}
+      >
+        <Stack.Screen name="index" />
+      </Stack>
     </ThemeProvider>
   );
 }

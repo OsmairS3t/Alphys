@@ -79,17 +79,21 @@ export default function RegisterProduct({ closeModal, updateList, product }: Pro
   }
 
   async function loadCategories() {
-    const response = await categoryDatabase.searchByName(search)
-    setCategories(response)
-    let newArray: ISelectProps[] = response.map(cat => {
-      return { key: String(cat.id), value: cat.name }
-    })
-    setData(newArray)
+    const response = await categoryDatabase.find()
+    if(response) {
+      setCategories(response)
+      let newArray: ISelectProps[] = response.map(cat => {
+        return { key: String(cat.id), value: cat.name }
+      })
+      setData(newArray)
+    }
   }
 
   async function loadCategory(nameCategory: string) {
-    const response = await categoryDatabase.findByName(nameCategory)
-    return response
+    const response = await categoryDatabase.searchByName(nameCategory)
+    if(response) {
+      return response
+    }
   }
 
   async function loadProduct(id: number) {

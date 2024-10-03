@@ -1,50 +1,45 @@
 import { Alert } from 'react-native'
-import { useSQLiteContext } from "expo-sqlite"
+import { supabase } from '../databases/supabase'
 import { IRecipe } from '../utils/interface'
 
 export function useRecipeDatabase() {
-  const database = useSQLiteContext()
 
   async function create(data: Omit<IRecipe, 'id'>) {
-    const statement = await database.prepareAsync(`
-      INSERT INTO recipes(nameproduct, preparation, cooking, ingredients) 
-      VALUES($nameproduct, $preparation, $cooking, $ingredients)`)
     try {
-      const result = await statement.executeAsync({
-        $nameproduct: data.nameproduct,
-        $preparation: data.preparation,
-        $cooking: data.cooking,
-        $ingredients: JSON.stringify(data.ingredients)
-      })
-      const insertedRow = result.lastInsertRowId.toString()
+      const insertedRow = await supabase
+        .from('recipes')
+        .insert({
+          nameproduct: data.nameproduct,
+          preparation: data.preparation,
+          cooking: data.cooking,
+          ingredients: JSON.stringify(data.ingredients)
+        })
+        .select('id')
       return { insertedRow }
     } catch (error) {
       throw error
-    } finally {
-      statement.finalizeAsync()
     }
   }
 
   async function update(data: IRecipe) {
-    const statement = await database.prepareAsync("UPDATE recipes SET nameproduct=$nameproduct, preparation=$preparation, cooking=$cooking WHERE id=$id")
     try {
-      await statement.executeAsync({
-        $id: data.id,
-        $nameproduct: data.nameproduct,
-        $preparation: data.preparation,
-        $cooking: data.cooking,
-        $ingredients: JSON.stringify(data.ingredients)
-      })
+      await supabase
+        .from('recipes')
+        .update({
+          nameproduct: data.nameproduct,
+          preparation: data.preparation,
+          cooking: data.cooking,
+          ingredients: JSON.stringify(data.ingredients)
+        })
+        .eq('id', data.id)
     } catch (error) {
       throw error
-    } finally{
-      statement.finalizeAsync()
     }
   }
 
   async function remove(id: number) {
     try {
-      await database.runAsync("DELETE FROM recipes WHERE id=" + id)
+      await supabase.from('recipes').delete().eq('id', id)
       Alert.alert('Receita excluída com sucesso!')
     } catch (error) {
       throw error
@@ -53,21 +48,36 @@ export function useRecipeDatabase() {
 
   async function searchById(id: number) {
     try {
-      const response = await database.getFirstAsync<IRecipe>("SELECT * FROM recipes WHERE id=" + id)
-      return response
+      const { data } = await supabase.from('recipes').select('*').eq('id', id)
+      if(data) {
+        return data[0]
+      }
     } catch (error) {
       throw error
     }
   }
+  
   async function searchByName(name: string) {
     try {
-      const query = "SELECT * FROM recipes WHERE nameproduct LIKE ?"
-      const response = await database.getAllAsync<IRecipe>(query, `%${name}%`)
-      return response
+      const { data } = await supabase.from('recipes').select('*').like('nameproduct', name)
+      if(data) {
+        return data
+      }
     } catch (error) {
       throw error
     }
   }
 
-  return { create, update, remove, searchById, searchByName }
+  async function find() {
+    try {
+      const { data } = await supabase.from('recipes').select('*')
+      if(data) {
+        return data
+      }
+    } catch (error) {
+      throw error
+    }
+  }
+
+  return { create, update, remove, searchById, searchByName, find }
 }

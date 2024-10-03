@@ -1,68 +1,57 @@
 import { Alert } from 'react-native'
-import { useSQLiteContext } from "expo-sqlite"
+import { supabase } from '../databases/supabase'
 import { IStock } from '../utils/interface'
 
 export function useStockDatabase() {
-  const database = useSQLiteContext()
 
   async function create(data: Omit<IStock, 'id'>) {
-    const statement = await database.prepareAsync("INSERT INTO stocks(product_id, product_name, amount, hasstock) VALUES($product_id, $product_name, $amount, $hasstock)")
     try {
-      const result = await statement.executeAsync({
-        $product_id: data.product_id,
-        $product_name: data.product_name,
-        $amount: data.amount,
-        $hasstock: data.hasstock,
-      })
-      const insertedRow = result.lastInsertRowId.toString()
+      const insertedRow = await supabase
+        .from('stocks')
+        .insert({
+          product_id: data.product_id,
+          product_name: data.product_name,
+          amount: data.amount,
+          hasstock: data.hasstock,
+        })
+        .select('id')
       return { insertedRow }
     } catch (error) {
       throw error
-    } finally {
-      statement.finalizeAsync()
     }
   }
 
   async function update(data: IStock) {
-    const statement = await database.prepareAsync("UPDATE stocks SET product_id= $product_id, product_name=$product_name, amount=$amount, hasstock=$hasstock WHERE id=$id")
     try {
-      await statement.executeAsync({
-        $id: data.id,
-        $product_id: data.product_id,
-        $product_name: data.product_name,
-        $amount: data.amount,
-        $hasstock: data.hasstock
-      })
+      await supabase
+        .from('stocks')
+        .update({
+          product_id: data.product_id,
+          product_name: data.product_name,
+          amount: data.amount,
+          hasstock: data.hasstock
+        })
+        .eq('id', data.id)
     } catch (error) {
       throw error
-    } finally{
-      statement.finalizeAsync()
     }
   }
 
   async function remove(id: number) {
-    //verificar se existe venda cadastrada pra esse cliente antes
     try {
-      await database.runAsync("DELETE FROM stocks WHERE id=" + id)
+      await supabase.from('stocks').delete().eq('id', id)
       Alert.alert('Produto excluído do estoque com sucesso!')
     } catch (error) {
       throw error
     }
   }
 
-  async function list() {
+  async function searchById(id: number) {
     try {
-      const response = await database.getAllAsync<IStock>("SELECT * FROM stocks ORDER BY product_name;")
-      return response
-    } catch (error) {
-      throw error      
-    }
-  }
-
-  async function getStock(id: number) {
-    try {
-      const response = await database.getFirstAsync<IStock>("SELECT * FROM stocks WHERE id=" + id)
-      return response
+      const { data } = await supabase.from('stocks').select('*').eq('id', id)
+      if(data) {
+        return data[0]
+      }
     } catch (error) {
       throw error
     }
@@ -70,8 +59,10 @@ export function useStockDatabase() {
 
   async function searchByProductId(id: number) {
     try {
-      const response = await database.getFirstAsync<IStock>("SELECT * FROM stocks WHERE product_id=" + id)
-      return response
+      const { data } = await supabase.from('stocks').select('*').eq('id', id)
+      if (data) {
+        return data[0]
+      }
     } catch (error) {
       throw error
     }
@@ -79,13 +70,28 @@ export function useStockDatabase() {
 
   async function searchByProduct(name: string) {
     try {
-      const query = "SELECT * FROM stocks WHERE product_name LIKE ? ORDER BY product_name"
-      const response = await database.getAllAsync<IStock>(query, `%${name}%`)
-      return response
+      const { data } = await supabase
+      .from('stocks')
+      .select('*')
+      .like('product_name', name)
+      if (data) {
+        return data
+      }
     } catch (error) {
       throw error
     }
   }
 
-  return { create, update, remove, getStock, list, searchByProductId, searchByProduct }
+  async function find() {
+    try {
+      const { data } = await supabase.from('stocks').select('*').order('product_name', {ascending: true})
+      if (data) {
+        return data
+      }
+    } catch (error) {
+      throw error      
+    }
+  }
+
+  return { create, update, remove, searchById, searchByProductId, searchByProduct, find }
 }

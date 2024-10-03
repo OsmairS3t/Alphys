@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Alert } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { IIngredient, IProduct, IRecipe } from '../../../utils/interface';
-import { keyRecipe } from '../../../utils/keyStorage';
-import uuid from 'react-native-uuid';
 import * as ImagePicker from 'expo-image-picker';
 import { InputForm } from '../../components/Forms/InputForm';
 
@@ -24,7 +21,6 @@ import {
   PhotoImage,
   ImgCapture
 } from '../../styles/recipeStyle';
-import { supabase } from '../../../databases/supabase';
 import { useRecipeDatabase } from '../../../hooks/useRecipeDatabase';
 
 type RecipeProps = {

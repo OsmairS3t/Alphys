@@ -58,12 +58,12 @@ export default function RegisterSale({ closeModal, updateList, sale }: SaleProps
   const [dataSale, setDataSale] = useState('')
 
   async function loadClient(idClient: number) {
-    const response = transactionDatabase.searchById(idClient)
+    const response:IClient = await clientDatabase.searchById(idClient)
     return response
   }
 
   async function loadProduct(idProduct: number) {
-    const response = await productDatabase.searchById(idProduct)
+    const response:IProduct = await productDatabase.searchById(idProduct)
     return response
   }
 
@@ -75,77 +75,76 @@ export default function RegisterSale({ closeModal, updateList, sale }: SaleProps
   }
 
   async function loadSelectClients() {
-    const response = await clientDatabase.searchByName('')
-    let newArray: ISelectProps[] = response.map(cli => {
-      return { key: String(cli.id), value: String(cli.name) }
-    })
-    setDataClient(newArray)
+    const response = await clientDatabase.find()
+    if(response) {
+      let newArray: ISelectProps[] = response.map(cli => {
+        return { key: String(cli.id), value: String(cli.name) }
+      })
+      setDataClient(newArray)
+    }
   }
 
   async function loadSelectProducts() {
-    const response = await productDatabase.searchByName('')
-    let newArray: ISelectProps[] = response.map(ds => {
-      return { key: String(ds.id), value: String(ds.categoryname + ' - ' + ds.name) }
-    })
-    setDataProduct(newArray)
+    const response = await productDatabase.find()
+    if(response) {
+      let newArray: ISelectProps[] = response.map(ds => {
+        return { key: String(ds.id), value: String(ds.categoryname + ' - ' + ds.name) }
+      })
+      setDataProduct(newArray)
+    }
   }
 
   async function loadSales(id: number) {
-    const response = await transactionDatabase.searchByModality('sale')
     //listar tambem apenas os que não foram pagos
-    const foundSales = response.find(ds => ds.id === id)
-    setClientSale(String(foundSales?.client_name))
-    setProductSale(String(foundSales?.product_name))
-    setAmountSale(String(foundSales?.amount))
-    setPriceSale(String(foundSales?.price))
-    setIsPaidSale(Boolean(foundSales?.ispaid))
-    setDataSale(String(foundSales?.datetransaction))
+    const response = await transactionDatabase.searchByModality('sale')
+    if(response) {
+      const foundSales = response.find(ds => ds.id === id)
+      setClientSale(String(foundSales?.client_name))
+      setProductSale(String(foundSales?.product_name))
+      setAmountSale(String(foundSales?.amount))
+      setPriceSale(String(foundSales?.price))
+      setIsPaidSale(Boolean(foundSales?.ispaid))
+      setDataSale(String(foundSales?.datetransaction))
+    }
   }
 
   async function handleSave() {
-    const result = await AsyncStorage.getItem(keyStock)
-    const dataStock: IStock[] = result ? JSON.parse(result) : []
-    const stockFound = dataStock.find(de => de.product?.id === selectedProduct)
-    let stockUpdate = dataStock.filter(de => de.product?.id !== selectedProduct)
-    // dados do estoque
-    // verifica se tem estoque do produto suficiente para a venda
-    if (Number(amount) > Number(stockFound?.amount)) {
-      Alert.alert('Não há quantidade disponível para este produto.')
-      return false;
-    } else {
-      const newAmount = Number(stockFound?.amount) - Number(amount)
-      let idStock = ''
-      let objProduct: IProduct | undefined
-      if (stockFound) {
-        idStock = String(stockFound.id)
-        objProduct = stockFound.product
-      }
-      const dataNewStock = {
-        id: idStock,
-        product: objProduct,
-        amount: newAmount,
-        hasStock: newAmount > 0 ? true : false
-      }
-      stockUpdate.push(dataNewStock)
-    }
-    // dados da venda
-    const data = {
-      id: uuid.v4().toString(),
-      client: await loadClient(selectedClient),
-      product: await loadProduct(selectedProduct),
-      amount: Number(amount),
-      price: Number(priceProduct) * Number(amount),
-      isPaid: isPaid,
-      dateSale: actualDate()
-    }
+    let objProduct= await loadProduct(Number(selectedProduct))
+    let objClient = await loadClient(Number(selectedClient))
+    let stockId = 0
     try {
-      const response = await AsyncStorage.getItem(keySale)
-      let oldData: ISale[] = response ? JSON.parse(response) : []
-
-      oldData.push(data)
-
-      await AsyncStorage.setItem(keyStock, JSON.stringify(stockUpdate))
-      await AsyncStorage.setItem(keySale, JSON.stringify(oldData))
+      //localizar produto no estoque pra ver se tem estoque suficiente e salva novo estoque
+      const dataStock:IStock = await stockDatabase.searchByProductId(Number(selectedProduct))
+      if(dataStock) {
+        stockId = dataStock.id
+        if(dataStock.amount < Number(amount)) {
+          Alert.alert('Não há quantidade disponível para este produto.')
+          return false;
+        } else {
+          //diminuir quantidade no estoque
+          const newAmount = Number(dataStock.amount) - Number(amount)
+          await stockDatabase.update({
+            id: dataStock.id,
+            product_id: dataStock.product_id,
+            product_name: objProduct.categoryname +'-'+ objProduct.name,
+            amount: newAmount,
+            hasstock: newAmount > 0 ? true : false
+          })
+        }
+      }
+      //salvar venda do produto
+      await transactionDatabase.create({
+        modality: 'sale',
+        kind: '',
+        place: '',
+        product_name: objProduct.categoryname + '-'+ objProduct.name,
+        client_name: objClient.name,
+        amount: Number(amount),
+        price: objProduct.price * Number(amount),
+        datetransaction: actualDate(),
+        ispaid: isPaid,
+        stock_id: stockId
+      })
       Alert.alert('Venda incluída com sucesso!')
       updateList();
       closeModal(false);
@@ -155,14 +154,14 @@ export default function RegisterSale({ closeModal, updateList, sale }: SaleProps
   }
 
   useEffect(() => {
-    if(idSale!=='') {
-      loadSales(idSale)
+    if(sale) {
+      loadSales(sale.id)
     }
     loadSelectClients()
     loadSelectProducts()
   }, [])
 
-  if(idSale) {
+  if(sale) {
     return (
       <Container>
         <HeaderModal closeModal={() => closeModal(false)} titleModal='CADASTRO DE VENDAS' />
@@ -203,7 +202,7 @@ export default function RegisterSale({ closeModal, updateList, sale }: SaleProps
             setSelected={(val: string) => setSelectedProduct(val)}
             data={dataProduct}
             save="key"
-            onSelect={() => loadStockProduct(selectedProduct)}
+            onSelect={() => loadStockProduct(Number(selectedProduct))}
           />
   
           <GroupInput>

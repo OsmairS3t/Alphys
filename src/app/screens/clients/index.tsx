@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { FlatList, Pressable, Modal, Alert } from 'react-native';
 import { useFocusEffect } from 'expo-router';
-import { IClient, ISale } from '../../../utils/interface';
+import { IClient } from '../../../utils/interface';
 import HeaderModal from '../../components/HeaderModal';
 import RegisterClient from './regClient';
 
@@ -38,8 +38,10 @@ export default function Client({ closeModal }: ClientProps) {
 
   async function loadClients() {
     try {
-      const response = await clientDatabase.searchByName(search)
-      setClients(response)
+      const response = await clientDatabase.find()
+      if(response) {
+        setClients(response)
+      }
     } catch (e) {
       console.log(e)
     }

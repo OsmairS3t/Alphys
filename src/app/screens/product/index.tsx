@@ -38,8 +38,10 @@ export default function Product({ closeModal }: ProductProps) {
 
   async function loadProducts() {
     try {
-      const response = await productDatabase.searchByName(search)
-      setProducts(response)
+      const response = await productDatabase.find()
+      if(response) {
+        setProducts(response)
+      }
     } catch (e) {
       console.log(e)
     }

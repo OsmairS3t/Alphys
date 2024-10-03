@@ -44,11 +44,13 @@ export default function RegisterOrder({ closeModal, updateList, order }: OrderPr
 
   async function loadClients() {
     try {
-      const response = await clientDatabase.searchByName('')
-      let newArray: ISelectProps[] = response.map(cli => {
-        return { key: String(cli.id), value: String(cli.name) }
-      })
-      setDataClient(newArray)
+      const response = await clientDatabase.find()
+      if (response) {
+        let newArray: ISelectProps[] = response.map(cli => {
+          return { key: String(cli.id), value: String(cli.name) }
+        })
+        setDataClient(newArray)
+      }
     } catch (e) {
       console.log(e)
     }
@@ -65,11 +67,13 @@ export default function RegisterOrder({ closeModal, updateList, order }: OrderPr
 
   async function loadProducts() {
     try {
-      const response = await productDatabase.searchByName('')
-      let newArray: ISelectProps[] = response.map(pro => {
-        return { key: String(pro.id), value: String(pro.categoryname) +' - '+ String(pro.name) }
-      })
-      setDataProduct(newArray)
+      const response = await productDatabase.find()
+      if(response) {
+        let newArray: ISelectProps[] = response.map(pro => {
+          return { key: String(pro.id), value: String(pro.categoryname) +' - '+ String(pro.name) }
+        })
+        setDataProduct(newArray)
+      }
     } catch (e) {
       console.log(e)
     }

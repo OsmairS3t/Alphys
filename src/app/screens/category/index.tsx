@@ -33,8 +33,10 @@ export default function Category({ closeModal }: CategoryProps) {
 
   async function loadCategories() {
     try {
-      const response = await categoryDatabase.searchByName(search)
-      setCategories(response)
+      const response = await categoryDatabase.find()
+      if(response) {
+        setCategories(response)
+      }
     } catch (error) {
       console.log(error)
     }

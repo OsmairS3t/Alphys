@@ -65,11 +65,13 @@ export default function RegisterStock({ closeModal, updateList, stock }: StockPr
 
   async function LoadProductSelect() {
     try {
-      const response = await productDatabase.searchByName('')
-      let newArray: ISelectProps[] = response.map(dp => {
-        return { key: String(dp.id), value: dp.categoryname + ' - ' + dp.name }
-      })
-      setData(newArray)
+      const response = await productDatabase.find()
+      if(response) {
+        let newArray: ISelectProps[] = response.map(dp => {
+          return { key: String(dp.id), value: dp.categoryname + ' - ' + dp.name }
+        })
+        setData(newArray)
+      }
     } catch (error) {
       console.log(error)
     }

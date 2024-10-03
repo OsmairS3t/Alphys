@@ -44,13 +44,15 @@ export default function Sale({ closeModal }: SaleProps) {
   async function loadSales(status: boolean) {
     try {
       const response = await transactionDatabase.searchByModality('sale')
-      const filterSales = response.filter(as => as.ispaid === status)
-      let tot = 0
-      filterSales.map(s => {
-        tot += s.price
-      })
-      setTot(tot)
-      setSales(filterSales)
+      if(response) {
+        const filterSales = response.filter(as => as.ispaid === status)
+        let tot = 0
+        filterSales.map(s => {
+          tot += s.price
+        })
+        setTot(tot)
+        setSales(filterSales)
+      }
     } catch (e) {
       console.log(e)
     }
@@ -77,7 +79,7 @@ export default function Sale({ closeModal }: SaleProps) {
       const amountSaled = responseSale?.amount
 
       //localiza produto no estoque e pega quantidade
-      const responseStock = await stockDatabase.getStock(Number(responseSale?.stock_id))
+      const responseStock = await stockDatabase.searchById(Number(responseSale?.stock_id))
       const amountStock = responseStock?.amount
 
       //salva novo estoque

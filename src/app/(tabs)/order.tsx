@@ -1,38 +1,15 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Modal, FlatList, Pressable, Alert, View, Text } from 'react-native';
+import { useState, useEffect } from 'react';
+import { Modal, FlatList, Pressable, Alert } from 'react-native';
 import { useTheme } from 'styled-components';
-import { useFocusEffect } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { IOrder } from '../../utils/interface';
 
-import FilterStock from '../components/Filter/filterstock';
-
-import { keyClient, keyOrder, keyProduct, keySale, keyStock } from '../../utils/keyStorage';
-import { IClient, IOrder, IProduct, ISale, ISelectProps, IStock } from '../../utils/interface';
-
-import { ButtonFilterScreenPage, ButtonForm, 
+import { ButtonFilterScreenPage, 
   ButtonNewScreenPage, 
   Container, 
   HeaderScreenPage, 
   IconButtonNewScreenPage, 
   IconFilterScreenPage, 
-  TitleModal, 
-  TextButton } from '../styles/global'
-import {
-  Title,
-  GroupSale,
-  ItemSale,
-  ClientReceipt,
-  ProductReceipt,
-  PriceReceipt,
-  TextSale,
-  QtdSale,
-  StatusSale,
-  IconSale,
-  BtnSituation,
-  TextBtnSituation,
-  Separator
-} from '../styles/orderStyle'
-import HeaderModal from '../components/HeaderModal';
+  TitleModal } from '../styles/global'
 import RegisterOrder from '../screens/order/regOrder';
 
 import { GroupColumn, 
@@ -56,20 +33,23 @@ export default function Order() {
   const orderDatabase = useOrderDatabase()
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false)
   const [isNewModalOpen, setIsNewModalOpen] = useState(false)
-  const [filterOrderType, setFilterOrderType] = useState('C') //C (client) or P (product)
+  const [filterOrderType, setFilterOrderType] = useState('') //C (client) or P (product)
   const [filterOrderId, setFilterOrderId] = useState('')
   const [order, setOrder] = useState<IOrder>()
   const [orders, setOrders] = useState<IOrder[]>([]);
-  const [users, setUsers] = useState<IUser[]>([])
  
   async function loadOrders(typeFilter: string, filter: string) {
     try {
       if (typeFilter === '') {
-        const response = await orderDatabase.list()
-        setOrders(response)
+        const response = await orderDatabase.find()
+        if(response) {
+          setOrders(response)
+        }
       } else {
         const response = await orderDatabase.searchByName(filter, typeFilter)
-        setOrders(response)
+        if(response) {
+          setOrders(response)
+        }
       }
     } catch (e) {
       console.log(e)

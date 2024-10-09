@@ -14,7 +14,8 @@ export const Container = styled.View<SizeProps>`
 `;
 
 export const ContainerGraphic = styled.View`
-  padding: 0px 20px;
+  padding: 0px 10px;
+
 `;
 
 export const BlockBuy = styled.View<SizeProps>`

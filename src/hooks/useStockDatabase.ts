@@ -59,7 +59,7 @@ export function useStockDatabase() {
 
   async function searchByProductId(id: number) {
     try {
-      const { data } = await supabase.from('stocks').select('*').eq('id', id)
+      const { data } = await supabase.from('stocks').select('*').eq('product_id', id)
       if (data) {
         return data[0]
       }

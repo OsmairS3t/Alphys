@@ -1,8 +1,8 @@
-import { useRouter } from 'expo-router';
 import React from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable } from 'react-native';
+import { useRouter } from 'expo-router';
 
-import { ContainerHeader, ContainerImgHeader, ImgLogoHeader, IconSignOut } from './styles/global';
+import { ContainerHeader, ContainerImgHeader, ImgLogoHeader, IconSignOut, IconUser } from './styles/global';
 
 export default function Header() {
   const router = useRouter()
@@ -11,10 +11,17 @@ export default function Header() {
     router.replace('/')
   }
 
+  function handleUser() {
+    router.push('/screens/profile')
+  }
+
   const logo = '../assets/logo_alpys.png';
 
   return (
     <ContainerHeader>
+      <Pressable onPress={handleUser}>
+        <IconUser name='user' />
+      </Pressable>
       <ContainerImgHeader>
         <ImgLogoHeader source={require(logo)} />
       </ContainerImgHeader>

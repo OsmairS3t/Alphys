@@ -1,8 +1,9 @@
 import { useState, useEffect, useContext } from 'react';
-import { useWindowDimensions, Alert } from 'react-native';
+import { LineChart } from 'react-native-chart-kit'
+import { useWindowDimensions, Alert, View, Dimensions, Text } from 'react-native';
 import { LoadingContext } from '../../loadingContext';
 import { useTheme } from 'styled-components';
-import { VictoryBar, VictoryChart, VictoryTheme } from 'victory-native';
+import { useTransactionDatabase } from '../../hooks/useTransactionDatabase';
 import { ITransaction } from '../../utils/interface'
 import {
   Container,
@@ -14,49 +15,67 @@ import {
   GroupTextResume,
   TextResume
 } from '../styles/transactionStyle'
-import { useTransactionDatabase } from '../../hooks/useTransactionDatabase';
+
+type TChart = {
+  labels: string[]
+  values: number[]
+}
 
 export default function Transactions() {
   const { isLoading, showLoading, hideLoading } = useContext(LoadingContext);
   const theme = useTheme();
   const transactionDatabase = useTransactionDatabase()
-  const { height } = useWindowDimensions();
+  const { height, width } = useWindowDimensions();
+  const [saldo, setSaldo] = useState<TChart[]>([])
+  const [venda, setVenda] = useState<TChart[]>([])
+  
   const heightBuy = height * 0.3
   const heightSale = height * 0.2
   const heightResume = height * 0.2
   const [transactionsList, setTransactionsList] = useState<ITransaction[]>([]);
+
   const [isPay, setIsPay] = useState(false)
   const [priceBuy, setPriceBuy] = useState(0)
   const [priceSale, setPriceSale] = useState(0)
   const [resumePriceBuy, setResumePriceBuy] = useState('')
   const [resumePriceSale, setResumePriceSale] = useState('')
   const [resumePriceFinal, setResumePriceFinal] = useState('')
-  const sampleData = [
-    { x: "Jan", y: 200 },
-    { x: "Fev", y: 333 },
-    { x: "Mar", y: 525 },
-    { x: "Abr", y: 410 },
-    { x: "Mai", y: 315 },
-    { x: "Jun", y: 800 },
-    { x: "Jul", y: 650 },
-    { x: "Ago", y: 700 },
-    { x: "Set", y: 600 },
-    { x: "Out", y: 400 },
-    { x: "Nov", y: 500 },
-    { x: "Dez", y: 1500 }
-  ]
-  const dataSale = [
-    { x: "Jan", y: 200 },
-    { x: "Fev", y: 333 },
-    { x: "Mar", y: 525 },
-    { x: "Abr", y: 410 },
-    { x: "Mai", y: 625 }
-  ]
+  const chartConfigSaldo = {
+    backgroundGradientFrom: "#1E2923",
+    backgroundGradientFromOpacity: 0,
+    backgroundGradientTo: "#08130D",
+    backgroundGradientToOpacity: 0.5,
+    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+    strokeWidth: 2,
+    barPercentage: 0.5,
+    useShadowColorFromDataset: false
+  };
+  const chartConfigVenda = {
+    backgroundGradientFrom: "#1E2923",
+    backgroundGradientFromOpacity: 0,
+    backgroundGradientTo: "#08130D",
+    backgroundGradientToOpacity: 0.5,
+    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+    strokeWidth: 2,
+    barPercentage: 0.5,
+    useShadowColorFromDataset: false
+  };
+
+  async function loadTransactions() {
+    try {
+      const resumeSaldo = await transactionDatabase.resumeByData('05/07/2024')
+      if(resumeSaldo) {
+        console.log(resumeSaldo)
+      } 
+    } catch (error) {
+      console.log(error)      
+    }
+  }
 
   async function loadBuys() {
-    if (isLoading) {
-      Alert.alert('Testando contexto Carregando')
-    }
+    // if (isLoading) {
+    //   Alert.alert('Testando contexto Carregando')
+    // }
     let priceAccumulator = 0
     try {
       const responseBuys = await transactionDatabase.searchByModality('buy')
@@ -90,74 +109,71 @@ export default function Transactions() {
     }
   }
 
+  const saldoData = {
+    labels: ["05/10/2024", "06/10/2024", "07/10/2024", "08/10/2024", "09/10/2024", "10/10/2024"],
+    datasets: [
+      {
+        data: [20, 45, 28, 80, 99, 43],
+        color: (opacity = 1) => `rgba(242, 121, 0, ${opacity})`,
+        strokeWidth: 2
+      }
+    ],
+    legend: ["Saldo Diário"]
+  };
+
+
+  const vendaData = {
+    labels: ["05/10/2024", "06/10/2024", "07/10/2024", "08/10/2024", "09/10/2024", "10/10/2024"],
+    datasets: [
+      {
+        data: [20, 45, 28, 80, 99, 43],
+        color: (opacity = 1) => `rgba(242, 121, 0, ${opacity})`,
+        strokeWidth: 2
+      }
+    ],
+    legend: ["Saldo Diário"]
+  };
+
   useEffect(() => {
-    loadBuys();
-    loadSales();
-    const price = priceSale - priceBuy
-    setResumePriceFinal(Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(price))
+    loadTransactions()
+    // const price = priceSale - priceBuy
+    // setResumePriceFinal(Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(price))
   }, [])
 
   return (
     <Container height={height}>
       <BlockBuy height={heightBuy}>
         <Title>COMPRAS:</Title>
+
         <ContainerGraphic>
-          <VictoryChart
-            theme={VictoryTheme.material}
-            domainPadding={10}
+          <LineChart
+            data={saldoData}
+            width={width}
             height={200}
-            padding={{ top: 10, bottom: 100, left: 50, right: 50 }}
-          >
-            <VictoryBar
-              style={{ data: { fill: theme.colors.buy } }}
-              data={sampleData}
-              animate={{
-                duration: 2000,
-                onLoad: { duration: 1000 }
-              }}
-            />
-          </VictoryChart>
+            verticalLabelRotation={30}
+            chartConfig={chartConfigSaldo}
+            bezier
+          />
         </ContainerGraphic>
+
+        <ContainerGraphic>
+          <LineChart
+            data={vendaData}
+            width={width}
+            height={200}
+            verticalLabelRotation={30}
+            chartConfig={chartConfigVenda}
+            bezier
+          />
+        </ContainerGraphic>
+
+        <ContainerGraphic>
+          <Text>RESUMO:</Text>
+        </ContainerGraphic>
+      
       </BlockBuy>
 
-      <BlockSale height={heightSale}>
-        <Title>VENDAS:</Title>
-        <ContainerGraphic>
-          <VictoryChart
-            theme={VictoryTheme.material}
-            domainPadding={10}
-            height={200}
-            padding={{ top: 10, bottom: 100, left: 50, right: 50 }}
-          >
-            <VictoryBar
-              style={{ data: { fill: theme.colors.sale } }}
-              data={dataSale}
-              animate={{
-                duration: 2000,
-                onLoad: { duration: 1000 }
-              }}
-            />
-          </VictoryChart>
-        </ContainerGraphic>
-      </BlockSale>
 
-      <BlockResume height={heightResume}>
-        <Title>RESUMO:</Title>
-        <ContainerGraphic>
-          <GroupTextResume>
-            <TextResume bold={800}>Compras:</TextResume>
-            <TextResume>{resumePriceBuy}</TextResume>
-          </GroupTextResume>
-          <GroupTextResume>
-            <TextResume bold={800}>Vendas:</TextResume>
-            <TextResume>{resumePriceSale}</TextResume>
-          </GroupTextResume>
-          <GroupTextResume>
-            <TextResume bold={800}>Saldo:</TextResume>
-            <TextResume>{resumePriceFinal}</TextResume>
-          </GroupTextResume>
-        </ContainerGraphic>
-      </BlockResume>
     </Container>
   )
 }

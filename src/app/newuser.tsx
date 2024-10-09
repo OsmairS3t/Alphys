@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'expo-router';
 import { useTheme } from 'styled-components';
-import uuid from 'react-native-uuid';
 import { Input } from './components/Forms/InputForm/styles';
 
 import {
@@ -16,14 +14,14 @@ import {
   LinkScreen,
   TextLink
 } from './styles/global';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { keyUser } from '../utils/keyStorage';
 import { IUser } from '../utils/interface';
 import { Alert } from 'react-native';
+import { useUserDatabase } from '../hooks/useUserDatabase';
 
 const NewUser: React.FC = () => {
   const theme = useTheme();
-  const logo = '../assets/logo_alpys.png';
+  const userDatabase = useUserDatabase()
+  const logo = '../assets/logo_alpys.png'
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
   const [password, setPassword] = useState('')
@@ -34,17 +32,15 @@ const NewUser: React.FC = () => {
       email: String(email),
       name: String(name),
       password: String(password),
-      password2: String(password2)
+      photo: ''
     }
     try {
-      const response = await AsyncStorage.getItem(keyUser)
-      const users: IUser[] = response ? JSON.parse(response) : []
-      const foundUser = users.find(u => u.email === email)
+      const foundUser = await userDatabase.searchByEmail(email)
       if (foundUser) {
         Alert.alert('Usuário já cadastrado!')
       } else {
-        await AsyncStorage.setItem(keyUser, JSON.stringify(dataUser))
-        Alert.alert('Usuário incluído com sucesso!')
+        await userDatabase.create(dataUser)
+        Alert.alert('Usuário cadastrado com sucesso!')
       }
     } catch (error) {
       console.log(error)

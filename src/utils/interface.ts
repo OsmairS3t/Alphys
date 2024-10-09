@@ -10,9 +10,11 @@ export interface ISelectProps {
   value: string;
 }
 export interface IUser {
+  id: number;
   email: string;
   name: string;
   password: string;
+  photo: string;
 }
 export interface ICategory {
   id: number;

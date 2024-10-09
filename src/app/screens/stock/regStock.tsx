@@ -4,7 +4,7 @@ import { useTheme } from 'styled-components';
 import HeaderModal from '../../components/HeaderModal';
 import { InputForm } from '../../components/Forms/InputForm';
 import { SelectList } from 'react-native-dropdown-select-list'
-import { ISelectProps, IStock } from '../../../utils/interface';
+import { IProduct, ISelectProps, IStock } from '../../../utils/interface';
 import { ButtonForm, TextButton } from '../../styles/global';
 import { Container, TitleModal } from '../../styles/stockStyle';
 import { useStockDatabase } from '../../../hooks/useStockDatabase';
@@ -32,21 +32,11 @@ export default function RegisterStock({ closeModal, updateList, stock }: StockPr
   }
 
   async function handleSave() {
-    const objProduct = await loadProduct(Number(selected))
     try {
-      // localiza o produto na coleção existente para não duplicar
-      const updateData = await stockDatabase.searchByProductId(Number(selected))
-      if (!updateData) {
-        // se não tem inclui como novo
-        await stockDatabase.create({
-          product_id: Number(objProduct?.id),
-          product_name: String(objProduct?.name),
-          amount: Number(amount),
-          hasstock: (Number(amount) > 0) ? true : false
-        })
-        Alert.alert('Produto incluído no estoque com sucesso!')
-      } else {
-        // caso encontre, remove da coleção e inclui o novo com nova quantidade
+      // caso seja atualização de estoque
+      if(stock) { 
+        const updateData = await stockDatabase.searchByProductId(stock.product_id)
+        // atualiza a nova quantidade
         await stockDatabase.update({
           id: updateData.id,
           product_id: updateData.product_id,
@@ -55,12 +45,33 @@ export default function RegisterStock({ closeModal, updateList, stock }: StockPr
           hasstock: (Number(amount) > 0) ? true : false
         })
         Alert.alert('Quantidade do produto no estoque alterada com sucesso!')
+      } else {
+        // verifique se não esta tentando incluir um produto ja existente no estoque
+        const objStock: IStock = await stockDatabase.searchByProductId(Number(selected))
+        if(objStock) {
+          Alert.alert('Já existe um estoque para esse produto cadastrado.')
+          return;
+        } else {
+          const objProduct:IProduct = await loadProduct(Number(selected))
+          await stockDatabase.create({
+            product_id: Number(objProduct?.id),
+            product_name: objProduct.categoryname +'-'+ String(objProduct?.name),
+            amount: Number(amount),
+            hasstock: (Number(amount) > 0) ? true : false
+          })
+          Alert.alert('Produto incluído no estoque com sucesso!')
+        }
       }
       updateList();
       closeModal(false);
     } catch (error) {
       console.log('Ocorreu um erro ao tentar salvar: ', error)
     }
+  }
+
+  async function LoadProductSelected(stock: IStock) {
+    setInitialValue({key: String(stock.product_id), value: stock.product_name})
+    setAmount(String(stock.amount))
   }
 
   async function LoadProductSelect() {
@@ -77,29 +88,11 @@ export default function RegisterStock({ closeModal, updateList, stock }: StockPr
     }
   }
 
-  async function LoadProductSelected() {
-    try {
-      if(stock) {
-        let newArray: ISelectProps[] = [
-          {
-            key: String(stock.product_id),
-            value: stock.product_name
-          }
-        ]
-        setData(newArray)
-        setAmount(String(stock.amount))
-        setInitialValue(newArray[0])
-      }
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
   useEffect(() => {
     if (stock) {
-      LoadProductSelect()
+      LoadProductSelected(stock)
     } else {
-      LoadProductSelected()
+      LoadProductSelect()
     }
   }, [])
 

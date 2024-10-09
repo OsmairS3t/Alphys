@@ -83,6 +83,21 @@ export function useTransactionDatabase() {
     }
   }
 
+  async function resumeByData(datetransaction: string) {
+    try {
+      const { data } = await supabase
+        .from('transactions')
+        .select('modality, price')
+        .eq('datetransaction', datetransaction)
+        .eq('ispaid', true)
+      if(data) {
+        return data
+      }
+    } catch (error) {
+      throw error
+    }
+  }
+
   async function searchByClient(client_name: string) {
     try {
       const { data } = await supabase
@@ -141,6 +156,7 @@ export function useTransactionDatabase() {
     remove, 
     searchById, 
     searchByModality, 
+    resumeByData,
     searchByClient, 
     searchByStock, 
     searchByProduct, 

@@ -19,7 +19,10 @@ import {
   GroupIconTextRow,
   ItemColumnList,
   TextColumnList,
-  IconColumnList
+  IconColumnList,
+  GroupItemFlatList,
+  ItemDetailFlatList,
+  ItemBtnFlatList
 } from '../../styles/registerStyle';
 import { useTransactionDatabase } from '../../../hooks/useTransactionDatabase';
 
@@ -109,28 +112,30 @@ export default function Buy({ closeModal }: BuyProps) {
               data={buys}
               keyExtractor={(item) => String(item.id)}
               renderItem={({ item }) =>
-                <GroupIconTextRow>
-                  <Pressable onPress={() => { handleEditBuyModalOpen(item) }}>
-                    <ItemColumnList>
-                      <TextColumnList>Descrição: {item.product_name}</TextColumnList>
-                      <TextColumnList>Quant.: {item.amount}</TextColumnList>
-                      <TextColumnList>
-                        Valor: {Intl
-                          .NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
-                          .format(item.price)}
-                      </TextColumnList>
-                      <TextColumnList>
-                        Dia da compra: {item.datetransaction}
-                      </TextColumnList>
-                    </ItemColumnList>
-                  </Pressable>
+                <GroupItemFlatList>
+                  <ItemDetailFlatList>
+                    <TextColumnList>Descrição: {item.product_name}</TextColumnList>
+                    <TextColumnList>Quant.: {item.amount}</TextColumnList>
+                    <TextColumnList>
+                      Valor: {Intl
+                        .NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
+                        .format(item.price)}
+                    </TextColumnList>
+                    <TextColumnList>
+                      Dia da compra: {item.datetransaction}
+                    </TextColumnList>
+                  </ItemDetailFlatList>
 
-                  <Pressable onPress={() => handleDeleteBuy(item.id)}>
-                    <ItemColumnList>
-                      <IconColumnList name='trash-2' size={24} />
-                    </ItemColumnList>
-                  </Pressable>
-                </GroupIconTextRow>
+                  <ItemBtnFlatList>
+                    <Pressable onPress={() => { handleEditBuyModalOpen(item) }}>
+                        <IconColumnList name='edit' size={24} />
+                    </Pressable>
+                    <Pressable onPress={() => handleDeleteBuy(item.id)}>
+                        <IconColumnList name='trash-2' size={24} />
+                    </Pressable>
+                  </ItemBtnFlatList>
+
+                </GroupItemFlatList>
               }
             />
             <ItemColumnList>

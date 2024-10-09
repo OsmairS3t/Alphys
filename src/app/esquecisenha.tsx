@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'expo-router';
 import { useTheme } from 'styled-components';
-import uuid from 'react-native-uuid';
 import { Input } from './components/Forms/InputForm/styles';
 
 import {
@@ -16,20 +15,21 @@ import {
   LinkScreen,
   TextLink
 } from './styles/global';
+import { useUserDatabase } from '../hooks/useUserDatabase';
+import { IUser } from '../utils/interface';
+import { Alert } from 'react-native';
 
 const ForgotPassword: React.FC = () => {
   const theme = useTheme();
+  const userDatabase = useUserDatabase()
   const logo = '../assets/logo_alpys.png';
   const [email, setEmail] = useState('')
-  const [name, setName] = useState('')
-  const [password, setPassword] = useState('')
-  const [password2, setPassword2] = useState('')
 
   async function handleRemember() {
-    const dataUser = {
-      email: email,
+    const user:IUser = await userDatabase.searchByEmail(email)
+    if(user) {
+      Alert.alert('Sua senha de acesso é: ', user.password)
     }
-    console.log(dataUser)
   }
 
   return (

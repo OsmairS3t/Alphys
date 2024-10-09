@@ -70,6 +70,26 @@ export const ContainerModal = styled.View`
 export const GroupColumn = styled.View`
 `;
 
+export const GroupItemFlatList = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin: 4px 0px;
+`;
+
+export const ItemDetailFlatList = styled.View`
+  width: 90%;
+  padding: 8px;
+`;
+  
+export const ItemBtnFlatList = styled.View`
+  width: 10%;
+  height: 100%;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+`;
+
 export const ItemColumnList = styled.View`
   margin: 4px 0px;
 `;

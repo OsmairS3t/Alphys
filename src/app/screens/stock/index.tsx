@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Modal, FlatList, Pressable } from 'react-native';
+import { Modal, FlatList, Pressable, Alert, Text } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -64,6 +64,37 @@ export default function Stock({ closeModal }: StockProps) {
     setIsStockModalOpen(true)
   }
 
+  async function deleteStock(id: number) {
+    try {
+      await stockDatabase.remove(id)
+      Alert.alert('Produto excluído do estoque com sucesso!')
+      loadStock()
+    } catch (error) {
+      console.log('Erro ao tentar excluir prod: ', error)
+    }
+  }
+
+  function handleDeleteStock(id: number) {
+    Alert.alert(
+      'Exclusao de Produtos',
+      'Tem certeza que deseja excluir este produto?',
+      [
+        {
+          text: 'Sim',
+          onPress: () => {
+            deleteStock(id)
+          },
+          style: 'default',
+        },
+        {
+          text: 'Não',
+          style: 'cancel',
+        },
+      ],
+      { cancelable: true },
+    );
+  }
+
   useFocusEffect(
     useCallback(() => {
       loadStock()
@@ -97,7 +128,7 @@ export default function Stock({ closeModal }: StockProps) {
                   </ItemColumnList>
                 </Pressable>
 
-                <Pressable onPress={() => {}}>
+                <Pressable onPress={() => handleDeleteStock(item.id)}>
                   <TextColumnList>
                     <IconColumnList name='trash-2' size={24} />
                   </TextColumnList>

@@ -174,14 +174,13 @@ export const TitleForm = styled.Text`
 export const ContainerHeader = styled.View`
   height: 100px;
   flex-direction: row;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   padding: 30px 20px 4px 20px;
   background-color: ${({ theme }) => theme.colors.secondary};
 `;
 
 export const ContainerImgHeader = styled.View`
-  width: 100%;
   height: ${RFValue(100)}px;
   background-color: ${({ theme }) => theme.colors.secondary};
   align-items: center;
@@ -193,6 +192,10 @@ export const ContainerImgHeader = styled.View`
 export const ImgLogoHeader = styled.Image`
   width: 150px;
   height: 65px;
+`;
+
+export const IconUser = styled(Feather).attrs({ size: 24 })`
+  color: ${({ theme }) => theme.colors.shape};
 `;
 
 export const IconSignOut = styled(Feather).attrs({ size: 24 })`

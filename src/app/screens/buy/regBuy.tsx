@@ -25,7 +25,7 @@ export default function RegisterBuy({ closeModal, updateList, buy }: BuyProps) {
   const [amount, setAmount] = useState('')
   const [price, setPrice] = useState('')
   const [dateBuy, setDateBuy] = useState(actualDate())
-  const [ispaid, setIsPaid] = useState(false)
+  const [ispaid, setIsPaid] = useState(true)
 
   async function loadBuy() {
     try {

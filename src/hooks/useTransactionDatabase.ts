@@ -56,6 +56,21 @@ export function useTransactionDatabase() {
     }
   }
 
+  async function listByModality(modality: string) {
+    try {
+      const { data } = await supabase
+        .from('transactions')
+        .select('datetransaction, price')
+        .eq('modality', modality)
+        .eq('ispaid', true)
+      if(data) {
+        return data
+      }
+    } catch (error) {
+      throw error
+    }
+  }
+
   async function searchById(id: number) {
     try {
       const { data } = await supabase.from('transactions').select('*').eq('id', id)
@@ -75,21 +90,6 @@ export function useTransactionDatabase() {
         .eq('modality', modality)
         .order('client_name', { ascending: true })
         .order('product_name', { ascending: true })
-      if(data) {
-        return data
-      }
-    } catch (error) {
-      throw error
-    }
-  }
-
-  async function resumeByData(datetransaction: string) {
-    try {
-      const { data } = await supabase
-        .from('transactions')
-        .select('modality, price')
-        .eq('datetransaction', datetransaction)
-        .eq('ispaid', true)
       if(data) {
         return data
       }
@@ -156,7 +156,7 @@ export function useTransactionDatabase() {
     remove, 
     searchById, 
     searchByModality, 
-    resumeByData,
+    listByModality,
     searchByClient, 
     searchByStock, 
     searchByProduct, 

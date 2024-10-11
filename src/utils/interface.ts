@@ -73,3 +73,8 @@ export interface ITransaction {
   ispaid: boolean;
   stock_id: number;
 }
+export type TList = {
+  modalidy: string
+  datetransaction: string
+  price: number
+}

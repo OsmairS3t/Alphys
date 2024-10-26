@@ -5,6 +5,16 @@ export interface IGraphic {
   x: string;
   y: number;
 }
+type dataSet = {
+  data: number[];
+  color: (opacity: number) => string;
+  strokeWidth: number 
+}
+export interface IBuySelData {
+  labels: string[];
+  datasets: dataSet[];
+  legend: string[];
+}
 export interface ISelectProps {
   key: string;
   value: string;

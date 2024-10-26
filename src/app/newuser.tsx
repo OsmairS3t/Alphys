@@ -24,10 +24,23 @@ const NewUser: React.FC = () => {
   const logo = '../assets/logo_alpys.png'
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
+  const [photo, setPhoto] = useState('')
   const [password, setPassword] = useState('')
   const [password2, setPassword2] = useState('')
 
+  function validatePassword(passOne: string, passTwo: string) {
+    if (passOne !== passTwo) {
+      return false
+    } else {
+      return true
+    }
+  }
+
   async function handleSave() {
+    if (!validatePassword(password, password2)) {
+      Alert.alert('As duas senhas precisam ser iguais.')
+      return
+    }
     const dataUser = {
       email: String(email),
       name: String(name),

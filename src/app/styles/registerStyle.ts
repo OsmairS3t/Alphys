@@ -113,6 +113,15 @@ export const GroupIconTextRow = styled.View`
   border-bottom-color: ${({ theme }) => theme.colors.border_input};
 `;
 
+export const GroupBtnAction = styled.View`
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 50px;
+  gap: 16px;
+`;
+
 export const IconColumnListMaterial = styled(MaterialIcons)<IconProps>`
   color: ${({ theme, isPaid }) => isPaid ? theme.colors.success : theme.colors.attention};
 `;

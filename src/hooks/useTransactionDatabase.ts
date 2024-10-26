@@ -88,8 +88,7 @@ export function useTransactionDatabase() {
         .from('transactions')
         .select('*')
         .eq('modality', modality)
-        .order('client_name', { ascending: true })
-        .order('product_name', { ascending: true })
+        .order('datetransaction', { ascending: true })
       if(data) {
         return data
       }

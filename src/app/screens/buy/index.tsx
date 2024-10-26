@@ -22,6 +22,7 @@ import {
   IconColumnList,
   GroupItemFlatList,
   ItemDetailFlatList,
+  GroupBtnAction,
   ItemBtnFlatList
 } from '../../styles/registerStyle';
 import { useTransactionDatabase } from '../../../hooks/useTransactionDatabase';
@@ -37,7 +38,7 @@ export default function Buy({ closeModal }: BuyProps) {
     try {
       const response = await transactionDatabase.searchByModality('buy')
       let tot = 0
-      if(response) {
+      if (response) {
         response.map(b => {
           tot += b.price
         })
@@ -124,17 +125,19 @@ export default function Buy({ closeModal }: BuyProps) {
                     <TextColumnList>
                       Dia da compra: {item.datetransaction}
                     </TextColumnList>
+
+                    <GroupBtnAction>
+                      <Pressable onPress={() => { handleEditBuyModalOpen(item) }}>
+                        <IconColumnList name='edit' size={24} />
+                      </Pressable>
+                      <Pressable onPress={() => handleDeleteBuy(item.id)}>
+                        <IconColumnList name='trash-2' size={24} />
+                      </Pressable>
+                    </GroupBtnAction>
                   </ItemDetailFlatList>
 
                   <ItemBtnFlatList>
-                    <Pressable onPress={() => { handleEditBuyModalOpen(item) }}>
-                        <IconColumnList name='edit' size={24} />
-                    </Pressable>
-                    <Pressable onPress={() => handleDeleteBuy(item.id)}>
-                        <IconColumnList name='trash-2' size={24} />
-                    </Pressable>
                   </ItemBtnFlatList>
-
                 </GroupItemFlatList>
               }
             />
